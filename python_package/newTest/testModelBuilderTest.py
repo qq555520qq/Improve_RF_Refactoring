@@ -1,5 +1,4 @@
 import unittest
-from os import path
 from python_package.newRfrefactoring.testModelBuilder import TestModelBuilder
 from init import test_data
 
