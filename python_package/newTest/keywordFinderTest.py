@@ -11,7 +11,6 @@ class KeywordFinderTest(unittest.TestCase):
 
     def test_find_keyword_from_file(self):
         testModel = self.builder.build(test_data+'/add sprint.robot')
-        # testModel = self.builder.build('C:/Users/Gene/Desktop/test_automation/RobotTests/Regression Test/TMD-14746 Asset and Maintenance Tab.robot')
         self.finder.visit_model_for_finding_keyword(testModel, 'Click SideBar')
 
         keywordCalls = self.finder.get_keyword_calls()

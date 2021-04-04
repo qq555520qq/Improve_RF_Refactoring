@@ -22,9 +22,8 @@ class KeywordRenamerTest(unittest.TestCase):
         self.assertEqual(len(keywordDefs), 1)
         self.finder.clear_keyword_calls()
         self.finder.clear_keyword_defs()
-
-        self.renamer.rename_keyword_for_nodes(keywordCalls, 'Test Rename Keyword')
-        self.renamer.rename_keyword_for_nodes(keywordDefs, 'Test Rename Keyword')
+        
+        self.renamer.rename_keyword_for_nodes('Test Rename Keyword', keywordDefs, keywordCalls)
         
         self.finder.visit_model_for_finding_keyword(testModel, 'Test Rename Keyword')
 
@@ -33,9 +32,7 @@ class KeywordRenamerTest(unittest.TestCase):
 
         self.assertEqual(len(keywordCalls), 1)
         self.assertEqual(len(keywordDefs), 1)
-
-        self.renamer.rename_keyword_for_nodes(keywordCalls, 'Click SideBar')
-        self.renamer.rename_keyword_for_nodes(keywordDefs, 'Click SideBar')
+        self.renamer.rename_keyword_for_nodes('Click SideBar', keywordDefs, keywordCalls)
 
     def test_rename_keyword_for_nodes(self):
         testModels = self.builder.get_all_models_in_directory(test_data)
@@ -49,8 +46,7 @@ class KeywordRenamerTest(unittest.TestCase):
         self.finder.clear_keyword_calls()
         self.finder.clear_keyword_defs()
 
-        self.renamer.rename_keyword_for_nodes(keywordCalls, 'Test Rename Keyword')
-        self.renamer.rename_keyword_for_nodes(keywordDefs, 'Test Rename Keyword')
+        self.renamer.rename_keyword_for_nodes('Test Rename Keyword', keywordDefs, keywordCalls)
 
         self.finder.visit_models_for_finding_keyword(testModels, 'Test Rename Keyword')
 
@@ -60,5 +56,5 @@ class KeywordRenamerTest(unittest.TestCase):
         self.assertEqual(len(keywordCalls), 7)
         self.assertEqual(len(keywordDefs), 7)
 
-        self.renamer.rename_keyword_for_nodes(keywordCalls, 'Click SideBar')
-        self.renamer.rename_keyword_for_nodes(keywordDefs, 'Click SideBar')
+        self.renamer.rename_keyword_for_nodes('Click SideBar', keywordDefs, keywordCalls)
+        self.renamer.rename_keyword_for_nodes('Click SideBar', keywordDefs, keywordCalls)

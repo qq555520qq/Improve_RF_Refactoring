@@ -9,9 +9,8 @@ from keywordRenamerTest import KeywordRenamerTest
 from fileCheckerTest import FileCheckerTest
 
 if __name__ == "__main__":
-    suite = (unittest.TestLoader().loadTestsFromTestCase(KeywordFinderTest))
-    # suite = (unittest.TestLoader().loadTestsFromTestCase(TestModelBuilderTest))
-    # suite.addTest(unittest.TestLoader().loadTestsFromTestCase(KeywordFinderTest))
-    # suite.addTest(unittest.TestLoader().loadTestsFromTestCase(KeywordRenamerTest))
-    # suite.addTest(unittest.TestLoader().loadTestsFromTestCase(FileCheckerTest))
+    suite = (unittest.TestLoader().loadTestsFromTestCase(TestModelBuilderTest))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(KeywordFinderTest))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(KeywordRenamerTest))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(FileCheckerTest))
     unittest.TextTestRunner(verbosity=2).run(suite)
