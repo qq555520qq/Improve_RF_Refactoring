@@ -1,5 +1,5 @@
 import ast
-from robot.api import get_model, Token
+from robot.api import Token
 from python_package.newRfrefactoring.utility import normalize
 
 
