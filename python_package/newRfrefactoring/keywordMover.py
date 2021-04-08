@@ -47,7 +47,7 @@ class KeywordMover(ast.NodeTransformer):
 
     def move_keyword_defined_to_file(self, movedKeywordName, fromFileModel, targetFileModel):
 
-        def get_models_without_import(allModels, modelsWithImport):
+        def split_models_without_import(allModels, modelsWithImport):
             for model in modelsWithImport:
                 if(model in allModels):
                     allModels.remove(model)
@@ -60,33 +60,48 @@ class KeywordMover(ast.NodeTransformer):
                 elif(model.source == oldModel.source):
                     allModels[index] = model
 
-        self.finder.visit_model_for_finding_keyword(fromFileModel, movedKeywordName)
-        self.movedKeywordNode = self.finder.get_keyword_defs()[0]['keywordNode']
+        def find_moved_keyword_node(fromFileModel, movedKeywordName):
+            self.finder.visit_model_for_finding_keyword(fromFileModel, movedKeywordName)
+            return self.finder.get_keyword_defs()[0]['keywordNode']
 
-        self.removeOldKeywordDefined = True
-        self.visit(fromFileModel)
-        fromFileModel.save()
-        update_model(fromFileModel, self.modelsInDir)
-        self.removeOldKeywordDefined = False
-
-        self.insertKeywordDefined = True
-        self.visit(targetFileModel)
-        targetFileModel.save()
-        update_model(targetFileModel, self.modelsInDir)
-        self.insertKeywordDefined = False
-
-        fromFileName = get_file_name_from_path(fromFileModel.source)
-        self.checker.visit_models_to_check_keyword_and_resource(self.modelsInDir, movedKeywordName, fromFileName)
-        modelsUsingKeyword = self.checker.get_models_with_resource_and_keyword()
-        self.checker.clear_models_with_resource_and_keyword()
-
-        targetFileName = get_file_name_from_path(targetFileModel.source)
-        self.checker.visit_models_to_check_keyword_and_resource(modelsUsingKeyword, movedKeywordName, targetFileName)
-        modelsWithImport = self.checker.get_models_with_resource_and_keyword()
-        modelsWithoutImport = get_models_without_import(modelsUsingKeyword, modelsWithImport)
-
-        self.importResource = True
-        for model in modelsWithoutImport:
-            self.visit(model)
+        def save_model_and_update_old_models(model, oldModels):
             model.save()
-        self.importResource = False
+            update_model(model, oldModels)
+
+        def remove_old_keyword_defined(model):
+            self.removeOldKeywordDefined = True
+            self.visit(model)
+            save_model_and_update_old_models(model, self.modelsInDir)
+            self.removeOldKeywordDefined = False
+
+        def insert_new_keyword_defined(model):
+            self.insertKeywordDefined = True
+            self.visit(model)
+            save_model_and_update_old_models(model, self.modelsInDir)
+            self.insertKeywordDefined = False
+
+        def get_models_without_import_new_resource(movedKeywordName, oldImportedResource, newImportedResource):
+            oldImportedResourceName = get_file_name_from_path(oldImportedResource.source)
+            self.checker.visit_models_to_check_keyword_and_resource(self.modelsInDir, movedKeywordName, oldImportedResourceName)
+            modelsUsingKeyword = self.checker.get_models_with_resource_and_keyword()
+            self.checker.clear_models_with_resource_and_keyword()
+            newImportedResourceName = get_file_name_from_path(newImportedResource.source)
+            self.checker.visit_models_to_check_keyword_and_resource(modelsUsingKeyword, movedKeywordName, newImportedResourceName)
+            modelsWithImport = self.checker.get_models_with_resource_and_keyword()
+            return split_models_without_import(modelsUsingKeyword, modelsWithImport)
+
+        def import_new_resource_for_models(modelsWithoutImport):
+            self.importResource = True
+            for model in modelsWithoutImport:
+                self.visit(model)
+                save_model_and_update_old_models(model, self.modelsInDir)
+            self.importResource = False
+
+        self.movedKeywordNode = find_moved_keyword_node(fromFileModel, movedKeywordName)
+        remove_old_keyword_defined(fromFileModel)
+        insert_new_keyword_defined(targetFileModel)
+        modelsWithoutImport = get_models_without_import_new_resource(movedKeywordName, fromFileModel, targetFileModel)
+        import_new_resource_for_models(modelsWithoutImport)
+
+    def get_models_after_moving(self):
+        return self.modelsInDir

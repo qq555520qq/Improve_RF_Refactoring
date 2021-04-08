@@ -23,4 +23,4 @@ class FileCheckerTest(unittest.TestCase):
         self.checker.visit_models_to_check_keyword_and_resource(testModels, 'Login EzScrum', 'ezScrum.txt')
         models = self.checker.get_models_with_resource_and_keyword()
         
-        self.assertEqual(len(models), 7)
+        self.assertEqual(len(models), 8)
