@@ -7,12 +7,12 @@ from testModelBuilderTest import TestModelBuilderTest
 from keywordFinderTest import KeywordFinderTest
 from keywordRenamerTest import KeywordRenamerTest
 from fileCheckerTest import FileCheckerTest
-from keywordMoverTest import KeywordMoverTest
+from keywordMoveHelperTest import KeywordMoveHelperTest
 
 if __name__ == "__main__":
     suite = (unittest.TestLoader().loadTestsFromTestCase(TestModelBuilderTest))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(KeywordFinderTest))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(KeywordRenamerTest))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(FileCheckerTest))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(KeywordMoverTest))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(KeywordMoveHelperTest))
     unittest.TextTestRunner(verbosity=2).run(suite)
