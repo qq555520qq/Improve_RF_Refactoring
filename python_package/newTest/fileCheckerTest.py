@@ -1,6 +1,7 @@
 import unittest
 from python_package.newRfrefactoring.testModelBuilder import TestModelBuilder
 from python_package.newRfrefactoring.fileChecker import FileChecker
+from python_package.newRfrefactoring.keywordFinder import KeywordFinder
 from init import test_data
 
 
@@ -8,6 +9,7 @@ class FileCheckerTest(unittest.TestCase):
     def setUp(self):
         self.builder = TestModelBuilder()
         self.checker = FileChecker()
+        self.finder = KeywordFinder()
 
     def test_visit_model_to_check_keyword_and_resource_from_file(self):
         testModel = self.builder.build(test_data+'/add story by excel.robot')
@@ -24,3 +26,25 @@ class FileCheckerTest(unittest.TestCase):
         models = self.checker.get_models_with_resource_and_keyword()
         
         self.assertEqual(len(models), 8)
+    
+    def test_find_model_with_same_keywords(self):
+        testFromModel = self.builder.build(test_data+'/add sprint.robot')
+        self.finder.find_keywords_by_lines(testFromModel, 10, 11)
+        keywords = self.finder.get_lines_keywords()
+        
+        testModel = self.builder.build(test_data+'/add story by excel.robot')
+        self.checker.find_model_with_same_keywords(testModel, keywords)
+        sameKeywords = self.checker.get_models_with_same_keywords()
+
+        self.assertEqual(len(sameKeywords), 1)
+    
+    def test_find_models_with_same_keywords(self):
+        testFromModel = self.builder.build(test_data+'/add sprint.robot')
+        self.finder.find_keywords_by_lines(testFromModel, 10, 11)
+        keywords = self.finder.get_lines_keywords()
+        
+        testModels = self.builder.get_all_models_in_directory(test_data)
+        self.checker.find_models_with_same_keywords(testModels, keywords)
+        sameKeywords = self.checker.get_models_with_same_keywords()
+        
+        self.assertEqual(len(sameKeywords), 7)

@@ -8,7 +8,7 @@ from python_package.newRfrefactoring.keywordFinder import KeywordFinder
 
 class KeywordMoveHelper(ast.NodeTransformer):
 
-    def __init__(self, modelsInDir):
+    def __init__(self, modelsInDir=[]):
         self.finder = KeywordFinder()
         self.checker = FileChecker()
         self.modelsInDir = modelsInDir

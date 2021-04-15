@@ -2,10 +2,14 @@ import unittest
 from python_package.newRfrefactoring.testModelBuilder import TestModelBuilder
 from python_package.newRfrefactoring.keywordMoveHelper import KeywordMoveHelper
 from python_package.newRfrefactoring.fileChecker import FileChecker
+from python_package.newRfrefactoring.utility import recovery_models
 from init import test_data
+from robot.parsing.model import Keyword, Statement
+from robot.api import Token
 
 
 class KeywordMoveHelperTest(unittest.TestCase):
+
     def setUp(self):
         self.builder = TestModelBuilder()
         self.teardownModels = self.builder.get_all_models_in_directory(test_data)
@@ -25,14 +29,19 @@ class KeywordMoveHelperTest(unittest.TestCase):
 
         self.assertEqual(len(modelsUsingKeyword), 8)
 
-        def recovery_models(models):
-            for model in models:
-                if isinstance(model, list):
-                    recovery_models(model)
-                else:
-                    model.save()
-
         recovery_models(self.teardownModels)
 
+    # def test_insert_new_keyword_to_file(self):
+    #     targetFileModel = self.builder.build(test_data + '/ezScrum.txt')
 
+    #     body = Statement.from_tokens([
+    #         Token(Token.SEPARATOR, '    '),
+    #         Token(Token.KEYWORD, 'New Keyword'),
+    #         Token(Token.SEPARATOR, '    '),
+    #         Token(Token.ARGUMENT, 'xxx'),
+    #         Token(Token.EOL, '\n')
+    #     ])
+    #     keywordNode = Keyword(header, body)
+    #     print(keywordNode)
+    #     self.mover.insert_new_keyword_defined(targetFileModel, keywordNode)
 
