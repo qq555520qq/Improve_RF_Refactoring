@@ -24,3 +24,11 @@ def recovery_models(models):
             recovery_models(model)
         else:
             model.save()
+
+def is_keyword_name_equal(node, keywordName):
+    if(node.__class__.__name__ == 'KeywordCall'):
+        return node.keyword == keywordName
+    elif(node.__class__.__name__ == 'TestTemplate' or node.__class__.__name__ == 'SuiteTeardown' or node.__class__.__name__ == 'TestSetup' or node.__class__.__name__ == 'TestTeardown'or node.__class__.__name__ == 'Setup' or node.__class__.__name__ == 'Teardown'):
+        return node.name == keywordName
+    elif(node.__class__.__name__ == 'TestTemplate' or node.__class__.__name__ == 'Template'):
+        return node.value == keywordName

@@ -1,6 +1,6 @@
 import ast
 from robot.api import Token
-from python_package.newRfrefactoring.utility import normalize, get_file_name_from_path, get_keywords_for_run_keywords
+from python_package.newRfrefactoring.utility import normalize, get_file_name_from_path, get_keywords_for_run_keywords, is_keyword_name_equal
 
 
 class FileChecker(ast.NodeVisitor):
@@ -165,7 +165,7 @@ class FileChecker(ast.NodeVisitor):
                 self.find_model_with_same_keywords(model, keywordsList)
     
     def append_tokens_of_same_keywords(self, token):
-        if(self.keywordsList[0].value == token.value):
+        if is_keyword_name_equal(self.keywordsList[0], token.value):
             self.tempKeywords.append(token)
             del(self.keywordsList[0])
             if(len(self.keywordsList) == 0):
@@ -181,7 +181,7 @@ class FileChecker(ast.NodeVisitor):
         if(normalize(node.name) == normalize('Run Keywords')):
             keywordTokens = get_keywords_for_run_keywords(node.get_tokens(Token.ARGUMENT))
             for keywordToken in keywordTokens:
-                if(self.keywordsList[0].value == keywordToken.value):
+                if is_keyword_name_equal(self.keywordsList[0], keywordToken.value):
                     self.tempKeywords.append(keywordToken)
                     del(self.keywordsList[0])
                     if(len(self.keywordsList) == 0):

@@ -31,17 +31,3 @@ class KeywordMoveHelperTest(unittest.TestCase):
 
         recovery_models(self.teardownModels)
 
-    # def test_insert_new_keyword_to_file(self):
-    #     targetFileModel = self.builder.build(test_data + '/ezScrum.txt')
-
-    #     body = Statement.from_tokens([
-    #         Token(Token.SEPARATOR, '    '),
-    #         Token(Token.KEYWORD, 'New Keyword'),
-    #         Token(Token.SEPARATOR, '    '),
-    #         Token(Token.ARGUMENT, 'xxx'),
-    #         Token(Token.EOL, '\n')
-    #     ])
-    #     keywordNode = Keyword(header, body)
-    #     print(keywordNode)
-    #     self.mover.insert_new_keyword_defined(targetFileModel, keywordNode)
-

@@ -75,7 +75,7 @@ class KeywordFinder(ast.NodeVisitor):
         if self.byKeywordName:
             self.append_keywordCall_into_list(node.value, node.get_token(Token.NAME))
         elif self.byLines:
-            self.append_keyword_by_lines(node.get_token(Token.NAME))
+            self.append_keyword_by_lines(node)
 
     def visit_Template(self, node):
         """
@@ -84,7 +84,7 @@ class KeywordFinder(ast.NodeVisitor):
         if self.byKeywordName:
             self.append_keywordCall_into_list(node.value, node.get_token(Token.NAME))
         elif self.byLines:
-            self.append_keyword_by_lines(node.get_token(Token.NAME))
+            self.append_keyword_by_lines(node)
 
     def visit_KeywordCall(self, node):
         """
@@ -93,7 +93,7 @@ class KeywordFinder(ast.NodeVisitor):
         if self.byKeywordName:
             self.append_keywordCall_into_list(node.keyword, node.get_token(Token.KEYWORD))
         elif self.byLines:
-            self.append_keyword_by_lines(node.get_token(Token.KEYWORD))
+            self.append_keyword_by_lines(node)
 
     def visit_Keyword(self, node):
         """ 
@@ -111,7 +111,9 @@ class KeywordFinder(ast.NodeVisitor):
         elif self.byLines:
             for token in node.body:
                 if(token.__class__.__name__ == 'KeywordCall'):
-                    self.append_keyword_by_lines(token.get_token(Token.KEYWORD))
+                    self.append_keyword_by_lines(token)
+                elif(token.__class__.__name__ == 'ForLoop'):
+                    self.append_keyword_by_lines(token)
 
     def find_keywords_by_lines(self, model, startLine, endLine):
         self.byLines = True
@@ -158,9 +160,9 @@ class KeywordFinder(ast.NodeVisitor):
         else:
             self.append_keywordCall_into_list(keywordCall, node.get_token(Token.NAME))
 
-    def append_keyword_by_lines(self, token):
-        if(token.lineno >= self.startLine and token.lineno <= self.endLine):
-            self.linesKeywords.append(token)
+    def append_keyword_by_lines(self, node):
+        if(node.lineno >= self.startLine and node.lineno <= self.endLine):
+            self.linesKeywords.append(node)
 
     def append_keyword_of_multiple_keywords_by_lines(self, node):
         keyword = normalize(node.get_value(Token.NAME))
@@ -168,7 +170,7 @@ class KeywordFinder(ast.NodeVisitor):
             for keywordToken in node.get_tokens(Token.ARGUMENT):
                 self.append_keyword_by_lines(keywordToken)
         else:
-            self.append_keyword_by_lines(node.get_token(Token.NAME))
+            self.append_keyword_by_lines(node)
 
     def clear_keyword_calls(self):
         self.keywordCallList = []
