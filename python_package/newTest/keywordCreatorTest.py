@@ -2,6 +2,7 @@ import unittest
 from python_package.newRfrefactoring.testModelBuilder import TestModelBuilder
 from python_package.newRfrefactoring.keywordFinder import KeywordFinder
 from python_package.newRfrefactoring.keywordCreator import KeywordCreator
+from python_package.newRfrefactoring.refactoringFacade import RefactoringFacade
 from python_package.newRfrefactoring.utility import recovery_models
 from robot.api import Token
 from init import test_data
@@ -33,9 +34,9 @@ class KeywordCreatorTest(unittest.TestCase):
         recovery_models([tearDownModel])
 
     # def test_wrap_some_keywords_as_one_keyword(self):
-        # tearDownModel = self.builder.build(test_data+'/ezScrum.txt')
-        # self.refactor.wrap_some_keywords_as_one_keyword(test_data, test_data+'/add sprint.robot', 10, 11, test_data+'/ezScrum.txt', 'Choose File And Click Side')
-        # self.refactor.wrap_some_keywords_as_one_keyword(test_data, test_data+'/test_data.robot', 116, 118, test_data+'/ezScrum.txt', 'Choose File And Click Side')
+    #     tearDownModel = self.builder.build(test_data+'/ezScrum.txt')
+        # RefactoringFacade().wrap_some_keywords_as_one_keyword(test_data, test_data+'/add sprint.robot', 10, 11, test_data+'/ezScrum.txt', 'Choose File And Click Side')
+        # RefactoringFacade().wrap_some_keywords_as_one_keyword(test_data, test_data+'/test_data.robot', 116, 121, test_data+'/ezScrum.txt', 'Choose File And Click Side')
         # newModel = self.builder.build(test_data+'/ezScrum.txt')
         # self.finder.visit_model_for_finding_keyword(newModel, 'Choose File And Click Side')
         # keywords = self.finder.get_keyword_defs()

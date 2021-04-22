@@ -19,12 +19,12 @@ class KeywordCreator:
 
         KeywordMoveHelper().insert_new_keyword_defined(targetFileModel, keywordNode)
 
-    def get_keywords_Dictionary_With_Args(self, keywords):
+    def get_keywords_dictionary_with_args(self, keywords):
         keywordsWithArgs = []
         for keyword in keywords:
             if(keyword.__class__.__name__ == 'KeywordCall'):
                 args = keyword.get_tokens(Token.ARGUMENT)
-                keywordDict = {'loop': False, 'node': keyword, 'keywordName': keyword.name, 'arguments': args}
+                keywordDict = {'loop': False, 'node': keyword, 'keywordName': keyword.keyword, 'arguments': args}
                 keywordsWithArgs.append(keywordDict)
             elif(keyword.__class__.__name__ == 'ForLoop'):
                 loopValuesList = keyword.header.values

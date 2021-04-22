@@ -1,4 +1,5 @@
 import os
+from prettytable import PrettyTable
 
 def normalize(text):
     return text.lower().replace(' ', '').replace('_', '')
@@ -32,3 +33,57 @@ def is_keyword_name_equal(node, keywordName):
         return node.name == keywordName
     elif(node.__class__.__name__ == 'TestTemplate' or node.__class__.__name__ == 'Template'):
         return node.value == keywordName
+
+def print_keyword(keywordNode):
+
+    keywordStr = PrettyTable()
+
+    fields = ['Keyword name']
+    for i in range(len(keywordNode.args)):
+        fields.append('Argument' + str(i+1))
+    keywordStr.field_names = fields
+
+    keywordData = [keywordNode.keyword]
+    for arg in keywordNode.args:
+        keywordData.append(arg)
+    keywordStr.add_row(keywordData)
+
+    print(keywordStr)
+
+def print_Teardown(teardownNode):
+
+    keywordStr = PrettyTable()
+
+    fields = ['Kind',]
+    for i in range(len(keywordNode.args)):
+        fields.append('Argument' + str(i+1))
+    keywordStr.field_names = fields
+
+    keywordData = [keywordNode.keyword]
+    for arg in keywordNode.args:
+        keywordData.append(arg)
+    keywordStr.add_row(keywordData)
+
+    print(keywordStr)
+
+def print_loop(loopNode):
+
+    loopStr = PrettyTable()
+    
+    fields = []
+    for i in range(len(loopNode.variables)):
+        fields.append('Variable' + str(i+1))
+    fields.append('Flavor')
+    for i in range(len(loopNode.values)):
+        fields.append('Values' + str(i+1))
+    loopStr.field_names = fields
+    
+    loopData = []
+    for variable in loopNode.variables:
+        loopData.append(variable)
+    loopData.append(loopNode.flavor)
+    for values in loopNode.values:
+        loopData.append(values)
+    loopStr.add_row(loopData)
+
+    print(loopStr)

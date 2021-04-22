@@ -96,6 +96,22 @@ class FileChecker(ast.NodeVisitor):
         elif self.checkModelsUsingSameKeywords:
             self.append_tokens_of_same_keywords(node.get_token(Token.KEYWORD))
 
+    def visit_Keyword(self, node):
+        """ 
+            Visit keyword table to get keywordDef and keywordCalled
+        """
+        if self.checkKeywordAndResource:
+            for keyword in node.body:
+                if keyword.__class__.__name__ == 'KeywordCall':
+                    self.is_keyword_used_for_one_keyword(keyword.name)
+                elif keyword.__class__.__name__ == 'Teardown':
+                    self.is_keyword_used_for_multiple_keyword(keyword.name)
+                elif keyword.__class__.__name__ == 'ForLoop':
+                    
+
+        elif self.checkModelsUsingSameKeywords:
+            self.append_tokens_of_same_keywords(node.get_token(Token.KEYWORD))
+
     def visit_ResourceImport(self, node):
         """
             Visit all Resource to check isImported.

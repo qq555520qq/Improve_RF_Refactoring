@@ -110,10 +110,10 @@ class KeywordFinder(ast.NodeVisitor):
                     self.append_keywordCall_of_multiple_keywords_into_list(token)
         elif self.byLines:
             for token in node.body:
-                if(token.__class__.__name__ == 'KeywordCall'):
+                if(token.__class__.__name__ == 'KeywordCall' or token.__class__.__name__ == 'ForLoop'):
                     self.append_keyword_by_lines(token)
-                elif(token.__class__.__name__ == 'ForLoop'):
-                    self.append_keyword_by_lines(token)
+                elif(token.__class__.__name__ == 'Teardown'):
+                    self.append_keyword_of_multiple_keywords_by_lines(token)
 
     def find_keywords_by_lines(self, model, startLine, endLine):
         self.byLines = True
