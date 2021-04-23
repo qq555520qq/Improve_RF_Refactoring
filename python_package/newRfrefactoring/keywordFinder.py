@@ -109,10 +109,12 @@ class KeywordFinder(ast.NodeVisitor):
                 elif(token.__class__.__name__ == 'Teardown'):
                     self.append_keywordCall_of_multiple_keywords_into_list(token)
         elif self.byLines:
-            for token in node.body:
-                if(token.__class__.__name__ == 'KeywordCall' or token.__class__.__name__ == 'ForLoop'):
-                    self.append_keyword_by_lines(token)
-                elif(token.__class__.__name__ == 'Teardown'):
+            for bodyMember in node.body:
+                if(bodyMember.__class__.__name__ == 'KeywordCall'):
+                    self.append_keyword_by_lines(bodyMember)
+                elif(bodyMember.__class__.__name__ == 'ForLoop'):
+
+                elif(bodyMember.__class__.__name__ == 'Teardown'):
                     self.append_keyword_of_multiple_keywords_by_lines(token)
 
     def find_keywords_by_lines(self, model, startLine, endLine):
@@ -126,7 +128,15 @@ class KeywordFinder(ast.NodeVisitor):
     def append_keyword_by_lines(self, node):
         if(node.lineno >= self.startLine and node.lineno <= self.endLine):
             nodeDict = {'model': self.model, 'node': node}
-            self.linesKeywords.append(node)
+            self.linesKeywords.append(nodeDict)
+
+    def append_keyword_by_lines_for_loop(self, loopNode):
+        nodeDict = {'model': self.model, 'node': loopNode, 'loopBody': loopNode.body}
+        for loopBodyMember in loopNode.body:
+            if(loopBodyMember.lineno < self.startLine or loopBodyMember.lineno > self.endLine):
+                nodeDict['loopBody'].remove(loopBodyMember)
+        if len(nodeDict['loopBody']) != 0:
+            self.linesKeywords.append(nodeDict)
 
     def append_keyword_of_multiple_keywords_by_lines(self, node):
         keyword = normalize(node.get_value(Token.NAME))

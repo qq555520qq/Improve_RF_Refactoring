@@ -106,7 +106,7 @@ class FileChecker(ast.NodeVisitor):
                     self.is_keyword_used_for_one_keyword(keyword.name)
                 elif keyword.__class__.__name__ == 'Teardown':
                     self.is_keyword_used_for_multiple_keyword(keyword.name)
-                elif keyword.__class__.__name__ == 'ForLoop':
+                # elif keyword.__class__.__name__ == 'ForLoop':
                     
 
         elif self.checkModelsUsingSameKeywords:
