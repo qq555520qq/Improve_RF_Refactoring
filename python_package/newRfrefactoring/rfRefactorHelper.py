@@ -38,7 +38,8 @@ if __name__ == '__main__':
 
             finder.find_keywords_by_lines(fromModel, startLine, endLine)
             lineKeywords = finder.get_lines_keywords()
-            print(lineKeywords)
+            for index, keyword in enumerate(lineKeywords):
+                print(keyword)
             # print('According to your data, we found the following information.')
             # for index, keyword in enumerate(lineKeywords):
             #     print('Number:' + str(index + 1))

@@ -2,7 +2,6 @@ import unittest
 from python_package.newRfrefactoring.testModelBuilder import TestModelBuilder
 from python_package.newRfrefactoring.keywordFinder import KeywordFinder
 from python_package.newRfrefactoring.keywordCreator import KeywordCreator
-from python_package.newRfrefactoring.refactoringFacade import RefactoringFacade
 from python_package.newRfrefactoring.utility import recovery_models
 from robot.api import Token
 from init import test_data

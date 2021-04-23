@@ -119,8 +119,22 @@ class KeywordFinder(ast.NodeVisitor):
         self.byLines = True
         self.startLine = startLine
         self.endLine = endLine
+        self.model = model
         self.visit(model)
         self.byLines = False
+
+    def append_keyword_by_lines(self, node):
+        if(node.lineno >= self.startLine and node.lineno <= self.endLine):
+            nodeDict = {'model': self.model, 'node': node}
+            self.linesKeywords.append(node)
+
+    def append_keyword_of_multiple_keywords_by_lines(self, node):
+        keyword = normalize(node.get_value(Token.NAME))
+        if(keyword == normalize('Run Keywords')):
+            for keywordToken in node.get_tokens(Token.ARGUMENT):
+                self.append_keyword_by_lines(keywordToken)
+        else:
+            self.append_keyword_by_lines(node)
 
     def visit_model_for_finding_keyword(self, model, keyword):
         """ 
@@ -147,11 +161,6 @@ class KeywordFinder(ast.NodeVisitor):
             nodeDict = {'model': self.model, 'nodes': nodes, 'token': keywordToken}
             self.keywordCallList.append(nodeDict)
 
-    def append_keywordDef_into_list(self, actualKeywordName, keywordNode):
-        if normalize(actualKeywordName) == self.targetKeyword:
-            nodeDict = {'model': self.model, 'keywordNode': keywordNode}
-            self.keywordDefList.append(nodeDict)
-
     def append_keywordCall_of_multiple_keywords_into_list(self, node):
         keywordCall = normalize(node.get_value(Token.NAME))
         if(keywordCall == normalize('Run Keywords')):
@@ -160,17 +169,10 @@ class KeywordFinder(ast.NodeVisitor):
         else:
             self.append_keywordCall_into_list(keywordCall, node.get_token(Token.NAME))
 
-    def append_keyword_by_lines(self, node):
-        if(node.lineno >= self.startLine and node.lineno <= self.endLine):
-            self.linesKeywords.append(node)
-
-    def append_keyword_of_multiple_keywords_by_lines(self, node):
-        keyword = normalize(node.get_value(Token.NAME))
-        if(keyword == normalize('Run Keywords')):
-            for keywordToken in node.get_tokens(Token.ARGUMENT):
-                self.append_keyword_by_lines(keywordToken)
-        else:
-            self.append_keyword_by_lines(node)
+    def append_keywordDef_into_list(self, actualKeywordName, keywordNode):
+        if normalize(actualKeywordName) == self.targetKeyword:
+            nodeDict = {'model': self.model, 'keywordNode': keywordNode}
+            self.keywordDefList.append(nodeDict)
 
     def clear_keyword_calls(self):
         self.keywordCallList = []
