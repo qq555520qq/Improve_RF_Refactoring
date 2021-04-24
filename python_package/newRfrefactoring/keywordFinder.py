@@ -1,6 +1,6 @@
 import ast
 from robot.api import Token
-from python_package.newRfrefactoring.utility import normalize
+from python_package.newRfrefactoring.utility import normalize, get_keywords_for_run_keywords
 
 
 class KeywordFinder(ast.NodeVisitor):
@@ -21,7 +21,7 @@ class KeywordFinder(ast.NodeVisitor):
         if self.byKeywordName:
             self.append_keywordCall_of_multiple_keywords_into_list(node)
         elif self.byLines:
-            self.append_keyword_of_multiple_keywords_by_lines(node)
+            self.append_keyword_by_lines_for_run_keywords(node)
 
     def visit_SuiteTeardown(self, node):
         """
@@ -30,7 +30,7 @@ class KeywordFinder(ast.NodeVisitor):
         if self.byKeywordName:
             self.append_keywordCall_of_multiple_keywords_into_list(node)
         elif self.byLines:
-            self.append_keyword_of_multiple_keywords_by_lines(node)
+            self.append_keyword_by_lines_for_run_keywords(node)
 
     def visit_TestSetup(self, node):
         """
@@ -39,7 +39,7 @@ class KeywordFinder(ast.NodeVisitor):
         if self.byKeywordName:
             self.append_keywordCall_of_multiple_keywords_into_list(node)
         elif self.byLines:
-            self.append_keyword_of_multiple_keywords_by_lines(node)
+            self.append_keyword_by_lines_for_run_keywords(node)
 
     def visit_TestTeardown(self, node):
         """
@@ -48,7 +48,7 @@ class KeywordFinder(ast.NodeVisitor):
         if self.byKeywordName:
             self.append_keywordCall_of_multiple_keywords_into_list(node)
         elif self.byLines:
-            self.append_keyword_of_multiple_keywords_by_lines(node)
+            self.append_keyword_by_lines_for_run_keywords(node)
 
     def visit_Setup(self, node):
         """
@@ -57,7 +57,7 @@ class KeywordFinder(ast.NodeVisitor):
         if self.byKeywordName:
             self.append_keywordCall_of_multiple_keywords_into_list(node)
         elif self.byLines:
-            self.append_keyword_of_multiple_keywords_by_lines(node)
+            self.append_keyword_by_lines_for_run_keywords(node)
 
     def visit_Teardown(self, node):
         """
@@ -66,7 +66,7 @@ class KeywordFinder(ast.NodeVisitor):
         if self.byKeywordName:
             self.append_keywordCall_of_multiple_keywords_into_list(node)
         elif self.byLines:
-            self.append_keyword_of_multiple_keywords_by_lines(node)
+            self.append_keyword_by_lines_for_run_keywords(node)
 
     def visit_TestTemplate(self, node):
         """
@@ -85,6 +85,10 @@ class KeywordFinder(ast.NodeVisitor):
             self.append_keywordCall_into_list(node.value, node.get_token(Token.NAME))
         elif self.byLines:
             self.append_keyword_by_lines(node)
+
+    def visit_ForLoop(self, node):
+        if self.byLines:
+            self.append_keyword_by_lines_for_forloop(node)
 
     def visit_KeywordCall(self, node):
         """
@@ -113,9 +117,9 @@ class KeywordFinder(ast.NodeVisitor):
                 if(bodyMember.__class__.__name__ == 'KeywordCall'):
                     self.append_keyword_by_lines(bodyMember)
                 elif(bodyMember.__class__.__name__ == 'ForLoop'):
-
+                    self.append_keyword_by_lines_for_forloop(bodyMember)
                 elif(bodyMember.__class__.__name__ == 'Teardown'):
-                    self.append_keyword_of_multiple_keywords_by_lines(token)
+                    self.append_keyword_by_lines_for_run_keywords(bodyMember)
 
     def find_keywords_by_lines(self, model, startLine, endLine):
         self.byLines = True
@@ -130,20 +134,26 @@ class KeywordFinder(ast.NodeVisitor):
             nodeDict = {'model': self.model, 'node': node}
             self.linesKeywords.append(nodeDict)
 
-    def append_keyword_by_lines_for_loop(self, loopNode):
-        nodeDict = {'model': self.model, 'node': loopNode, 'loopBody': loopNode.body}
+    def append_keyword_by_lines_for_forloop(self, loopNode):
+        nodeDict = {'model': self.model, 'node': loopNode, 'body': loopNode.body.copy()}
         for loopBodyMember in loopNode.body:
             if(loopBodyMember.lineno < self.startLine or loopBodyMember.lineno > self.endLine):
-                nodeDict['loopBody'].remove(loopBodyMember)
-        if len(nodeDict['loopBody']) != 0:
+                nodeDict['body'].remove(loopBodyMember)
+        if len(nodeDict['body']) != 0:
             self.linesKeywords.append(nodeDict)
 
-    def append_keyword_of_multiple_keywords_by_lines(self, node):
-        keyword = normalize(node.get_value(Token.NAME))
+    def append_keyword_by_lines_for_run_keywords(self, node):
+        keyword = normalize(node.name)
         if(keyword == normalize('Run Keywords')):
-            for keywordToken in node.get_tokens(Token.ARGUMENT):
-                self.append_keyword_by_lines(keywordToken)
+            runKeywordsBody = get_keywords_for_run_keywords(node.get_tokens(Token.ARGUMENT))
+            for keywordDict in runKeywordsBody.copy():
+                if (keywordDict['keywordName'].lineno < self.startLine or keywordDict['keywordName'].lineno > self.endLine):
+                    runKeywordsBody.remove(keywordDict)
+            nodeDict = {'model': self.model, 'node': node, 'body': runKeywordsBody}
+            if len(nodeDict['body']) != 0:
+                self.linesKeywords.append(nodeDict)
         else:
+            nodeDict = {'model': self.model, 'node': node}
             self.append_keyword_by_lines(node)
 
     def visit_model_for_finding_keyword(self, model, keyword):
