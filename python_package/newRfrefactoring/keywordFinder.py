@@ -152,9 +152,9 @@ class KeywordFinder(ast.NodeVisitor):
             nodeDict = {'model': self.model, 'node': node, 'body': runKeywordsBody}
             if len(nodeDict['body']) != 0:
                 self.linesKeywords.append(nodeDict)
-        else:
-            nodeDict = {'model': self.model, 'node': node}
-            self.append_keyword_by_lines(node)
+        elif(node.lineno >= self.startLine and node.lineno <= self.endLine):
+            nodeDict = {'model': self.model, 'node': node, 'body':[]}
+            self.linesKeywords.append(nodeDict)
 
     def visit_model_for_finding_keyword(self, model, keyword):
         """ 

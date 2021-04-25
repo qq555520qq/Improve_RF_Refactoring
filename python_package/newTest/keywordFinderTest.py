@@ -31,14 +31,14 @@ class KeywordFinderTest(unittest.TestCase):
 
     def test_find_keyword_by_lines_for_all_loops(self):
         testModel = self.builder.build(test_data+'/test_data.robot')
-        self.finder.find_keywords_by_lines(testModel, 116, 118)
+        self.finder.find_keywords_by_lines(testModel, 116, 119)
         keywords = self.finder.get_lines_keywords()
 
         self.assertEqual(len(keywords[0]['body']), 2)
         self.assertTrue(keywords[0]['body'][0].lineno >= 116)
-        self.assertTrue(keywords[0]['body'][0].lineno <= 118)
+        self.assertTrue(keywords[0]['body'][0].lineno <= 119)
         self.assertTrue(keywords[0]['body'][1].lineno >= 116)
-        self.assertTrue(keywords[0]['body'][1].lineno <= 118)
+        self.assertTrue(keywords[0]['body'][1].lineno <= 119)
 
     def test_find_keyword_by_lines_for_some_keywords_in_loops(self):
         testModel = self.builder.build(test_data+'/test_data.robot')
@@ -63,7 +63,7 @@ class KeywordFinderTest(unittest.TestCase):
         testModel = self.builder.build(test_data+'/test_data.robot')
         self.finder.find_keywords_by_lines(testModel, 7, 7)
         keywords = self.finder.get_lines_keywords()
-        print(keywords)
+        
         self.assertEqual(len(keywords), 1)
         self.assertTrue(keywords[0]['body'][0]['keywordName'].lineno == 7)
 

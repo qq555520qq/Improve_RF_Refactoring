@@ -1,6 +1,6 @@
 import ast
 from robot.api import Token
-from python_package.newRfrefactoring.utility import normalize, get_file_name_from_path, get_keywords_for_run_keywords, is_keyword_name_equal
+from python_package.newRfrefactoring.utility import normalize, get_file_name_from_path, get_keywords_for_run_keywords
 
 
 class FileChecker(ast.NodeVisitor):
@@ -15,7 +15,7 @@ class FileChecker(ast.NodeVisitor):
         self.currentModel = None
         self.correctModels = []
         self.copyKeywordsList = []
-        self.keywordsList = []
+        self.keywordNamesList = []
         self.sameKeywords = []
         self.tempKeywords = []
 
@@ -24,54 +24,54 @@ class FileChecker(ast.NodeVisitor):
             Visit all keyword's call in suite_setup to check isKeywordUsed.
         """
         if self.checkKeywordAndResource:
-            self.is_keyword_used_for_multiple_keyword(node)
+            self.is_keyword_used_for_run_keywords(node)
         elif self.checkModelsUsingSameKeywords:
-            self.append_tokens_of_same_keywords_of_run_keywords(node)
+            self.append_same_keywords_for_run_keywords(node)
 
     def visit_SuiteTeardown(self, node):
         """
             Visit all keyword's call in suite_teardown to check isKeywordUsed.
         """
         if self.checkKeywordAndResource:
-            self.is_keyword_used_for_multiple_keyword(node)
+            self.is_keyword_used_for_run_keywords(node)
         elif self.checkModelsUsingSameKeywords:
-            self.append_tokens_of_same_keywords_of_run_keywords(node)
+            self.append_same_keywords_for_run_keywords(node)
 
     def visit_TestSetup(self, node):
         """
             Visit all keyword's call in test_setup to check isKeywordUsed.
         """
         if self.checkKeywordAndResource:
-            self.is_keyword_used_for_multiple_keyword(node)
+            self.is_keyword_used_for_run_keywords(node)
         elif self.checkModelsUsingSameKeywords:
-            self.append_tokens_of_same_keywords_of_run_keywords(node)
+            self.append_same_keywords_for_run_keywords(node)
 
     def visit_TestTeardown(self, node):
         """
             Visit all keyword's call in test_teardown to check isKeywordUsed.
         """
         if self.checkKeywordAndResource:
-            self.is_keyword_used_for_multiple_keyword(node)
+            self.is_keyword_used_for_run_keywords(node)
         elif self.checkModelsUsingSameKeywords:
-            self.append_tokens_of_same_keywords_of_run_keywords(node)
+            self.append_same_keywords_for_run_keywords(node)
 
     def visit_Setup(self, node):
         """
             Visit all keyword's call in setup to check isKeywordUsed.
         """
         if self.checkKeywordAndResource:
-            self.is_keyword_used_for_multiple_keyword(node)
+            self.is_keyword_used_for_run_keywords(node)
         elif self.checkModelsUsingSameKeywords:
-            self.append_tokens_of_same_keywords_of_run_keywords(node)
+            self.append_same_keywords_for_run_keywords(node)
 
     def visit_Teardown(self, node):
         """
             Visit all keyword's call in teardown to check isKeywordUsed.
         """
         if self.checkKeywordAndResource:
-            self.is_keyword_used_for_multiple_keyword(node)
+            self.is_keyword_used_for_run_keywords(node)
         elif self.checkModelsUsingSameKeywords:
-            self.append_tokens_of_same_keywords_of_run_keywords(node)
+            self.append_same_keywords_for_run_keywords(node)
 
     def visit_TestTemplate(self, node):
         """
@@ -86,6 +86,15 @@ class FileChecker(ast.NodeVisitor):
         """
         if self.checkKeywordAndResource:
             self.is_keyword_used_for_one_keyword(node.value)
+    
+    def visit_ForLoop(self, node):
+        """
+            Visit all keyword's call to check isKeywordUsed.
+        """
+        if self.checkKeywordAndResource:
+            self.is_keyword_used_for_forloop(node.body)
+        elif self.checkModelsUsingSameKeywords:
+            self.append_same_keywords_for_forLoop(node)
 
     def visit_KeywordCall(self, node):
         """
@@ -94,7 +103,7 @@ class FileChecker(ast.NodeVisitor):
         if self.checkKeywordAndResource:
             self.is_keyword_used_for_one_keyword(node.keyword)
         elif self.checkModelsUsingSameKeywords:
-            self.append_tokens_of_same_keywords(node.get_token(Token.KEYWORD))
+            self.append_same_keywords_for_one_keyword(node)
 
     def visit_Keyword(self, node):
         """ 
@@ -103,14 +112,19 @@ class FileChecker(ast.NodeVisitor):
         if self.checkKeywordAndResource:
             for keyword in node.body:
                 if keyword.__class__.__name__ == 'KeywordCall':
-                    self.is_keyword_used_for_one_keyword(keyword.name)
+                    self.is_keyword_used_for_one_keyword(keyword.keyword)
                 elif keyword.__class__.__name__ == 'Teardown':
-                    self.is_keyword_used_for_multiple_keyword(keyword.name)
-                # elif keyword.__class__.__name__ == 'ForLoop':
-                    
-
+                    self.is_keyword_used_for_run_keywords(keyword)
+                elif keyword.__class__.__name__ == 'ForLoop':
+                    self.is_keyword_used_for_forloop(keyword.body)
         elif self.checkModelsUsingSameKeywords:
-            self.append_tokens_of_same_keywords(node.get_token(Token.KEYWORD))
+            for keyword in node.body:
+                if keyword.__class__.__name__ == 'KeywordCall':
+                    self.append_same_keywords_for_one_keyword(keyword)
+                elif keyword.__class__.__name__ == 'Teardown':
+                    self.append_same_keywords_for_run_keywords(keyword)
+                elif keyword.__class__.__name__ == 'ForLoop':
+                    self.append_same_keywords_for_forLoop(keyword)
 
     def visit_ResourceImport(self, node):
         """
@@ -119,21 +133,30 @@ class FileChecker(ast.NodeVisitor):
         if self.checkKeywordAndResource:
             self.is_resource_imported(node.name)
 
-    def is_keyword_used_for_multiple_keyword(self, node):
-        keywordCalled = normalize(node.name)
-        if(keywordCalled == normalize('Run Keywords')):
-            for keywordToken in node.get_tokens(Token.ARGUMENT):
-                if(keywordCalled == self.checkedKeyword):
-                    self.isKeywordCalled = True
-                    break
-        else:
-            if(keywordCalled == self.checkedKeyword):
-                self.isKeywordCalled = True
-
     def is_keyword_used_for_one_keyword(self, keywordName):
         if(not(self.isKeywordCalled)):
-            if(self.checkedKeyword in normalize(keywordName)):
+            if(self.checkedKeyword == normalize(keywordName)):
                 self.isKeywordCalled = True
+
+    def is_keyword_used_for_run_keywords(self, node):
+        if(not(self.isKeywordCalled)):
+            keywordCalled = normalize(node.name)
+            if(keywordCalled == normalize('Run Keywords')):
+                for keywordToken in node.get_tokens(Token.ARGUMENT):
+                    if(keywordCalled == self.checkedKeyword):
+                        self.isKeywordCalled = True
+                        break
+            else:
+                if(keywordCalled == self.checkedKeyword):
+                    self.isKeywordCalled = True
+
+    def is_keyword_used_for_forloop(self, loopBody):
+        if(not(self.isKeywordCalled)):
+            for loopBodyMember in loopBody:
+                if loopBodyMember.__class__.__name__ == 'KeywordCall':
+                    self.is_keyword_used_for_one_keyword(loopBodyMember.keyword)
+                elif loopBodyMember.__class__.__name__ == 'ForLoop':
+                    self.is_keyword_used_for_forloop(loopBodyMember)
 
     def is_resource_imported(self, resourcePath):
         if(not(self.isResourceImported)):
@@ -156,58 +179,96 @@ class FileChecker(ast.NodeVisitor):
     def visit_models_to_check_keyword_and_resource(self, testModels, keyword, resource):
         for testModel in testModels:
             if isinstance(testModel, list):
-                self.visit_models_to_check_keyword_and_resource(
-                    testModel, keyword, resource)
+                self.visit_models_to_check_keyword_and_resource(testModel, keyword, resource)
             else:
-                self.visit_model_to_check_keyword_and_resource(
-                    testModel, keyword, resource)
+                self.visit_model_to_check_keyword_and_resource(testModel, keyword, resource)
 
-    def find_model_with_same_keywords(self, model, keywordsList):
+    def find_model_with_same_keywords(self, model, nodeDicts):
+
+        def get_keywords_name_from_nodeDictList(nodeDictList):
+            keywordNamesList = []
+            for nodeDict in nodeDictList:
+                if nodeDict['node'].__class__.__name__ == 'KeywordCall':
+                    keywordNamesList.append(nodeDict['node'].keyword)
+                elif nodeDict['node'].__class__.__name__ == 'ForLoop':
+                    for loopBodyMember in nodeDict['body']:
+                        keywordNamesList.append(loopBodyMember.keyword)
+                else:
+                    if(normalize(nodeDict['node'].name) == normalize('Run Keywords')):
+                        for keywordDict in nodeDict['body']:
+                            keywordNamesList.append(keywordDict['keywordName'].value)
+                    else:
+                        keywordNamesList.append(nodeDict['node'].name)
+
+            return keywordNamesList
+        
         self.checkModelsUsingSameKeywords = True
-        self.copyKeywordsList = keywordsList.copy()
-        self.keywordsList = keywordsList
+        self.keywordNamesList = get_keywords_name_from_nodeDictList(nodeDicts)
+        self.copyKeywordNamesList = self.keywordNamesList.copy()
         self.currentModel = model
         self.visit(model)
         self.checkModelsUsingSameKeywords = False
 
-    def find_models_with_same_keywords(self, models, keywordsList):
-        copyList = keywordsList.copy()
+    def find_models_with_same_keywords(self, models, nodeDictList):
         for model in models:
-            if(len(copyList) != len(keywordsList)):
-                keywordsList = copyList.copy()
             if isinstance(model, list):
-                self.find_models_with_same_keywords(model, keywordsList)
+                self.find_models_with_same_keywords(model, nodeDictList)
             else:
-                self.find_model_with_same_keywords(model, keywordsList)
+                self.find_model_with_same_keywords(model, nodeDictList)
     
-    def append_tokens_of_same_keywords(self, token):
-        if is_keyword_name_equal(self.keywordsList[0], token.value):
-            self.tempKeywords.append(token)
-            del(self.keywordsList[0])
-            if(len(self.keywordsList) == 0):
-                modelDict = {'runKeywords': False, 'model': self.currentModel, 'keywords': self.tempKeywords.copy()}
-                self.sameKeywords.append(modelDict)
+    def append_same_keywords_for_one_keyword(self, node):
+        if self.keywordNamesList[0] == node.keyword:
+            modelDict = {'model': self.currentModel, 'node': node}
+            self.tempKeywords.append(modelDict)
+            del(self.keywordNamesList[0])
+            if(len(self.keywordNamesList) == 0):
+                self.sameKeywords.append(self.tempKeywords.copy())
                 self.tempKeywords = []
-                self.keywordsList = self.copyKeywordsList.copy()
-        elif(len(self.copyKeywordsList) != len(self.keywordsList)):
+                self.keywordNamesList = self.copyKeywordNamesList.copy()
+        elif(len(self.copyKeywordNamesList) != len(self.keywordNamesList)):
             self.tempKeywords = []
-            self.keywordsList = self.copyKeywordsList.copy()
+            self.keywordNamesList = self.copyKeywordNamesList.copy()
     
-    def append_tokens_of_same_keywords_of_run_keywords(self, node):
+    def append_same_keywords_for_run_keywords(self, node):
         if(normalize(node.name) == normalize('Run Keywords')):
             keywordTokens = get_keywords_for_run_keywords(node.get_tokens(Token.ARGUMENT))
             for keywordToken in keywordTokens:
-                if is_keyword_name_equal(self.keywordsList[0], keywordToken.value):
-                    self.tempKeywords.append(keywordToken)
-                    del(self.keywordsList[0])
-                    if(len(self.keywordsList) == 0):
-                        modelDict = {'runKeywords': True, 'model': self.currentModel, 'keywords': self.tempKeywords.copy()}
-                        self.sameKeywords.append(modelDict)
+                if self.keywordNamesList[0] == keywordToken['keywordName'].value:
+                    modelDict = {'model': self.currentModel, 'node': node, 'keyword': keywordToken}
+                    self.tempKeywords.append(modelDict)
+                    del(self.keywordNamesList[0])
+                    if(len(self.keywordNamesList) == 0):
+                        self.sameKeywords.append(self.tempKeywords.copy())
                         self.tempKeywords = []
-                        self.keywordsList = self.copyKeywordsList.copy()
-                elif(len(self.copyKeywordsList) != len(self.keywordsList)):
+                        self.keywordNamesList = self.copyKeywordNamesList.copy()
+                elif(len(self.copyKeywordNamesList) != len(self.keywordNamesList)):
                     self.tempKeywords = []
-                    self.keywordsList = self.copyKeywordsList.copy()
+                    self.keywordNamesList = self.copyKeywordNamesList.copy()
+        elif self.keywordNamesList[0] == node.name:
+            modelDict = {'model': self.currentModel, 'node': node}
+            self.tempKeywords.append(modelDict)
+            del(self.keywordNamesList[0])
+            if(len(self.keywordNamesList) == 0):
+                self.sameKeywords.append(self.tempKeywords.copy())
+                self.tempKeywords = []
+                self.keywordNamesList = self.copyKeywordNamesList.copy()
+        elif(len(self.copyKeywordNamesList) != len(self.keywordNamesList)):
+            self.tempKeywords = []
+            self.keywordNamesList = self.copyKeywordNamesList.copy()
+
+    def append_same_keywords_for_forLoop(self, node):
+        for loopBodyMember in node.body:
+            if self.keywordNamesList[0] == loopBodyMember.keyword:
+                modelDict = {'model': self.currentModel, 'node': node, 'keyword': loopBodyMember}
+                self.tempKeywords.append(modelDict)
+                del(self.keywordNamesList[0])
+                if(len(self.keywordNamesList) == 0):
+                    self.sameKeywords.append(self.tempKeywords.copy())
+                    self.tempKeywords = []
+                    self.keywordNamesList = self.copyKeywordNamesList.copy()
+            elif(len(self.copyKeywordNamesList) != len(self.keywordNamesList)):
+                self.tempKeywords = []
+                self.keywordNamesList = self.copyKeywordNamesList.copy()
 
     def get_models_with_resource_and_keyword(self):
         return self.correctModels
