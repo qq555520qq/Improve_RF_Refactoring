@@ -19,6 +19,11 @@ class KeywordCreatorTest(unittest.TestCase):
 
         keywordBody = [
             Token(Token.SEPARATOR, '    '),
+            Token(Token.ARGUMENTS, '[Arguments]'),
+            Token(Token.SEPARATOR, '    '),
+            Token(Token.ARGUMENT, '${test}'),
+            Token(Token.EOL, '\n'),
+            Token(Token.SEPARATOR, '    '),
             Token(Token.KEYWORD, 'Login EzScrum'),
             Token(Token.EOL, '\n')
         ]

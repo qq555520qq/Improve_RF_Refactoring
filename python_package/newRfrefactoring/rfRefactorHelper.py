@@ -2,15 +2,15 @@ import sys
 from os import path
 p = path.normpath(path.dirname(path.abspath(__file__))+"/../..")
 sys.path.append(p)
+from python_package.newRfrefactoring.threadWithReturn import BuildingModelThread
 from python_package.newRfrefactoring.testModelBuilder import TestModelBuilder
 from python_package.newRfrefactoring.keywordFinder import KeywordFinder
 from python_package.newRfrefactoring.fileChecker import FileChecker
-from python_package.newRfrefactoring.threadWithReturn import BuildingModelThread
-from python_package.newRfrefactoring.utility import print_keywordCall_for_linesKeywords, print_loop_for_linesKeywords, print_run_keywords_for_linesKeywords
+from python_package.newRfrefactoring.keywordCreator import KeywordCreator
+from python_package.newRfrefactoring.utility import print_keywordCall_for_linesKeywords, print_loop_for_linesKeywords, print_run_keywords_for_linesKeywords, normalize
 
 def print_lines_keywords(liensKeywords):
     for index, keyword in enumerate(liensKeywords):
-        print('Number:' + str(index + 1))
         if(keyword['node'].__class__.__name__ == 'KeywordCall'):
             print_keywordCall_for_linesKeywords(keyword['node'])
         elif(keyword['node'].__class__.__name__ == 'ForLoop'):
@@ -18,10 +18,28 @@ def print_lines_keywords(liensKeywords):
         elif(keyword['node'].__class__.__name__ == 'SuiteSetup' or keyword['node'].__class__.__name__ == 'SuiteTeardown' or keyword['node'].__class__.__name__ == 'TestSetup' or keyword['node'].__class__.__name__ == 'TestTeardown'or keyword['node'].__class__.__name__ == 'Setup' or keyword['node'].__class__.__name__ == 'Teardown'):
             print_run_keywords_for_linesKeywords(keyword)
 
+def get_arguments_of_new_keyword_from_user():
+    newKeywordArgs = []
+    while True:
+        if len(newKeywordArgs) == 0:
+            print('New keyword without arguments now.')
+        else:
+            print('\nThe following information is new keyword\'s arguments now.')
+            for index, arg in enumerate(newKeywordArgs):
+                print('New argument' + str(index+1) + ':' + arg)
+            print('')
+        arg = input('If you want to add a new argument for new keyword, please input argument content.\nIf you don\'t want to add a new argument, please input \'Exit input\'.\n\nNew argument' + str(len(newKeywordArgs) + 1) + ':')
+        if normalize(arg) == normalize('Exit input'):
+            break
+        else:
+            newKeywordArgs.append(arg)
+    return newKeywordArgs
+
 if __name__ == '__main__':
     builder = TestModelBuilder()
     finder = KeywordFinder()
     checker = FileChecker()
+    creator = KeywordCreator()
 
     print('Please select a mode:')
     print('1. Wrap steps as a keyword')
@@ -39,7 +57,7 @@ if __name__ == '__main__':
             fromFilePath = input('File path:')
             fileBuildThread = BuildingModelThread(fromFilePath)
             fileBuildThread.start()
-#15 16
+#134 138
             print('Please input start line and end line to get steps.')
             startLine = int(input('Start line:'))
             endLine = int(input('End line:'))
@@ -54,10 +72,16 @@ if __name__ == '__main__':
             checker.find_models_with_same_keywords(allModels, lineKeywords)
             modelsWithSameKeywords = checker.get_models_with_same_keywords()
 
-            print('According to your data, we found the following information.')
+            print('According to your data we found the following information and we will wrap these keywords as a new keyword.')
             print_lines_keywords(lineKeywords)
-            
-            #Need adding wrap a new keyword
+            newKeywordArgs = get_arguments_of_new_keyword_from_user()
+            argsTokens = creator.build_tokens_of_arguments(newKeywordArgs)
+
+            isChangeArgument = input('Do you want to change keywords\' arguments?(Y\N):')
+            while True:
+                if normalize(isChangeArgument) == normalize('Y'):
+                    print_lines_keywords(lineKeywords)
+                    print('Please select keyword that you want to change arguments.')
 
             # for a in modelsWithSameKeywords:
             #     print(a)

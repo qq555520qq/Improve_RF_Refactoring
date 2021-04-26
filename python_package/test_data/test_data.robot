@@ -113,9 +113,10 @@ Duplicate Variable Keyword
 
 For Loop Keyword
     [Arguments]    ${times}
-    :FOR    ${var}    IN    @{testVariable}
-    \    Log    ${times}
-    \    test    ${testVariable}
+    FOR    ${var}    IN    @{testVariable}
+        Log    ${times}
+        test    ${testVariable}
+    END
 
 Difference Kinds of Variable Keyword
     Log    &{testVariable}
@@ -128,3 +129,12 @@ Difference Kinds of Variable Keyword
 Default argument Keyword
     [Arguments]    ${test}=${testVariable}
     Log    msg=${testVariable}
+
+Multiple Keywords
+    Log    testLog
+    FOR    ${var}    IN    @{testVariable}
+        Log    ${var}
+        Log    ${var}2
+    END
+    [Teardown]    Run Keywords    Test Keyword
+    ...                    AND    For Loop Keyword    5

@@ -15,9 +15,24 @@ class KeywordCreator:
             Token(Token.EOL, '\n')
         ])
 
-        keywordNode = Keyword(header, keywordBody)
+        body = Statement.from_tokens(keywordBody)
+
+        keywordNode = Keyword(header, body)
 
         KeywordMoveHelper().insert_new_keyword_defined(targetFileModel, keywordNode)
+
+    def build_tokens_of_arguments(self, args):
+        argsTokens = [
+            Token(Token.SEPARATOR, '    '),
+            Token(Token.ARGUMENTS, '[Arguments]')
+        ]
+        for arg in args:
+            argsTokens.append(Token(Token.SEPARATOR, '    '))
+            argsTokens.append(Token(Token.ARGUMENT, arg))
+        argsTokens.append(Token(Token.EOL, '\n'))
+        
+        return argsTokens
+
 
     def get_keywords_dictionary_with_args(self, keywords):
         keywordsWithArgs = []
