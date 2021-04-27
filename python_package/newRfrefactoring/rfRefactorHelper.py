@@ -9,16 +9,7 @@ from python_package.newRfrefactoring.fileChecker import FileChecker
 from python_package.newRfrefactoring.keywordCreator import KeywordCreator
 from python_package.newRfrefactoring.utility import print_keywordCall_for_linesKeywords, print_loop_for_linesKeywords, print_run_keywords_for_linesKeywords, normalize, clear_screen
 
-def print_all_lines_keywords(liensKeywords):
-    for index, keyword in enumerate(liensKeywords):
-        if(keyword['node'].__class__.__name__ == 'KeywordCall'):
-            print_keywordCall_for_linesKeywords(keyword['node'])
-        elif(keyword['node'].__class__.__name__ == 'ForLoop'):
-            print_loop_for_linesKeywords(keyword)
-        elif(keyword['node'].__class__.__name__ == 'SuiteSetup' or keyword['node'].__class__.__name__ == 'SuiteTeardown' or keyword['node'].__class__.__name__ == 'TestSetup' or keyword['node'].__class__.__name__ == 'TestTeardown'or keyword['node'].__class__.__name__ == 'Setup' or keyword['node'].__class__.__name__ == 'Teardown'):
-            print_run_keywords_for_linesKeywords(keyword)
-
-def print_line_keyword(lineKeywords, line):
+def print_lines_keywords(lineKeywords, line=None):
     for lineKeyword in lineKeywords:
         if(lineKeyword['node'].__class__.__name__ == 'KeywordCall'):
             print_keywordCall_for_linesKeywords(lineKeyword['node'], line)
@@ -99,7 +90,7 @@ if __name__ == '__main__':
 
             clear_screen()
             print('According to your data we found the following information and we will wrap these keywords as a new keyword.')
-            print_all_lines_keywords(lineKeywords)
+            print_lines_keywords(lineKeywords)
             newKeywordArgs = get_arguments_of_new_keyword_from_user()
             if len(newKeywordArgs) != 0:
                 argsTokens = creator.build_tokens_of_arguments(newKeywordArgs)
@@ -108,12 +99,13 @@ if __name__ == '__main__':
             while normalize(isChangeArgument) == normalize('Y'):
                 clear_screen()
                 print('Please select keyword that you want to change arguments.')
-                print_all_lines_keywords(lineKeywords)
+                print_lines_keywords(lineKeywords)
                 line = int(input('Please input line that you want to change.\nLine:'))
                 clear_screen()
                 print('This is the keyword\'s information now.')
-                print_line_keyword(lineKeywords, line)
+                print_lines_keywords(lineKeywords, line)
                 keywordArgs = get_arguments_of_the_keyword_from_user()
+                # 先找出來line的keyword在print
                 # 更新Lines keywords
                 clear_screen()
             # keywordsDict = creator.get_keywords_dictionary_with_args(lineKeywords)
