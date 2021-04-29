@@ -1,6 +1,6 @@
 import ast
 from robot.api import Token
-from python_package.newRfrefactoring.utility import normalize, get_keywords_for_run_keywords
+from python_package.newRfrefactoring.utility import normalize, get_keywords_for_run_keywords, is_KeywordCall, is_ForLoop
 
 
 class KeywordFinder(ast.NodeVisitor):
@@ -108,15 +108,15 @@ class KeywordFinder(ast.NodeVisitor):
             self.append_keywordDef_into_list(keywordDef, node)
             
             for token in node.body:
-                if(token.__class__.__name__ == 'KeywordCall'):
+                if is_KeywordCall(token):
                     self.append_keywordCall_into_list(token.get_value(Token.KEYWORD), token.get_token(Token.KEYWORD))
                 elif(token.__class__.__name__ == 'Teardown'):
                     self.append_keywordCall_of_multiple_keywords_into_list(token)
         elif self.byLines:
             for bodyMember in node.body:
-                if(bodyMember.__class__.__name__ == 'KeywordCall'):
+                if is_KeywordCall(bodyMember):
                     self.append_keyword_by_lines(bodyMember)
-                elif(bodyMember.__class__.__name__ == 'ForLoop'):
+                elif is_ForLoop(bodyMember):
                     self.append_keyword_by_lines_for_forloop(bodyMember)
                 elif(bodyMember.__class__.__name__ == 'Teardown'):
                     self.append_keyword_by_lines_for_run_keywords(bodyMember)

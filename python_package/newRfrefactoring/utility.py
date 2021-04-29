@@ -1,6 +1,5 @@
 import os
 import platform
-from prettytable import PrettyTable
 
 def normalize(text):
     return text.lower().replace(' ', '').replace('_', '')
@@ -11,6 +10,15 @@ def recovery_models(models):
             recovery_models(model)
         else:
             model.save()
+
+def is_KeywordCall(node):
+    return node.__class__.__name__ == 'KeywordCall'
+
+def is_ForLoop(node):
+    return node.__class__.__name__ == 'ForLoop'
+
+def is_Keyword_tag(node):
+    return node.__class__.__name__ == 'SuiteSetup' or node.__class__.__name__ == 'SuiteTeardown' or node.__class__.__name__ == 'TestSetup' or node.__class__.__name__ == 'TestTeardown'or node.__class__.__name__ == 'Setup' or node.__class__.__name__ == 'Teardown'
 
 def get_file_name_from_path(_path):
     return os.path.split(_path)[1]
@@ -37,114 +45,9 @@ def get_keywords_for_run_keywords(tokens):
         keywordTokens.append(keywordDict)
     return keywordTokens
 
-def print_keywordCall_for_linesKeywords(keywordNode, line=None):
-
-    def print_keywordCall(keywordNode):
-        keywordStr = PrettyTable()
-    
-        fields = ['Line', 'Keyword name']
-        keywordData = [keywordNode.lineno, keywordNode.keyword]
-        for i, arg in enumerate(keywordNode.args):
-            fields.append('Argument' + str(i+1))
-            keywordData.append(arg)
-        keywordStr.field_names = fields
-        keywordStr.add_row(keywordData)
-        print(keywordStr)
-
-    if line and line == keywordNode.lineno:
-        print_keywordCall(keywordNode)
-    elif not(line):
-        print_keywordCall(keywordNode)
-
-def print_loop_for_linesKeywords(loopDict, line=None):
-
-    loopStr = PrettyTable()
-    fields = []
-    loopData = []
-
-    if not(line):
-
-        for i, variable in enumerate(loopDict['node'].variables):
-            fields.append('Variable' + str(i+1))
-            loopData.append(variable)
-
-        fields.append('Flavor')
-        loopData.append(loopDict['node'].flavor)
-
-        for i, value in enumerate(loopDict['node'].values):
-            fields.append('Values' + str(i+1))
-            loopData.append(value)
-
-        loopStr.field_names = fields
-        loopStr.add_row(loopData)
-        print(loopStr)
-
-    for keyword in loopDict['body']:
-        if line and line == keyword.lineno:
-            print_keywordCall_for_linesKeywords(keyword)
-        elif not(line):
-            print_keywordCall_for_linesKeywords(keyword)
-
-def print_run_keywords_for_linesKeywords(runKeywordsDict, line=None):
-
-    def print_keyword_for_run_keywords(keyword):
-        keywordStr = PrettyTable()
-        fields = ['Line', 'Keyword name']
-        keywordData = [keyword['keywordName'].lineno, keyword['keywordName'].value]
-        for i, arg in enumerate(keyword['arguments']):
-            fields.append('Argument' + str(i+1))
-            keywordData.append(arg.value)
-        keywordStr.field_names = fields
-        keywordStr.add_row(keywordData)
-        print(keywordStr)
-
-    def print_keyword_for_one_keyword(keyword):
-        keywordStr = PrettyTable()
-        fields = []
-        keywordData = []
-        fields = ['Line', 'Kind', 'Keyword name']
-
-        keywordData.append(runKeywordsDict['node'].lineno)
-        keywordData.append(runKeywordsDict['node'].__class__.__name__)
-        keywordData.append(runKeywordsDict['node'].name)
-        for i, arg in enumerate(runKeywordsDict['node'].args):
-            fields.append('Argument' + str(i+1))
-            keywordData.append(arg)
-        keywordStr.field_names = fields
-        keywordStr.add_row(keywordData)
-        print(keywordStr)
-
-    def print_kind_line(runKeywordsDict):
-        keywordStr = PrettyTable()
-        fields = []
-        keywordData = []
-        fields = ['Line', 'Kind', 'Keyword name']
-        
-        keywordData.append(runKeywordsDict['node'].lineno)
-        keywordData.append(runKeywordsDict['node'].__class__.__name__)
-        keywordData.append(runKeywordsDict['node'].name)
-        keywordStr.field_names = fields
-        keywordStr.add_row(keywordData)
-        print(keywordStr)
-
-    if len(runKeywordsDict['body']) == 0:
-        if line and line == keyword['node'].lineno:
-            print_keyword_for_one_keyword(runKeywordsDict['node'])
-        elif not(line):
-            print_keyword_for_one_keyword(runKeywordsDict['node'])
-    else:
-        if not(line):
-            print_kind_line(runKeywordsDict)
-        for keyword in runKeywordsDict['body']:
-            if line and line == keyword['keywordName'].lineno:
-                print_keyword_for_run_keywords(keyword)
-            elif not(line):
-                print_keyword_for_run_keywords(keyword)
-
 def clear_screen():
     """ 
     Clear the terminal screen. 
     """
-    command = 'cls' if platform.system().lower()=='windows' else 'clear' 
-    os.system(command) 
-    
+    command = 'cls' if platform.system().lower() == 'windows' else 'clear'
+    os.system(command)

@@ -80,7 +80,7 @@ class KeywordRenamer(ast.NodeVisitor):
                 token.value = self.new_name
         elif(self.keywordToken):
             for token in node.body:
-                if(token.__class__.__name__ == 'KeywordCall' and self.keywordToken == token.get_token(Token.KEYWORD)):
+                if is_KeywordCall(token) and self.keywordToken == token.get_token(Token.KEYWORD):
                     token.get_token(Token.KEYWORD).value = self.new_name
                 elif(token.__class__.__name__ == 'Teardown'):
                     self.rename_keyword_from_multiple_keywords(token)

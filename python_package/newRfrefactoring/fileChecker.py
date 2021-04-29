@@ -1,6 +1,6 @@
 import ast
 from robot.api import Token
-from python_package.newRfrefactoring.utility import normalize, get_file_name_from_path, get_keywords_for_run_keywords
+from python_package.newRfrefactoring.utility import normalize, get_file_name_from_path, get_keywords_for_run_keywords, is_KeywordCall, is_ForLoop
 
 
 class FileChecker(ast.NodeVisitor):
@@ -111,19 +111,19 @@ class FileChecker(ast.NodeVisitor):
         """
         if self.checkKeywordAndResource:
             for keyword in node.body:
-                if keyword.__class__.__name__ == 'KeywordCall':
+                if is_KeywordCall(keyword):
                     self.is_keyword_used_for_one_keyword(keyword.keyword)
                 elif keyword.__class__.__name__ == 'Teardown':
                     self.is_keyword_used_for_run_keywords(keyword)
-                elif keyword.__class__.__name__ == 'ForLoop':
+                elif is_ForLoop(keyword):
                     self.is_keyword_used_for_forloop(keyword.body)
         elif self.checkModelsUsingSameKeywords:
             for keyword in node.body:
-                if keyword.__class__.__name__ == 'KeywordCall':
+                if is_KeywordCall(keyword):
                     self.append_same_keywords_for_one_keyword(keyword)
                 elif keyword.__class__.__name__ == 'Teardown':
                     self.append_same_keywords_for_run_keywords(keyword)
-                elif keyword.__class__.__name__ == 'ForLoop':
+                elif is_ForLoop(keyword):
                     self.append_same_keywords_for_forLoop(keyword)
 
     def visit_ResourceImport(self, node):
@@ -153,9 +153,9 @@ class FileChecker(ast.NodeVisitor):
     def is_keyword_used_for_forloop(self, loopBody):
         if(not(self.isKeywordCalled)):
             for loopBodyMember in loopBody:
-                if loopBodyMember.__class__.__name__ == 'KeywordCall':
+                if is_KeywordCall(loopBodyMember):
                     self.is_keyword_used_for_one_keyword(loopBodyMember.keyword)
-                elif loopBodyMember.__class__.__name__ == 'ForLoop':
+                elif is_ForLoop(loopBodyMember):
                     self.is_keyword_used_for_forloop(loopBodyMember)
 
     def is_resource_imported(self, resourcePath):
@@ -188,9 +188,9 @@ class FileChecker(ast.NodeVisitor):
         def get_keywords_name_from_nodeDictList(nodeDictList):
             keywordNamesList = []
             for nodeDict in nodeDictList:
-                if nodeDict['node'].__class__.__name__ == 'KeywordCall':
+                if is_KeywordCall(nodeDict['node']):
                     keywordNamesList.append(nodeDict['node'].keyword)
-                elif nodeDict['node'].__class__.__name__ == 'ForLoop':
+                elif is_ForLoop(nodeDict['node']):
                     for loopBodyMember in nodeDict['body']:
                         keywordNamesList.append(loopBodyMember.keyword)
                 else:
