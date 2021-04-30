@@ -1,5 +1,5 @@
 from robot.api import Token
-from python_package.newRfrefactoring.utility import is_ForLoop, is_Keyword_tag, is_KeywordCall
+from python_package.newRfrefactoring.common.utility import is_ForLoop, is_Keyword_tag, is_KeywordCall
 
 class LineKeywordsHelper():
 

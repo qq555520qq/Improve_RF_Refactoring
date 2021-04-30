@@ -3,12 +3,12 @@ from os import path
 import sys
 p = path.normpath(path.dirname(path.abspath(__file__))+"/../..")
 sys.path.append(p)
-from testModelBuilderTest import TestModelBuilderTest
-from keywordFinderTest import KeywordFinderTest
-from keywordRenamerTest import KeywordRenamerTest
-from fileCheckerTest import FileCheckerTest
-from keywordMoveHelperTest import KeywordMoveHelperTest
-from keywordCreatorTest import KeywordCreatorTest
+from builder.testModelBuilderTest import TestModelBuilderTest
+from keywords.keywordFinderTest import KeywordFinderTest
+from keywords.keywordRenamerTest import KeywordRenamerTest
+from checker.fileCheckerTest import FileCheckerTest
+from keywords.keywordMoveHelperTest import KeywordMoveHelperTest
+from keywords.keywordCreatorTest import KeywordCreatorTest
 
 if __name__ == "__main__":
     suite = (unittest.TestLoader().loadTestsFromTestCase(TestModelBuilderTest))

@@ -1,5 +1,5 @@
 import unittest
-from python_package.newRfrefactoring.testModelBuilder import TestModelBuilder
+from python_package.newRfrefactoring.builder.testModelBuilder import TestModelBuilder
 from init import test_data
 
 

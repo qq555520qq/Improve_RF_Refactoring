@@ -1,9 +1,9 @@
 import ast
 from robot.parsing.model import Statement
 from robot.api import Token
-from python_package.newRfrefactoring.utility import normalize, get_file_name_from_path
-from python_package.newRfrefactoring.fileChecker import FileChecker
-from python_package.newRfrefactoring.keywordFinder import KeywordFinder
+from python_package.newRfrefactoring.common.utility import normalize, get_file_name_from_path
+from python_package.newRfrefactoring.checker.fileChecker import FileChecker
+from python_package.newRfrefactoring.keywords.keywordFinder import KeywordFinder
 
 
 class KeywordMoveHelper(ast.NodeTransformer):

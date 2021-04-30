@@ -2,14 +2,14 @@ import sys
 from os import path
 p = path.normpath(path.dirname(path.abspath(__file__))+"/../..")
 sys.path.append(p)
-from python_package.newRfrefactoring.threadWithReturn import BuildingModelThread
-from python_package.newRfrefactoring.testModelBuilder import TestModelBuilder
-from python_package.newRfrefactoring.keywordFinder import KeywordFinder
-from python_package.newRfrefactoring.fileChecker import FileChecker
-from python_package.newRfrefactoring.keywordCreator import KeywordCreator
-from python_package.newRfrefactoring.keywordPrinter import KeywordPrinter
-from python_package.newRfrefactoring.lineKeywordsHelper import LineKeywordsHelper
-from python_package.newRfrefactoring.utility import *
+from python_package.newRfrefactoring.common.threadWithReturn import BuildingModelThread
+from python_package.newRfrefactoring.builder.testModelBuilder import TestModelBuilder
+from python_package.newRfrefactoring.keywords.keywordFinder import KeywordFinder
+from python_package.newRfrefactoring.checker.fileChecker import FileChecker
+from python_package.newRfrefactoring.keywords.keywordCreator import KeywordCreator
+from python_package.newRfrefactoring.keywords.keywordPrinter import KeywordPrinter
+from python_package.newRfrefactoring.helper.lineKeywordsHelper import LineKeywordsHelper
+from python_package.newRfrefactoring.common.utility import *
 from prettytable import PrettyTable
 
 def print_arugments_for_string_list(args):

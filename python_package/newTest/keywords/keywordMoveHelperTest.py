@@ -1,8 +1,8 @@
 import unittest
-from python_package.newRfrefactoring.testModelBuilder import TestModelBuilder
-from python_package.newRfrefactoring.keywordMoveHelper import KeywordMoveHelper
-from python_package.newRfrefactoring.fileChecker import FileChecker
-from python_package.newRfrefactoring.utility import recovery_models
+from python_package.newRfrefactoring.builder.testModelBuilder import TestModelBuilder
+from python_package.newRfrefactoring.keywords.keywordMoveHelper import KeywordMoveHelper
+from python_package.newRfrefactoring.checker.fileChecker import FileChecker
+from python_package.newRfrefactoring.common.utility import recovery_models
 from init import test_data
 from robot.parsing.model import Keyword, Statement
 from robot.api import Token
