@@ -52,6 +52,7 @@ class LineKeywordsHelper():
                                     if str(arg.value) == str(updatedArgData['updateArg']):
                                         arg.value = updatedArgData['newArg']
                                         isUpdated = True
+                                        print(lineKeyword['node'].data_tokens)
                                         break
                     elif lineKeyword['node'] == updatedArgData['lineKeyword']['node']:
                         keywordArgsTokens = lineKeyword['node'].get_tokens(Token.ARGUMENT)
@@ -60,3 +61,4 @@ class LineKeywordsHelper():
                                 arg.value = updatedArgData['newArg']
                                 isUpdated = True
                                 break
+            
