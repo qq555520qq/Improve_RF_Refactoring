@@ -4,6 +4,7 @@ from python_package.newRfrefactoring.keywords.keywordFinder import KeywordFinder
 from python_package.newRfrefactoring.keywords.keywordCreator import KeywordCreator
 from python_package.newRfrefactoring.common.utility import recovery_models
 from robot.api import Token
+from robot.parsing.model import Statement
 from init import test_data
 
 
@@ -17,7 +18,7 @@ class KeywordCreatorTest(unittest.TestCase):
     def test_create_new_keyword_for_file(self):
         tearDownModel = self.builder.build(test_data+'/ezScrum.txt')
 
-        keywordBody = [
+        keywordBody = Statement.from_tokens([
             Token(Token.SEPARATOR, '    '),
             Token(Token.ARGUMENTS, '[Arguments]'),
             Token(Token.SEPARATOR, '    '),
@@ -26,7 +27,7 @@ class KeywordCreatorTest(unittest.TestCase):
             Token(Token.SEPARATOR, '    '),
             Token(Token.KEYWORD, 'Login EzScrum'),
             Token(Token.EOL, '\n')
-        ]
+        ])
 
         self.creator.create_new_keyword_for_file(test_data+'/ezScrum.txt', 'New Created Keyword', keywordBody)
         

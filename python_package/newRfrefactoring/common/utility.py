@@ -51,3 +51,9 @@ def clear_screen():
     """
     command = 'cls' if platform.system().lower() == 'windows' else 'clear'
     os.system(command)
+
+def get_number_from_user(text):
+    number = ''
+    while not(number.isdigit()):
+        number = input(text)
+    return number

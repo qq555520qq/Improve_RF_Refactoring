@@ -27,7 +27,7 @@ class KeywordMoveHelper(ast.NodeTransformer):
                 Token(Token.EOL, '\n')
             ])
             node.body.insert(0, newResource)
-        return node
+        return self.generic_visit(node)
 
     def visit_Keyword(self, node):
         if(self.removeOldKeywordDefined):
@@ -40,8 +40,9 @@ class KeywordMoveHelper(ast.NodeTransformer):
             Visit all keyword's define to do something.
         """
         if(self.insertKeywordDefined):
-            empty_line = Statement.from_tokens([Token(Token.EOL, '\n')])
-            node.body.append(empty_line)
+            if node.body[-1].body[-1].__class__.__name__ != 'EmptyLine':
+                empty_line = Statement.from_tokens([Token(Token.EOL, '\n'), Token(Token.EOL, '\n')])
+                node.body[-1].body.append(empty_line)
             node.body.append(self.movedKeywordNode)
 
         return self.generic_visit(node)

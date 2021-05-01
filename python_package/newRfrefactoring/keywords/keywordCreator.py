@@ -15,9 +15,7 @@ class KeywordCreator:
             Token(Token.EOL, '\n')
         ])
 
-        body = Statement.from_tokens(keywordBody)
-
-        keywordNode = Keyword(header, body)
+        keywordNode = Keyword(header, keywordBody)
 
         KeywordMoveHelper().insert_new_keyword_defined(targetFileModel, keywordNode)
 

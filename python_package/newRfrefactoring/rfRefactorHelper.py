@@ -39,7 +39,7 @@ def print_arugments_for_string_list(args):
         argsTable.add_row([index + 1, arg])
     print(argsTable)
 
-def get_arguments_of_new_keyword_from_user():
+def get_arguments_of_new_keyword_from_user(lineKeywords):
     newKeywordArgs = []
     while True:
         clear_screen()
@@ -57,17 +57,6 @@ def get_arguments_of_new_keyword_from_user():
             newKeywordArgs.append(arg)
     return newKeywordArgs
 
-def get_arguments_for_line_keyword(keywordWithLine):
-    if is_KeywordCall(keywordWithLine['belong']['node']):
-        return keywordWithLine['node'].args
-    elif is_ForLoop(keywordWithLine['belong']['node']):
-        return keywordWithLine['node'].args
-    elif is_Keyword_tag(keywordWithLine['belong']['node']):
-        if len(keywordWithLine['belong']['body']) != 0:
-            return keywordWithLine['node']['arguments']
-        else:
-            return keywordWithLine['node'].args
-
 def is_arguemnts_changed_from_user(arg, isFirst):
     isChangeArgument = ''
     while(normalize(isChangeArgument) != normalize('Y') and normalize(isChangeArgument) != normalize('N')):
@@ -80,12 +69,6 @@ def is_arguemnts_changed_from_user(arg, isFirst):
         return True
     else:
         return False
-
-def get_number_from_user(text):
-    number = ''
-    while not(number.isdigit()):
-        number = input(text)
-    return number
 
 def update_keywords_arguments(lineKeywords, newKeywordArgs):
     newKeywordArgsTokens = []
@@ -103,7 +86,7 @@ def update_keywords_arguments(lineKeywords, newKeywordArgs):
                 print('This is the keyword\'s information now.')
                 kwPrinter.print_line_keyword(keywordWithLine['node'])
                 argNum = int(get_number_from_user('Please input the argument number which you want to replace with \"' + arg + '\"\n(Ex:1)\nArgument number:'))
-                lineKeywordArgs = get_arguments_for_line_keyword(keywordWithLine)
+                lineKeywordArgs = lineKwsHelper.get_arguments_for_line_keyword(keywordWithLine)
                 while not(argNum > 0 and argNum <= len(lineKeywordArgs)):
                     print('Please input correct argument number.')
                     argNum = int(get_number_from_user('Please input the argument number which you want to replace with \"' + arg + '\"\n(Ex:1)\nArgument number:'))
@@ -114,6 +97,56 @@ def update_keywords_arguments(lineKeywords, newKeywordArgs):
                 print('There is not keyword in line that you input.')
             isFirst = False
 
+def wrap_steps_as_a_new_keyword():
+    projectPath = get_project_path_from_user('Please input the folder\'s path which will be scanned.\nScanned folder path:')
+    clear_screen()
+    # projectPath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data'
+    # projectPath = 'D:/Project/test_automation'
+    projectbuildThread = BuildingModelThread(projectPath)
+    projectbuildThread.start()
+
+    fromFilePath = get_file_path_from_user('Please input the file\'s path which has the steps that will be wrapped as a keyword.\nFile path:')
+    clear_screen()
+    # fromFilePath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data/test_data.robot'
+    # fromFilePath = 'D:/Project/test_automation/RobotTests/Feature Tests/Parts Management/TMD-18039 Edit_View Part Instance Detail Page/Keywords/TMD-18137.txt'
+    fileBuildThread = BuildingModelThread(fromFilePath)
+    fileBuildThread.start()
+
+    startLine = int(get_number_from_user('Please input start line to get steps.\nStart line:'))
+    clear_screen()
+    endLine = int(get_number_from_user('Please input end line to get steps.\nEnd line:'))
+    clear_screen()
+    # startLine = 134
+    # endLine = 140
+    # startLine = 92
+    # endLine = 98
+
+    print('Please wait, Models building~')
+    allModels = projectbuildThread.join()
+    fromModel = fileBuildThread.join()
+    clear_screen()
+
+    finder.find_keywords_by_lines(fromModel, startLine, endLine)
+    lineKeywords = finder.get_lines_keywords()
+
+    checker.find_models_with_same_keywords(allModels, lineKeywords)
+    modelsWithSameKeywords = checker.get_models_with_same_keywords()
+
+    newKeywordArgs = get_arguments_of_new_keyword_from_user(lineKeywords)
+    newKeywordArgsTokens = []
+    if len(newKeywordArgs) != 0:
+        update_keywords_arguments(lineKeywords, newKeywordArgs)
+        newKeywordArgsTokens = creator.build_tokens_of_arguments(newKeywordArgs)
+    
+    newKeywordsBody = lineKwsHelper.get_new_keyword_body_from_line_keywords_and_arguments_tokens(lineKeywords, newKeywordArgsTokens)
+    newKeywordName = input('Please input name for new keyword.\nKeyword name:')
+    newKeywordPath = get_file_path_from_user('Please input the file\'s path where new keyword will insert into.\nFile path:')
+    creator.create_new_keyword_for_file(newKeywordPath, newKeywordName, newKeywordsBody)
+    projectbuildThread = BuildingModelThread(projectPath)
+    projectbuildThread.start()
+    
+    allModels = projectbuildThread.join()
+
 if __name__ == '__main__':
 
     clear_screen()
@@ -123,49 +156,7 @@ if __name__ == '__main__':
     while True:
         mode = input('Mode:')
         if(mode == '1.' or mode == '1'):
-            projectPath = get_project_path_from_user('Please input the folder\'s path which will be scanned.\nScanned folder path:')
-            clear_screen()
-            # projectPath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data'
-            projectbuildThread = BuildingModelThread(projectPath)
-            projectbuildThread.start()
-
-            fromFilePath = get_file_path_from_user('Please input the file\'s path which has the steps that will be wrapped as a keyword.\nFile path:')
-            clear_screen()
-            # fromFilePath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data/test_data.robot'
-            fileBuildThread = BuildingModelThread(fromFilePath)
-            fileBuildThread.start()
-
-            startLine = int(get_number_from_user('Please input start line to get steps.\nStart line:'))
-            clear_screen()
-            endLine = int(get_number_from_user('Please input end line to get steps.\nEnd line:'))
-            clear_screen()
-            # startLine = 134
-            # endLine = 140
-
-            print('Please wait, Models building~')
-            allModels = projectbuildThread.join()
-            fromModel = fileBuildThread.join()
-            clear_screen()
-
-            finder.find_keywords_by_lines(fromModel, startLine, endLine)
-            lineKeywords = finder.get_lines_keywords()
-
-            checker.find_models_with_same_keywords(allModels, lineKeywords)
-            modelsWithSameKeywords = checker.get_models_with_same_keywords()
-
-            newKeywordArgs = get_arguments_of_new_keyword_from_user()
-            newKeywordArgsTokens = []
-            if len(newKeywordArgs) != 0:
-                update_keywords_arguments(lineKeywords, newKeywordArgs)
-                newKeywordArgsTokens = creator.build_tokens_of_arguments(newKeywordArgs)
-
-
-
-
-
-            # keywordsDict = creator.get_keywords_dictionary_with_args(lineKeywords)
-
-            # self.creator.create_new_keyword_for_file(newKeywordPath, newKeywordName, lineKeywords)
+            wrap_steps_as_a_new_keyword()
             exit('Thank you for using.')
         else:
             print('Please input correct mode')
