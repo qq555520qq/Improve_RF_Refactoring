@@ -6,6 +6,10 @@ from robot.api import Token
 
 class KeywordCreator:
 
+    def __init__(self, allModels=[]):
+        self.allModels = allModels
+        self.mover = KeywordMoveHelper(self.allModels)
+
     def create_new_keyword_for_file(self, _path, keywordName, keywordBody):
 
         targetFileModel = TestModelBuilder().build(_path)
@@ -17,7 +21,7 @@ class KeywordCreator:
 
         keywordNode = Keyword(header, keywordBody)
 
-        KeywordMoveHelper().insert_new_keyword_defined(targetFileModel, keywordNode)
+        self.mover.insert_new_keyword_defined(targetFileModel, keywordNode)
 
     def build_tokens_of_arguments(self, args):
         argsTokens = [

@@ -41,7 +41,7 @@ class KeywordMoveHelper(ast.NodeTransformer):
         """
         if(self.insertKeywordDefined):
             if node.body[-1].body[-1].__class__.__name__ != 'EmptyLine':
-                empty_line = Statement.from_tokens([Token(Token.EOL, '\n'), Token(Token.EOL, '\n')])
+                empty_line = Statement.from_tokens([Token(Token.EOL, '\n')])
                 node.body[-1].body.append(empty_line)
             node.body.append(self.movedKeywordNode)
 

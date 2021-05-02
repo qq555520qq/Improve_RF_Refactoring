@@ -6,6 +6,7 @@ Library           RefactorLibrary    ${resourceFileVariable}_1    ${resourceFile
 
 *** Variables ***
 ${resourceFileVariable}    resource file test data
+${testVariable}    test variable
 
 *** Keywords ***
 Find Usage Test Keyword4
@@ -19,3 +20,25 @@ Find Usage Test Keyword4
 Find Variable Usage Test Keyword
     Find Usage Test Keyword1    ${resourceFileVariable}
     [Teardown]    Find Usage Test Keyword2    ${resourceFileVariable}1
+
+Same Keywords
+    Log    testLog
+    FOR    ${var}    IN    @{testVariable}
+        Log    ${var}
+        Log    ${var}2
+    END
+    [Teardown]    Run Keywords    Test Keyword
+    ...                    AND    For Loop Keyword    5
+
+For Loop Keyword
+    [Arguments]    ${times}
+    FOR    ${var}    IN    @{testVariable}
+        Log    ${times}
+        test    ${testVariable}
+    END
+
+Test Keyword
+    Log    ${testVariable}
+    Log    321
+    [Teardown]    Run Keywords    Log    ${testVariable}123
+    ...    AND    Log    321

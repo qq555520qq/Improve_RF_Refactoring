@@ -15,7 +15,7 @@ from prettytable import PrettyTable
 builder = TestModelBuilder()
 finder = KeywordFinder()
 checker = FileChecker()
-creator = KeywordCreator()
+creator = None
 lineKwsHelper = LineKeywordsHelper()
 kwPrinter = KeywordPrinter()
 
@@ -124,6 +124,7 @@ def wrap_steps_as_a_new_keyword():
     print('Please wait, Models building~')
     allModels = projectbuildThread.join()
     fromModel = fileBuildThread.join()
+    creator = KeywordCreator(allModels)
     clear_screen()
 
     finder.find_keywords_by_lines(fromModel, startLine, endLine)
@@ -139,13 +140,13 @@ def wrap_steps_as_a_new_keyword():
         newKeywordArgsTokens = creator.build_tokens_of_arguments(newKeywordArgs)
     
     newKeywordsBody = lineKwsHelper.get_new_keyword_body_from_line_keywords_and_arguments_tokens(lineKeywords, newKeywordArgsTokens)
+    clear_screen()
+    kwPrinter.print_all_lines_keywords(lineKeywords)
     newKeywordName = input('Please input name for new keyword.\nKeyword name:')
+    clear_screen()
     newKeywordPath = get_file_path_from_user('Please input the file\'s path where new keyword will insert into.\nFile path:')
+    # newKeywordPath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data/ezScrum.txt'
     creator.create_new_keyword_for_file(newKeywordPath, newKeywordName, newKeywordsBody)
-    projectbuildThread = BuildingModelThread(projectPath)
-    projectbuildThread.start()
-    
-    allModels = projectbuildThread.join()
 
 if __name__ == '__main__':
 
