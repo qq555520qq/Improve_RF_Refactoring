@@ -57,3 +57,15 @@ def get_number_from_user(text):
     while not(number.isdigit()):
         number = input(text)
     return number
+
+def get_folder_path_from_user(text):
+    projectPath = ''
+    while not(os.path.isdir(projectPath)):
+        projectPath = input(text)
+    return projectPath
+
+def get_file_path_from_user(text):
+    filePath = ''
+    while not(os.path.isfile(filePath)):
+        filePath = input(text)
+    return filePath

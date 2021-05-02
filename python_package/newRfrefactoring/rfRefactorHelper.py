@@ -19,26 +19,6 @@ creator = None
 lineKwsHelper = LineKeywordsHelper()
 kwPrinter = KeywordPrinter()
 
-def get_project_path_from_user(text):
-    projectPath = ''
-    while not(path.isdir(projectPath)):
-        projectPath = input(text)
-    return projectPath
-
-def get_file_path_from_user(text):
-    filePath = ''
-    while not(path.isfile(filePath)):
-        filePath = input(text)
-    return filePath
-
-def print_arugments_for_string_list(args):
-    print('\nThe following information is new keyword\'s arguments now.')
-    argsTable = PrettyTable()
-    argsTable.field_names = ['Number', 'Argument']
-    for index, arg in enumerate(args):
-        argsTable.add_row([index + 1, arg])
-    print(argsTable)
-
 def get_arguments_of_new_keyword_from_user(lineKeywords):
     newKeywordArgs = []
     while True:
@@ -57,6 +37,14 @@ def get_arguments_of_new_keyword_from_user(lineKeywords):
             newKeywordArgs.append(arg)
     return newKeywordArgs
 
+def print_arugments_for_string_list(args):
+    print('\nThe following information is new keyword\'s arguments now.')
+    argsTable = PrettyTable()
+    argsTable.field_names = ['Number', 'Argument']
+    for index, arg in enumerate(args):
+        argsTable.add_row([index + 1, arg])
+    print(argsTable)
+
 def is_arguemnts_changed_from_user(arg, isFirst):
     isChangeArgument = ''
     while(normalize(isChangeArgument) != normalize('Y') and normalize(isChangeArgument) != normalize('N')):
@@ -65,10 +53,14 @@ def is_arguemnts_changed_from_user(arg, isFirst):
         else:
             isChangeArgument = input('Do you want to change other keywords\' arguments with new argument \"'+ arg +'\"?(Y\\N):')
 
-    if normalize(isChangeArgument) == normalize('Y'):
-        return True
-    else:
-        return False
+    return normalize(isChangeArgument) == normalize('Y')
+
+def is_anwser_yes(text):
+    isReplace = ''
+    while(normalize(isReplace) != normalize('Y') and normalize(isReplace) != normalize('N')):
+        isReplace = input(text)
+
+    return normalize(isReplace) == normalize('Y')
 
 def update_keywords_arguments(lineKeywords, newKeywordArgs):
     newKeywordArgsTokens = []
@@ -98,10 +90,12 @@ def update_keywords_arguments(lineKeywords, newKeywordArgs):
             isFirst = False
 
 def wrap_steps_as_a_new_keyword():
-    projectPath = get_project_path_from_user('Please input the folder\'s path which will be scanned.\nScanned folder path:')
+    projectPath = get_folder_path_from_user('Please input the folder\'s path which will be scanned.\nScanned folder path:')
     clear_screen()
     # projectPath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data'
     # projectPath = 'D:/Project/test_automation'
+    teardowmModels = BuildingModelThread(projectPath)
+    teardowmModels.start()
     projectbuildThread = BuildingModelThread(projectPath)
     projectbuildThread.start()
 
@@ -145,8 +139,28 @@ def wrap_steps_as_a_new_keyword():
     newKeywordName = input('Please input name for new keyword.\nKeyword name:')
     clear_screen()
     newKeywordPath = get_file_path_from_user('Please input the file\'s path where new keyword will insert into.\nFile path:')
+    clear_screen()
     # newKeywordPath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data/ezScrum.txt'
     creator.create_new_keyword_for_file(newKeywordPath, newKeywordName, newKeywordsBody)
+    recovery_models(teardowmModels.join())
+    if len(modelsWithSameKeywords) != 0 and is_anwser_yes('The steps are the same in '+ str(len(modelsWithSameKeywords)) +' places\nDo you want to replace same steps in other files with new keyword?(Y\\N):'):
+        for modelWithSameKeywords in modelsWithSameKeywords:
+            kwPrinter.print_model_with_same_keywords(modelWithSameKeywords)
+            if is_anwser_yes('Do you want to replace the steps with new keyword?(Y\\N):'):
+                for index in range(len(newKeywordArgs)):
+                    arg = input('Please input argument content.\nIf you don\'t want to add a new argument, please input \'Exit\'.\n\nNew argument' + str(index + 1) + ':')
+                    if normalize(arg) == normalize('Exit'):
+                        break
+                    else:
+                        newKeywordArgs.append(arg)
+            
+        
+
+
+
+
+
+
 
 if __name__ == '__main__':
 
