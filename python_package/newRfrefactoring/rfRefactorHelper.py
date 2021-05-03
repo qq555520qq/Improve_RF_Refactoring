@@ -110,8 +110,8 @@ def wrap_steps_as_a_new_keyword():
     clear_screen()
     endLine = int(get_number_from_user('Please input end line to get steps.\nEnd line:'))
     clear_screen()
-    # startLine = 134
-    # endLine = 140
+    # startLine = 44
+    # endLine = 50
     # startLine = 92
     # endLine = 98
 
@@ -142,17 +142,24 @@ def wrap_steps_as_a_new_keyword():
     clear_screen()
     # newKeywordPath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data/ezScrum.txt'
     creator.create_new_keyword_for_file(newKeywordPath, newKeywordName, newKeywordsBody)
-    recovery_models(teardowmModels.join())
-    if len(modelsWithSameKeywords) != 0 and is_anwser_yes('The steps are the same in '+ str(len(modelsWithSameKeywords)) +' places\nDo you want to replace same steps in other files with new keyword?(Y\\N):'):
+    recovery_models(teardowmModels.join())  #記得刪掉
+    if len(modelsWithSameKeywords) != 0 and is_anwser_yes('The steps are same in '+ str(len(modelsWithSameKeywords)) +' places\nDo you want to replace same steps in other files with new keyword?(Y\\N):'):
         for modelWithSameKeywords in modelsWithSameKeywords:
+            clear_screen()
             kwPrinter.print_model_with_same_keywords(modelWithSameKeywords)
             if is_anwser_yes('Do you want to replace the steps with new keyword?(Y\\N):'):
-                for index in range(len(newKeywordArgs)):
-                    arg = input('Please input argument content.\nIf you don\'t want to add a new argument, please input \'Exit\'.\n\nNew argument' + str(index + 1) + ':')
+                clear_screen()
+                keywordArgs = []
+                for index, newArg in enumerate(newKeywordArgs):
+                    print_arugments_for_string_list(newKeywordArgs)
+                    arg = input('Please input \"'+ newArg +'\" content.\nIf you finish inputting argument, please input \'Exit\'.\n\nArgument' + str(index + 1)+'('+ newArg + '):')
                     if normalize(arg) == normalize('Exit'):
                         break
                     else:
-                        newKeywordArgs.append(arg)
+                        keywordArgs.append(arg)
+            creator.remove_node_for_same_keywords(modelWithSameKeywords, allModels)
+
+
             
         
 

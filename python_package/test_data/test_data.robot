@@ -40,6 +40,16 @@ test variable assign in step
     Should Be Equal    ${testVariable}    duplicate variable name
     [Teardown]    Log    teardown ${testVariable}
 
+Test mutiple keywords
+    Log    testLog
+    FOR    ${var}    IN    @{testVariable}
+        Log    ${var}
+        Log    ${var}2
+    END
+    [Teardown]    Run Keywords    Test Keyword
+    ...                    AND    For Loop Keyword    5
+    # [Teardown]    Log    ${testVariable}123
+
 *** Keywords ***
 Choose Project
     [Arguments]    ${project_name}
@@ -129,13 +139,3 @@ Difference Kinds of Variable Keyword
 Default argument Keyword
     [Arguments]    ${test}=${testVariable}
     Log    msg=${testVariable}
-
-Multiple Keywords
-    Log    testLog
-    FOR    ${var}    IN    @{testVariable}
-        Log    ${var}
-        Log    ${var}2
-    END
-    [Teardown]    Run Keywords    Test Keyword
-    ...                    AND    For Loop Keyword    5
-    # [Teardown]    Log    ${testVariable}123

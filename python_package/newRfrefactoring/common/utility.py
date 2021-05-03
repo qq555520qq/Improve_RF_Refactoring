@@ -69,3 +69,15 @@ def get_file_path_from_user(text):
     while not(os.path.isfile(filePath)):
         filePath = input(text)
     return filePath
+
+def save_model_and_update_old_models(model, oldModels):
+
+    def update_model(model, allModels):
+        for index, oldModel in enumerate(allModels):
+            if isinstance(oldModel, list):
+                update_model(model, oldModel)
+            elif(model.source == oldModel.source):
+                allModels[index] = model
+
+    model.save()
+    update_model(model, oldModels)

@@ -1,7 +1,7 @@
 import ast
 from robot.parsing.model import Statement
 from robot.api import Token
-from python_package.newRfrefactoring.common.utility import normalize, get_file_name_from_path
+from python_package.newRfrefactoring.common.utility import normalize, get_file_name_from_path, save_model_and_update_old_models
 from python_package.newRfrefactoring.checker.fileChecker import FileChecker
 from python_package.newRfrefactoring.keywords.keywordFinder import KeywordFinder
 
@@ -54,24 +54,12 @@ class KeywordMoveHelper(ast.NodeTransformer):
         else:
             return None
 
-    def save_model_and_update_old_models(self, model, oldModels):
-
-        def update_model(model, allModels):
-            for index, oldModel in enumerate(allModels):
-                if isinstance(oldModel, list):
-                    update_model(model, oldModel)
-                elif(model.source == oldModel.source):
-                    allModels[index] = model
-
-        model.save()
-        update_model(model, oldModels)
-
     def remove_old_keyword_defined(self, model, removedKeywordNode=None):
         if(removedKeywordNode):
             self.movedKeywordNode = removedKeywordNode
         self.removeOldKeywordDefined = True
         self.visit(model)
-        self.save_model_and_update_old_models(model, self.modelsInDir)
+        save_model_and_update_old_models(model, self.modelsInDir)
         self.removeOldKeywordDefined = False
 
     def insert_new_keyword_defined(self, model, insertedKeywordNode=None):
@@ -79,7 +67,7 @@ class KeywordMoveHelper(ast.NodeTransformer):
             self.movedKeywordNode = insertedKeywordNode
         self.insertKeywordDefined = True
         self.visit(model)
-        self.save_model_and_update_old_models(model, self.modelsInDir)
+        save_model_and_update_old_models(model, self.modelsInDir)
         self.insertKeywordDefined = False
     
     def get_models_without_import_new_resource(self, movedKeywordName, oldImportedResource, newImportedResource):
@@ -108,7 +96,7 @@ class KeywordMoveHelper(ast.NodeTransformer):
         self.importResource = True
         for model in modelsWithoutImport:
             self.visit(model)
-            self.save_model_and_update_old_models(model, self.modelsInDir)
+            save_model_and_update_old_models(model, self.modelsInDir)
         self.importResource = False
     
     def get_models_after_moving(self):

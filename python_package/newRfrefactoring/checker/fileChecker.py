@@ -1,6 +1,6 @@
 import ast
 from robot.api import Token
-from python_package.newRfrefactoring.common.utility import normalize, get_file_name_from_path, get_keywords_for_run_keywords, is_KeywordCall, is_ForLoop
+from python_package.newRfrefactoring.common.utility import normalize, get_file_name_from_path, get_keywords_for_run_keywords, is_KeywordCall, is_ForLoop, is_Keyword_tag
 
 
 class FileChecker(ast.NodeVisitor):
@@ -72,6 +72,10 @@ class FileChecker(ast.NodeVisitor):
             self.is_keyword_used_for_run_keywords(node)
         elif self.checkModelsUsingSameKeywords:
             self.append_same_keywords_for_run_keywords(node)
+            if len(self.keywordNamesList) != 0:
+                self.tempKeywords = []
+                self.keywordNamesList = self.copyKeywordNamesList.copy()
+
 
     def visit_TestTemplate(self, node):
         """
@@ -183,28 +187,29 @@ class FileChecker(ast.NodeVisitor):
             else:
                 self.visit_model_to_check_keyword_and_resource(testModel, keyword, resource)
 
-    def find_model_with_same_keywords(self, model, nodeDicts):
+    def find_model_with_same_keywords(self, model, lineKeywords):
 
-        def get_keywords_name_from_nodeDictList(nodeDictList):
+        def get_keywords_name_from_lineKeywords(lineKeywords):
             keywordNamesList = []
-            for nodeDict in nodeDictList:
-                if is_KeywordCall(nodeDict['node']):
-                    keywordNamesList.append(nodeDict['node'].keyword)
-                elif is_ForLoop(nodeDict['node']):
-                    for loopBodyMember in nodeDict['body']:
+            for lineKeyword in lineKeywords:
+                if is_KeywordCall(lineKeyword['node']):
+                    keywordNamesList.append(lineKeyword['node'].keyword)
+                elif is_ForLoop(lineKeyword['node']):
+                    for loopBodyMember in lineKeyword['body']:
                         keywordNamesList.append(loopBodyMember.keyword)
                 else:
-                    if(normalize(nodeDict['node'].name) == normalize('Run Keywords')):
-                        for keywordDict in nodeDict['body']:
+                    if(normalize(lineKeyword['node'].name) == normalize('Run Keywords')):
+                        for keywordDict in lineKeyword['body']:
                             keywordNamesList.append(keywordDict['keywordName'].value)
                     else:
-                        keywordNamesList.append(nodeDict['node'].name)
+                        keywordNamesList.append(lineKeyword['node'].name)
 
             return keywordNamesList
         
         self.checkModelsUsingSameKeywords = True
-        self.keywordNamesList = get_keywords_name_from_nodeDictList(nodeDicts)
+        self.keywordNamesList = get_keywords_name_from_lineKeywords(lineKeywords)
         self.copyKeywordNamesList = self.keywordNamesList.copy()
+        self.tempKeywords = []
         self.currentModel = model
         self.visit(model)
         self.checkModelsUsingSameKeywords = False
@@ -215,9 +220,9 @@ class FileChecker(ast.NodeVisitor):
                 self.find_models_with_same_keywords(model, nodeDictList)
             else:
                 self.find_model_with_same_keywords(model, nodeDictList)
-    
+
     def append_same_keywords_for_one_keyword(self, node):
-        if self.keywordNamesList[0] == node.keyword:
+        if normalize(self.keywordNamesList[0]) == normalize(node.keyword):
             modelDict = {'model': self.currentModel, 'node': node}
             self.tempKeywords.append(modelDict)
             del(self.keywordNamesList[0])
@@ -230,10 +235,10 @@ class FileChecker(ast.NodeVisitor):
             self.keywordNamesList = self.copyKeywordNamesList.copy()
     
     def append_same_keywords_for_run_keywords(self, node):
-        if(normalize(node.name) == normalize('Run Keywords')):
+        if normalize(node.name) == normalize('Run Keywords'):
             keywordTokens = get_keywords_for_run_keywords(node.get_tokens(Token.ARGUMENT))
-            for keywordToken in keywordTokens:
-                if self.keywordNamesList[0] == keywordToken['keywordName'].value:
+            for index, keywordToken in enumerate(keywordTokens):
+                if normalize(self.keywordNamesList[0]) == normalize(keywordToken['keywordName'].value):
                     modelDict = {'model': self.currentModel, 'node': node, 'keyword': keywordToken}
                     self.tempKeywords.append(modelDict)
                     del(self.keywordNamesList[0])
@@ -244,21 +249,22 @@ class FileChecker(ast.NodeVisitor):
                 elif(len(self.copyKeywordNamesList) != len(self.keywordNamesList)):
                     self.tempKeywords = []
                     self.keywordNamesList = self.copyKeywordNamesList.copy()
-        elif self.keywordNamesList[0] == node.name:
-            modelDict = {'model': self.currentModel, 'node': node}
-            self.tempKeywords.append(modelDict)
-            del(self.keywordNamesList[0])
-            if(len(self.keywordNamesList) == 0):
-                self.sameKeywords.append(self.tempKeywords.copy())
+        else:
+            if normalize(self.keywordNamesList[0]) == normalize(node.name):
+                modelDict = {'model': self.currentModel, 'node': node}
+                self.tempKeywords.append(modelDict)
+                del(self.keywordNamesList[0])
+                if(len(self.keywordNamesList) == 0):
+                    self.sameKeywords.append(self.tempKeywords.copy())
+                    self.tempKeywords = []
+                    self.keywordNamesList = self.copyKeywordNamesList.copy()
+            elif(len(self.copyKeywordNamesList) != len(self.keywordNamesList)):
                 self.tempKeywords = []
                 self.keywordNamesList = self.copyKeywordNamesList.copy()
-        elif(len(self.copyKeywordNamesList) != len(self.keywordNamesList)):
-            self.tempKeywords = []
-            self.keywordNamesList = self.copyKeywordNamesList.copy()
 
     def append_same_keywords_for_forLoop(self, node):
-        for loopBodyMember in node.body:
-            if self.keywordNamesList[0] == loopBodyMember.keyword:
+        for index, loopBodyMember in enumerate(node.body):
+            if normalize(self.keywordNamesList[0]) == normalize(loopBodyMember.keyword):
                 modelDict = {'model': self.currentModel, 'node': node, 'keyword': loopBodyMember}
                 self.tempKeywords.append(modelDict)
                 del(self.keywordNamesList[0])
