@@ -11,6 +11,7 @@ class KeywordCreator(ast.NodeTransformer):
     def __init__(self, allModels=[]):
         self.allModels = allModels
         self.mover = KeywordMoveHelper(self.allModels)
+        self.removedDict = None
         self.isRemoveNode = False
 
     def visit_SuiteSetup(self, node):
@@ -18,67 +19,70 @@ class KeywordCreator(ast.NodeTransformer):
             Visit all keyword's call in suite_setup to do somethings.
         """
         if self.isRemoveNode:
-            self.is_node_equal_for_run_keywords(node, self.sameKeywordDict)
+            return self.is_node_equal_for_run_keywords(node, self.removedDict)
 
     def visit_SuiteTeardown(self, node):
         """
             Visit all keyword's call in suite_teardown to do somethings.
         """
         if self.isRemoveNode:
-            self.is_node_equal_for_run_keywords(node, self.sameKeywordDict)
+            return self.is_node_equal_for_run_keywords(node, self.removedDict)
 
     def visit_TestSetup(self, node):
         """
             Visit all keyword's call in test_setup to do somethings.
         """
         if self.isRemoveNode:
-            self.is_node_equal_for_run_keywords(node, self.sameKeywordDict)
+            return self.is_node_equal_for_run_keywords(node, self.removedDict)
 
     def visit_TestTeardown(self, node):
         """
             Visit all keyword's call in test_teardown to do somethings.
         """
         if self.isRemoveNode:
-            self.is_node_equal_for_run_keywords(node, self.sameKeywordDict)
+            return self.is_node_equal_for_run_keywords(node, self.removedDict)
 
     def visit_Setup(self, node):
         """
             Visit all keyword's call in setup to do somethings.
         """
         if self.isRemoveNode:
-            self.is_node_equal_for_run_keywords(node, self.sameKeywordDict)
+            return self.is_node_equal_for_run_keywords(node, self.removedDict)
 
     def visit_Teardown(self, node):
         """
             Visit all keyword's call in teardown to do somethings.
         """
         if self.isRemoveNode:
-            self.is_node_equal_for_run_keywords(node, self.sameKeywordDict)
+            return self.is_node_equal_for_run_keywords(node, self.removedDict)
 
     def visit_TestTemplate(self, node):
         """
             Visit all keyword's call in test_template to do somethings.
         """
         if self.isRemoveNode:
-            return self.is_node_equal_for_one_keyword(node, self.sameKeywordDict['node'])
+            return self.is_node_equal_for_one_keyword(node, self.removedDict['node'])
 
     def visit_Template(self, node):
         """
             Visit all keyword's call in template to do somethings.
         """
         if self.isRemoveNode:
-            return self.is_node_equal_for_one_keyword(node, self.sameKeywordDict['node'])
+            return self.is_node_equal_for_one_keyword(node, self.removedDict['node'])
     
     def visit_ForLoop(self, node):
         """
             Visit all keyword's call to do somethings.
         """
         if self.isRemoveNode:
-            if self.sameKeywordDict['node'] == node:
+            if self.removedDict['node'] == node:
                 for loopBodyMemeber in node.body.copy():
-                    if loopBodyMemeber == self.sameKeywordDict['keyword']:
-                        node.remove(loopBodyMemeber)
-                        return self.generic_visit(node)
+                    if loopBodyMemeber == self.removedDict['keyword']:
+                        node.body.remove(loopBodyMemeber)
+                        if len(node.body) == 0:
+                            return None
+                        else:
+                            return self.generic_visit(node)
             return node
 
     def visit_KeywordCall(self, node):
@@ -86,7 +90,7 @@ class KeywordCreator(ast.NodeTransformer):
             Visit all keyword's call to do somethings.
         """
         if self.isRemoveNode:
-            return self.is_node_equal_for_one_keyword(node, self.sameKeywordDict['node'])
+            return self.is_node_equal_for_one_keyword(node, self.removedDict['node'])
 
     def create_new_keyword_for_file(self, _path, keywordName, keywordBody):
 
@@ -121,13 +125,15 @@ class KeywordCreator(ast.NodeTransformer):
     def is_node_equal_for_run_keywords(self, node, keywordDict):
         if node == keywordDict['node']:
             if normalize(node.name) == normalize('Run Keywords'):
-                runKeywordsArgs = node.data_tokens
+                runKeywordsArgs = node.data_tokens #疑似tuple不能改變
                 copyRunKeywordsArgs = runKeywordsArgs.copy()
                 for index, runKeywordsArg in enumerate(runKeywordsArgs.copy()):
-                    if keywordDict['keywordName'] == runKeywordsArg or runKeywordsArg in keywordDict['Arguments']:
+                    if keywordDict['keyword']['keywordName'] == runKeywordsArg or runKeywordsArg in keywordDict['keyword']['arguments']:
+                        removedIndex = runKeywordsArgs.index(runKeywordsArg)
                         runKeywordsArgs.remove(runKeywordsArg)
-                        if len(runKeywordsArgs) != (index + 1) and runKeywordsArgs[index + 1].value == 'AND':
-                            runKeywordsArgs.remove(runKeywordsArgs[index + 1])
+                        if len(runKeywordsArgs) != removedIndex:
+                            if runKeywordsArgs[removedIndex + 1].value == 'AND':
+                                runKeywordsArgs.remove(runKeywordsArgs[removedIndex + 1])
                 if len(copyRunKeywordsArgs) != len(runKeywordsArgs):
                     return self.generic_visit(node)                
         return node
@@ -139,4 +145,6 @@ class KeywordCreator(ast.NodeTransformer):
         save_model_and_update_old_models(sameKeywordDict['model'], allModels)
         self.isRemoveNode = False
 
-    # def replace_old_steps_with_keyword_for_same_keywords(self, sameKeywords, ):
+    def replace_old_steps_with_keyword_for_same_keywords(self, sameKeywords, allModels):
+        for sameKeyword in sameKeywords:
+            self.remove_node_for_same_keywords(sameKeyword, allModels)

@@ -147,18 +147,18 @@ def wrap_steps_as_a_new_keyword():
         for modelWithSameKeywords in modelsWithSameKeywords:
             clear_screen()
             kwPrinter.print_model_with_same_keywords(modelWithSameKeywords)
-            if is_anwser_yes('Do you want to replace the steps with new keyword?(Y\\N):'):
-                clear_screen()
-                keywordArgs = []
-                for index, newArg in enumerate(newKeywordArgs):
-                    print_arugments_for_string_list(newKeywordArgs)
-                    arg = input('Please input \"'+ newArg +'\" content.\nIf you finish inputting argument, please input \'Exit\'.\n\nArgument' + str(index + 1)+'('+ newArg + '):')
-                    if normalize(arg) == normalize('Exit'):
-                        break
-                    else:
-                        keywordArgs.append(arg)
-            creator.remove_node_for_same_keywords(modelWithSameKeywords, allModels)
-
+            # if is_anwser_yes('Do you want to replace the steps with new keyword?(Y\\N):'):
+            #     clear_screen()
+            #     keywordArgs = []
+            #     for index, newArg in enumerate(newKeywordArgs):
+            #         print_arugments_for_string_list(newKeywordArgs)
+            #         arg = input('Please input \"'+ newArg +'\" content.\nIf you finish inputting argument, please input \'Exit\'.\n\nArgument' + str(index + 1)+'('+ newArg + '):')
+            #         if normalize(arg) == normalize('Exit'):
+            #             break
+            #         else:
+            #             keywordArgs.append(arg)
+            creator.replace_old_steps_with_keyword_for_same_keywords(modelWithSameKeywords, allModels)
+            break
 
             
         
