@@ -3,7 +3,7 @@ from robot.api import Token
 from robot.parsing.model import Keyword, Statement
 from python_package.newRfrefactoring.builder.testModelBuilder import TestModelBuilder
 from python_package.newRfrefactoring.keywords.keywordMoveHelper import KeywordMoveHelper
-from python_package.newRfrefactoring.common.utility import save_model_and_update_old_models, normalize
+from python_package.newRfrefactoring.common.utility import save_model_and_update_old_models, normalize, get_keywords_for_run_keywords, is_Keyword_tag
 
 
 class KeywordCreator(ast.NodeTransformer):
@@ -69,7 +69,7 @@ class KeywordCreator(ast.NodeTransformer):
         """
         if self.isRemoveNode:
             return self.is_node_equal_for_one_keyword(node, self.removedDict['node'])
-    
+
     def visit_ForLoop(self, node):
         """
             Visit all keyword's call to do somethings.
@@ -114,7 +114,7 @@ class KeywordCreator(ast.NodeTransformer):
             argsTokens.append(Token(Token.SEPARATOR, '    '))
             argsTokens.append(Token(Token.ARGUMENT, arg))
         argsTokens.append(Token(Token.EOL, '\n'))
-        
+
         return argsTokens
 
     def is_node_equal_for_one_keyword(self, node, keywordNode):
@@ -122,21 +122,81 @@ class KeywordCreator(ast.NodeTransformer):
             return None
         return node
 
-    def is_node_equal_for_run_keywords(self, node, keywordDict):
-        if node == keywordDict['node']:
+    def is_node_equal_for_run_keywords(self, node, removedDict):
+        def get_arguments_value_from_arguments_tokens(argsTokens):
+            argsValues = []
+            for argToken in argsTokens:
+                argsValues.append(argToken.value)
+            return argsValues
+
+            removedDict['keyword']['arguments']
+        
+        if node == removedDict['node']:
             if normalize(node.name) == normalize('Run Keywords'):
-                runKeywordsArgs = node.data_tokens #疑似tuple不能改變
+                runKeywordsArgs = node.get_tokens(Token.ARGUMENT)
                 copyRunKeywordsArgs = runKeywordsArgs.copy()
-                for index, runKeywordsArg in enumerate(runKeywordsArgs.copy()):
-                    if keywordDict['keyword']['keywordName'] == runKeywordsArg or runKeywordsArg in keywordDict['keyword']['arguments']:
+                for index, runKeywordsArg in enumerate(copyRunKeywordsArgs):
+                    removedArgsValues = get_arguments_value_from_arguments_tokens(removedDict['keyword']['arguments'])
+                    if runKeywordsArg.value == removedDict['keyword']['keywordName'].value or runKeywordsArg.value in removedArgsValues:
                         removedIndex = runKeywordsArgs.index(runKeywordsArg)
-                        runKeywordsArgs.remove(runKeywordsArg)
-                        if len(runKeywordsArgs) != removedIndex:
-                            if runKeywordsArgs[removedIndex + 1].value == 'AND':
-                                runKeywordsArgs.remove(runKeywordsArgs[removedIndex + 1])
+                        del(runKeywordsArgs[removedIndex])
+                        if runKeywordsArg.value in removedArgsValues:
+                            removedArgsValues.remove(runKeywordsArg.value)
+                        if len(runKeywordsArgs) != removedIndex and runKeywordsArgs[removedIndex].value == 'AND':
+                            del(runKeywordsArgs[removedIndex])
+                        if len(removedArgsValues) == 0:
+                            break
                 if len(copyRunKeywordsArgs) != len(runKeywordsArgs):
-                    return self.generic_visit(node)                
+                    if len(runKeywordsArgs) != 0:
+                        runKeywordsDict = get_keywords_for_run_keywords(runKeywordsArgs)
+                        runKeywordsNode = self.build_tag_keywords_for_run_keywords(node.__class__.__name__, runKeywordsDict)
+                        self.removedDict['node'] = runKeywordsNode
+                        return self.generic_visit(runKeywordsNode)
+                    else:
+                        return None
         return node
+
+    def build_tag_keywords_for_run_keywords(self, tagClass, keywords):
+        def build_tokens_of_run_keywords(keywordsTokens, keywords):
+            isFirst = True
+            for keyword in keywords:
+                if isFirst:
+                    keywordsTokens.append(Token(Token.ARGUMENT, keyword['keywordName'].value))
+                    isFirst = False
+                else:
+                    keywordsTokens.append(Token(Token.EOL, '\n'))
+                    keywordsTokens.append(Token(Token.SEPARATOR, '    '))
+                    keywordsTokens.append(Token(Token.CONTINUATION, '...'))
+                    keywordsTokens.append(Token(Token.SEPARATOR, '                    '))
+                    keywordsTokens.append(Token(Token.ARGUMENT, 'AND'))
+                    keywordsTokens.append(Token(Token.SEPARATOR, '    '))
+                    keywordsTokens.append(Token(Token.ARGUMENT, keyword['keywordName'].value))
+                for arg in keyword['arguments']:
+                    keywordsTokens.append(Token(Token.SEPARATOR, '    '))
+                    keywordsTokens.append(Token(Token.ARGUMENT, arg.value))
+        tagToken = None
+        if tagClass == 'SuiteSetup':
+            tagToken = Token.SUITE_SETUP
+        elif tagClass == 'SuiteTeardown':
+            tagToken = Token.SUITE_TEARDOWN
+        elif tagClass == 'TestSetup':
+            tagToken = Token.TEST_SETUP
+        elif tagClass == 'TestTeardown':
+            tagToken = Token.TEST_TEARDOWN
+        elif tagClass == 'Setup':
+            tagToken = Token.SETUP
+        elif tagClass == 'Teardown':
+            tagToken = Token.TEARDOWN
+            
+        keywordsTokens = [
+            Token(Token.SEPARATOR, '    '),
+            Token(tagToken, '['+tagClass+']'),
+            Token(Token.SEPARATOR, '    '),
+            Token(Token.NAME, 'Run Keywords'),
+            Token(Token.SEPARATOR, '    ')
+        ]
+        build_tokens_of_run_keywords(keywordsTokens, keywords)
+        return Statement.from_tokens(keywordsTokens)
 
     def remove_node_for_same_keywords(self, sameKeywordDict, allModels):
         self.isRemoveNode = True
@@ -146,5 +206,15 @@ class KeywordCreator(ast.NodeTransformer):
         self.isRemoveNode = False
 
     def replace_old_steps_with_keyword_for_same_keywords(self, sameKeywords, allModels):
+        tagKeywords = []
+        updatedNode = None
         for sameKeyword in sameKeywords:
+            if is_Keyword_tag(sameKeyword['node']):
+                if not(sameKeyword['node'] in tagKeywords):
+                    tagKeywords.append(sameKeyword['node'])
+                else:
+                    sameKeyword['node'] = updatedNode
             self.remove_node_for_same_keywords(sameKeyword, allModels)
+            if is_Keyword_tag(sameKeyword['node']):
+                updatedNode = sameKeyword['node']
+            

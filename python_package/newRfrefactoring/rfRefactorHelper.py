@@ -90,7 +90,8 @@ def update_keywords_arguments(lineKeywords, newKeywordArgs):
             isFirst = False
 
 def wrap_steps_as_a_new_keyword():
-    projectPath = get_folder_path_from_user('Please input the folder\'s path which will be scanned.\nScanned folder path:')
+    # projectPath = get_folder_path_from_user('Please input the folder\'s path which will be scanned.\nScanned folder path:')
+    projectPath = 'C:/Users/Gene/Desktop/Thesis_For_Refactor/python_package/test_data'
     clear_screen()
     # projectPath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data'
     # projectPath = 'D:/Project/test_automation'
@@ -99,19 +100,20 @@ def wrap_steps_as_a_new_keyword():
     projectbuildThread = BuildingModelThread(projectPath)
     projectbuildThread.start()
 
-    fromFilePath = get_file_path_from_user('Please input the file\'s path which has the steps that will be wrapped as a keyword.\nFile path:')
+    # fromFilePath = get_file_path_from_user('Please input the file\'s path which has the steps that will be wrapped as a keyword.\nFile path:')
+    fromFilePath = 'C:/Users/Gene/Desktop/Thesis_For_Refactor/python_package/test_data/test_data.robot'
     clear_screen()
     # fromFilePath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data/test_data.robot'
     # fromFilePath = 'D:/Project/test_automation/RobotTests/Feature Tests/Parts Management/TMD-18039 Edit_View Part Instance Detail Page/Keywords/TMD-18137.txt'
     fileBuildThread = BuildingModelThread(fromFilePath)
     fileBuildThread.start()
 
-    startLine = int(get_number_from_user('Please input start line to get steps.\nStart line:'))
-    clear_screen()
-    endLine = int(get_number_from_user('Please input end line to get steps.\nEnd line:'))
-    clear_screen()
-    # startLine = 44
-    # endLine = 50
+    # startLine = int(get_number_from_user('Please input start line to get steps.\nStart line:'))
+    # clear_screen()
+    # endLine = int(get_number_from_user('Please input end line to get steps.\nEnd line:'))
+    # clear_screen()
+    startLine = 44
+    endLine = 50
     # startLine = 92
     # endLine = 98
 
@@ -127,7 +129,8 @@ def wrap_steps_as_a_new_keyword():
     checker.find_models_with_same_keywords(allModels, lineKeywords)
     modelsWithSameKeywords = checker.get_models_with_same_keywords()
 
-    newKeywordArgs = get_arguments_of_new_keyword_from_user(lineKeywords)
+    # newKeywordArgs = get_arguments_of_new_keyword_from_user(lineKeywords)
+    newKeywordArgs = ['${test1}']
     newKeywordArgsTokens = []
     if len(newKeywordArgs) != 0:
         update_keywords_arguments(lineKeywords, newKeywordArgs)
@@ -136,14 +139,18 @@ def wrap_steps_as_a_new_keyword():
     newKeywordsBody = lineKwsHelper.get_new_keyword_body_from_line_keywords_and_arguments_tokens(lineKeywords, newKeywordArgsTokens)
     clear_screen()
     kwPrinter.print_all_lines_keywords(lineKeywords)
-    newKeywordName = input('Please input name for new keyword.\nKeyword name:')
+    # newKeywordName = input('Please input name for new keyword.\nKeyword name:')
+    newKeywordName = 'Test123'
     clear_screen()
-    newKeywordPath = get_file_path_from_user('Please input the file\'s path where new keyword will insert into.\nFile path:')
+    # newKeywordPath = get_file_path_from_user('Please input the file\'s path where new keyword will insert into.\nFile path:')
+    newKeywordPath = 'C:/Users/Gene/Desktop/Thesis_For_Refactor/python_package/test_data/ezScrum.txt'
     clear_screen()
     # newKeywordPath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data/ezScrum.txt'
     creator.create_new_keyword_for_file(newKeywordPath, newKeywordName, newKeywordsBody)
     recovery_models(teardowmModels.join())  #記得刪掉
-    if len(modelsWithSameKeywords) != 0 and is_anwser_yes('The steps are same in '+ str(len(modelsWithSameKeywords)) +' places\nDo you want to replace same steps in other files with new keyword?(Y\\N):'):
+    
+    # if len(modelsWithSameKeywords) != 0 and is_anwser_yes('The steps are same in '+ str(len(modelsWithSameKeywords)) +' places\nDo you want to replace same steps in other files with new keyword?(Y\\N):'):
+    if True:
         for modelWithSameKeywords in modelsWithSameKeywords:
             clear_screen()
             kwPrinter.print_model_with_same_keywords(modelWithSameKeywords)
@@ -158,9 +165,7 @@ def wrap_steps_as_a_new_keyword():
             #         else:
             #             keywordArgs.append(arg)
             creator.replace_old_steps_with_keyword_for_same_keywords(modelWithSameKeywords, allModels)
-            break
 
-            
         
 
 
