@@ -21,11 +21,12 @@ Find Variable Usage Test Keyword
     Find Usage Test Keyword1    ${resourceFileVariable}
     [Teardown]    Find Usage Test Keyword2    ${resourceFileVariable}1
 
-Same Keywords
-    Log    testLog
+Find Variable Usage And Log Message
+    Find Variable Usage Test Keyword
+    Log    Welcome to ezScrum
     FOR    ${var}    IN    @{testVariable}
-        Test To Same Keyword    ${var}
-        Log Same Keyword    ${var}2
+        Log Mutiple Text    ${var}
+        Log Two Different Text    ${var}    new${var}
     END
     [Teardown]    Run Keywords    Test Keyword
     ...                    AND    For Loop Keyword    5

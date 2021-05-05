@@ -34,12 +34,12 @@ Find Usage Test Keyword3
     [Teardown]    Run Keywords    Find Usage Test Keyword1
     ...    AND    Find Usage Test Keyword2
 
-Test To Same Keyword
+Log Mutiple Text
     [Arguments]    ${text}
-    Log    ${text}123
     Log    ${text}
+    Log    Mutiple${text}
 
-Log Same Keyword
+Log Two Different Text
     [Arguments]    ${text}    ${secondText}
     Log    ${text}
     Log    ${secondText}
