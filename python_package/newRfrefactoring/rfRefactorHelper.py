@@ -201,17 +201,49 @@ def wrap_steps_as_a_new_keyword():
     mover = KeywordMoveHelper(allModels)
     import_resource_where_new_keyword(newKeywordName, modelsWithReplacement, newKeywordPath)
 
+def move_defined_keyword_to_another_model():
+    global mover
+    projectPath = get_folder_path_from_user('Please input the folder\'s path which will be scanned.\nEx:D:/test_data\nScanned folder path:')
+    clear_screen()
+    projectbuildThread = BuildingModelThread(projectPath)
+    projectbuildThread.start()
+    keywordName = input('Please input the keyword which you want to move.\nEx:Open The Browser\nMoved keyword\'s name:')
+    clear_screen()
+    fromFilePath = get_file_path_from_user('Please input the file\'s path where the moved keyword.\nEx:D:/test_data\nFrom file\'s path:')
+    fromFilebuildThread = BuildingModelThread(fromFilePath)
+    fromFilebuildThread.start()
+    clear_screen()
+    targetFilePath = get_file_path_from_user('Please input the file\'s path where the moved keyword will be inserted.\nEx:D:/test_data\nTarget file\'s path:')
+    targetFilebuildThread = BuildingModelThread(targetFilePath)
+    targetFilebuildThread.start()
+    clear_screen()
+    print('Please wait, Models building~')
+    allModels = projectbuildThread.join()
+    fromFileModel = fromFilebuildThread.join()
+    targetFileModel = targetFilebuildThread.join()
+    mover = KeywordMoveHelper(allModels)
+    targetFileName = get_file_name_from_path(targetFileModel.source)
+    mover.move_keyword_defined_to_file(keywordName, fromFileModel, targetFileModel, targetFileName)
+
 if __name__ == '__main__':
 
     clear_screen()
     print('Please select a mode:')
-    print('1. Wrap steps as a keyword')
+    print('1. Move defined keyword to another file')
+    print('2. Wrap steps as a keyword')
+    print('9. Exit system')
+
     mode = None
     while True:
         mode = input('Mode:')
         clear_screen()
         if(mode == '1.' or mode == '1'):
+            move_defined_keyword_to_another_model()
+            exit('Thank you for using.')
+        elif(mode == '2.' or mode == '2'):
             wrap_steps_as_a_new_keyword()
+            exit('Thank you for using.')
+        elif(mode == '9.' or mode == '9'):
             exit('Thank you for using.')
         else:
             print('Please input correct mode')

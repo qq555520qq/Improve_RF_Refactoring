@@ -29,12 +29,6 @@ class KeywordMoveHelper(ast.NodeTransformer):
             node.body.insert(0, newResource)
         return self.generic_visit(node)
 
-    def visit_Keyword(self, node):
-        if(self.removeOldKeywordDefined):
-            if(node == self.movedKeywordNode):
-                return None
-        return node
-
     def visit_KeywordSection(self, node):
         """
             Visit all keyword's define to do something.
@@ -45,7 +39,11 @@ class KeywordMoveHelper(ast.NodeTransformer):
                 node.body[-1].body.append(empty_line)
             node.body.append(self.movedKeywordNode)
             return self.generic_visit(node)
-
+        elif(self.removeOldKeywordDefined):
+            for index, keyword in  enumerate(node.body):
+                if(keyword == self.movedKeywordNode):
+                    del(node.body[index])
+                    return node
         return node
 
     def find_moved_keyword_node(self, fromFileModel, movedKeywordName):
