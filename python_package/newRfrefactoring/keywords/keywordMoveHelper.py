@@ -41,11 +41,12 @@ class KeywordMoveHelper(ast.NodeTransformer):
         """
         if(self.insertKeywordDefined):
             if node.body[-1].body[-1].__class__.__name__ != 'EmptyLine':
-                empty_line = Statement.from_tokens([Token(Token.EOL, '\n')])
+                empty_line = Statement.from_tokens([Token(Token.EOL, '\n'), Token(Token.EOL, '\n')])
                 node.body[-1].body.append(empty_line)
             node.body.append(self.movedKeywordNode)
+            return self.generic_visit(node)
 
-        return self.generic_visit(node)
+        return node
 
     def find_moved_keyword_node(self, fromFileModel, movedKeywordName):
         self.finder.visit_model_for_finding_keyword(fromFileModel, movedKeywordName)
@@ -78,17 +79,32 @@ class KeywordMoveHelper(ast.NodeTransformer):
                     allModels.remove(model)
             return allModels
 
-        oldImportedResourceName = get_file_name_from_path(oldImportedResource.source)
+        oldImportedResourceName = get_file_name_from_path(oldImportedResource)
         self.checker.visit_models_to_check_keyword_and_resource(self.modelsInDir, movedKeywordName, oldImportedResourceName)
         modelsUsingKeyword = self.checker.get_models_with_resource_and_keyword()
         self.checker.clear_models_with_resource_and_keyword()
 
-        newImportedResourceName = get_file_name_from_path(newImportedResource.source)
+        newImportedResourceName = get_file_name_from_path(newImportedResource)
         self.checker.visit_models_to_check_keyword_and_resource(modelsUsingKeyword, movedKeywordName, newImportedResourceName)
         modelsWithImportNewResource = self.checker.get_models_with_resource_and_keyword()
         self.checker.clear_models_with_resource_and_keyword()
 
         return split_models_without_import(modelsUsingKeyword, modelsWithImportNewResource)
+
+    def get_models_without_import_new_resource_from_models_with_replacement(self, newKeywordName, modelsWithReplacement, newImportedResourcePath):
+        
+        def split_models_without_import(allModels, modelsWithImport):
+            for model in modelsWithImport:
+                if(model in allModels):
+                    allModels.remove(model)
+            return allModels
+
+        newImportedResourceName = get_file_name_from_path(newImportedResourcePath)
+        self.checker.visit_models_to_check_keyword_and_resource(modelsWithReplacement, newKeywordName, newImportedResourceName)
+        modelsWithImportNewResource = self.checker.get_models_with_resource_and_keyword()
+        self.checker.clear_models_with_resource_and_keyword()
+
+        return split_models_without_import(modelsWithReplacement, modelsWithImportNewResource)
 
     def import_new_resource_for_models(self, modelsWithoutImport, importedResource):
         
@@ -110,5 +126,5 @@ class KeywordMoveHelper(ast.NodeTransformer):
         self.insert_new_keyword_defined(targetFileModel)
         if(newImportedResource):
             self.importedResource = newImportedResource
-            modelsWithoutImport = self.get_models_without_import_new_resource(movedKeywordName, fromFileModel, targetFileModel)
+            modelsWithoutImport = self.get_models_without_import_new_resource(movedKeywordName, fromFileModel.source, targetFileModel.source)
             self.import_new_resource_for_models(modelsWithoutImport, newImportedResource)

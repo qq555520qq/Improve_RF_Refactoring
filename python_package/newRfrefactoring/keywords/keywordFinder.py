@@ -151,7 +151,9 @@ class KeywordFinder(ast.NodeVisitor):
             for keywordDict in runKeywordsBody.copy():
                 if (keywordDict['keywordName'].lineno < self.startLine or keywordDict['keywordName'].lineno > self.endLine):
                     runKeywordsBody.remove(keywordDict)
-            nodeDict = {'model': self.model, 'node': node, 'body': runKeywordsBody}
+            nodeDict = {'containTag': False, 'model': self.model, 'node': node, 'body': runKeywordsBody}
+            if node.lineno >= self.startLine and node.lineno <= self.endLine:
+                nodeDict['containTag'] = True
             if len(nodeDict['body']) != 0:
                 self.linesKeywords.append(nodeDict)
         elif(node.lineno >= self.startLine and node.lineno <= self.endLine):

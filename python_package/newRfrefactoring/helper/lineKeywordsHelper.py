@@ -1,6 +1,7 @@
 from robot.api import Token
 from robot.parsing.model import Statement
 from python_package.newRfrefactoring.common.utility import is_ForLoop, is_Keyword_tag, is_KeywordCall
+from python_package.newRfrefactoring.builder.testModelBuilder import TestModelBuilder
 
 class LineKeywordsHelper():
 
@@ -78,6 +79,23 @@ class LineKeywordsHelper():
         if len(argsTokens) != 0:
             arguments = Statement.from_tokens(argsTokens)
             keywordsBody.append(arguments)
-        for lineKeyword in lineKeywords:
-            keywordsBody.append(lineKeyword['node'])
+        for index, lineKeyword in enumerate(lineKeywords):
+            if is_ForLoop(lineKeyword['node']):
+                if lineKeyword['containFor']:
+                    keywordsBody.append(lineKeyword['node'])
+                else:
+                    for loopBodyMember in lineKeyword['body']:
+                        keywordsBody.append(loopBodyMember)
+            elif is_Keyword_tag(lineKeyword['node']):
+                if lineKeyword['containTag'] and index != 0:
+                    keywordsBody.append(lineKeyword['node'])
+                else:
+                    for keyword in lineKeyword['body']:
+                        argumentsValues = []
+                        for arg in keyword['arguments']:
+                            argumentsValues.append(arg.value)
+                        keywordCall = TestModelBuilder().build_keywordCall('    ', keyword['keywordName'].value, argumentsValues)
+                        keywordsBody.append(keywordCall)
+            else:
+                keywordsBody.append(lineKeyword['node'])
         return keywordsBody

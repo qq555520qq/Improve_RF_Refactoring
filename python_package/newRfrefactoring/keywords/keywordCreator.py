@@ -193,88 +193,109 @@ class KeywordCreator(ast.NodeTransformer):
     def build_tag_keywords_for_run_keywords(self, tagClass, keywords):
         def build_tokens_of_run_keywords(keywordsTokens, keywords):
             isFirst = True
-            for keyword in keywords:
-                if isFirst:
-                    keywordsTokens.append(Token(Token.ARGUMENT, keyword['keywordName'].value))
-                    isFirst = False
+            if len(keywords) > 1:
+                for keyword in keywords:
+                    if isFirst:
+                        if isinstance(keyword['keywordName'], Token):
+                            keywordsTokens.append(Token(Token.ARGUMENT, keyword['keywordName'].value))
+                        else:
+                            keywordsTokens.append(Token(Token.ARGUMENT, keyword['keywordName']))
+                        isFirst = False
+                    else:
+                        keywordsTokens.append(Token(Token.EOL, '\n'))
+                        keywordsTokens.append(Token(Token.SEPARATOR, '    '))
+                        keywordsTokens.append(Token(Token.CONTINUATION, '...'))
+                        keywordsTokens.append(Token(Token.SEPARATOR, '                    '))
+                        keywordsTokens.append(Token(Token.ARGUMENT, 'AND'))
+                        keywordsTokens.append(Token(Token.SEPARATOR, '    '))
+                        if isinstance(keyword['keywordName'], Token):
+                            keywordsTokens.append(Token(Token.ARGUMENT, keyword['keywordName'].value))
+                        else:
+                            keywordsTokens.append(Token(Token.ARGUMENT, keyword['keywordName']))
+                    for arg in keyword['arguments']:
+                        keywordsTokens.append(Token(Token.SEPARATOR, '    '))
+                        if isinstance(keyword['keywordName'], Token):
+                            keywordsTokens.append(Token(Token.ARGUMENT, arg.value))
+                        else:
+                            keywordsTokens.append(Token(Token.ARGUMENT, arg))
+            else:
+                if isinstance(keywords[0]['keywordName'], Token):
+                    keywordsTokens.append(Token(Token.NAME, keywords[0]['keywordName'].value))
                 else:
-                    keywordsTokens.append(Token(Token.EOL, '\n'))
+                    keywordsTokens.append(Token(Token.NAME, keywords[0]['keywordName']))
+                for arg in keywords[0]['arguments']:
                     keywordsTokens.append(Token(Token.SEPARATOR, '    '))
-                    keywordsTokens.append(Token(Token.CONTINUATION, '...'))
-                    keywordsTokens.append(Token(Token.SEPARATOR, '                    '))
-                    keywordsTokens.append(Token(Token.ARGUMENT, 'AND'))
-                    keywordsTokens.append(Token(Token.SEPARATOR, '    '))
-                    keywordsTokens.append(Token(Token.ARGUMENT, keyword['keywordName'].value))
-                for arg in keyword['arguments']:
-                    keywordsTokens.append(Token(Token.SEPARATOR, '    '))
-                    keywordsTokens.append(Token(Token.ARGUMENT, arg.value))
-        tagToken = None
-        if tagClass == 'SuiteSetup':
-            tagToken = Token.SUITE_SETUP
-        elif tagClass == 'SuiteTeardown':
-            tagToken = Token.SUITE_TEARDOWN
-        elif tagClass == 'TestSetup':
-            tagToken = Token.TEST_SETUP
-        elif tagClass == 'TestTeardown':
-            tagToken = Token.TEST_TEARDOWN
-        elif tagClass == 'Setup':
-            tagToken = Token.SETUP
-        elif tagClass == 'Teardown':
-            tagToken = Token.TEARDOWN
+                    if isinstance(arg, Token):
+                        keywordsTokens.append(Token(Token.ARGUMENT, arg.value))
+                    else:
+                        keywordsTokens.append(Token(Token.ARGUMENT, arg))
+            keywordsTokens.append(Token(Token.EOL, '\n'))
+
+        def get_token_type_from_tag_class(tagClass):
+            if tagClass == 'SuiteSetup':
+                return [Token(Token.SUITE_SETUP, 'Suite Setup')]
+            elif tagClass == 'SuiteTeardown':
+                return [Token(Token.SUITE_TEARDOWN, 'Suite Teardown')]
+            elif tagClass == 'TestSetup':
+                return [Token(Token.TEST_SETUP, 'Test Setup')]
+            elif tagClass == 'TestTeardown':
+                return [Token(Token.TEST_TEARDOWN, 'Test Teardown')]
+            elif tagClass == 'Setup':
+                return [Token(Token.SEPARATOR, '    '), Token(Token.SETUP, '[Setup]')]
+            elif tagClass == 'Teardown':
+                return [Token(Token.SEPARATOR, '    '), Token(Token.TEARDOWN, '[Teardown]')]
             
-        keywordsTokens = [
-            Token(Token.SEPARATOR, '    '),
-            Token(tagToken, '['+tagClass+']'),
-            Token(Token.SEPARATOR, '    '),
-            Token(Token.NAME, 'Run Keywords'),
-            Token(Token.SEPARATOR, '    ')
-        ]
+        keywordsTokens = []
+        keywordsTokens = get_token_type_from_tag_class(tagClass)
+        keywordsTokens.append(Token(Token.SEPARATOR, '    '))
+        if len(keywords) > 1:
+            keywordsTokens.append(Token(Token.NAME, 'Run Keywords'))
+            keywordsTokens.append(Token(Token.SEPARATOR, '    '))
+
         build_tokens_of_run_keywords(keywordsTokens, keywords)
         return Statement.from_tokens(keywordsTokens)
 
-    def remove_node_for_same_keywords(self, sameKeywordDict, allModels):
-        self.isRemoveNode = True
-        self.removedDict = sameKeywordDict
-        self.visit(sameKeywordDict['model'])
-        save_model_and_update_old_models(sameKeywordDict['model'], allModels)
-        self.isRemoveNode = False
-
-    def replace_last_keyword_with_new_keyword(self, newKeywordDict, sameKeywords, allModels):
-        def build_keywordCall(newKeywordName, arguments):
-            keywordsTokens = [
-                Token(Token.SEPARATOR, '    '),
-                Token(Token.KEYWORD, newKeywordName)
-            ]
-            for arg in arguments:
-                keywordsTokens.append(Token(Token.SEPARATOR, '    '))
-                keywordsTokens.append(Token(Token.ARGUMENT, arg))
-            keywordsTokens.append(Token(Token.EOL, '\n'))
-            return Statement.from_tokens(keywordsTokens)
+    def replace_old_steps_with_keyword_for_same_keywords(self, newKeywordDict, sameKeywords):
+        def remove_node_for_same_keywords(sameKeywordDict, allModels):
+            self.isRemoveNode = True
+            self.removedDict = sameKeywordDict
+            self.visit(sameKeywordDict['model'])
+            save_model_and_update_old_models(sameKeywordDict['model'], allModels)
+            self.isRemoveNode = False
 
         def build_forLoop(lastSameKeyword, newKeywordName, arguments):
-            newKeywordNode = build_keywordCall(newKeywordName, arguments)
+            newKeywordNode = TestModelBuilder().build_keywordCall('        ', newKeywordName, arguments)
             for index, loopBodyMember in enumerate(lastSameKeyword['node'].body):
                 if loopBodyMember == lastSameKeyword['keyword']:
-                    lastSameKeyword[index] = newKeywordNode
+                    lastSameKeyword['node'].body[index] = newKeywordNode
                     break
             return lastSameKeyword['node']
 
+        def build_tag_keywords(lastSameKeyword, newKeywordDict):
+            if normalize(lastSameKeyword['node'].name) == normalize('Run Keywords'):
+                runKeywordsArgs = lastSameKeyword['node'].get_tokens(Token.ARGUMENT)
+                runKeywordsDict = get_keywords_for_run_keywords(runKeywordsArgs)
+                runKeywordsDict[-1] = newKeywordDict
+                return self.build_tag_keywords_for_run_keywords(lastSameKeyword['node'].__class__.__name__, runKeywordsDict)
+            else:
+                return self.build_tag_keywords_for_run_keywords(lastSameKeyword['node'].__class__.__name__, [newKeywordDict])
+
         def build_replaced_node(newKeywordDict, sameKeywords):
             if is_KeywordCall(sameKeywords[0]['node']) or (is_ForLoop(sameKeywords[0]['node']) and sameKeywords[0]['containFor']):
-                return build_keywordCall(newKeywordDict['keywordName'], newKeywordDict['arguments'])
+                return TestModelBuilder().build_keywordCall('    ', newKeywordDict['keywordName'], newKeywordDict['arguments'])
             elif is_ForLoop(sameKeywords[0]['node']) and not(sameKeywords[0]['containFor']):
                 return build_forLoop(sameKeywords[-1], newKeywordDict['keywordName'], newKeywordDict['arguments'])
-            # elif is_Keyword_tag(sameKeywords[0]['node']):
-            #     if 
+            elif is_Keyword_tag(sameKeywords[0]['node']):
+                return build_tag_keywords(sameKeywords[-1], newKeywordDict)
 
-        self.isReplaceLastKeyword = True
-        self.newNode = build_replaced_node(newKeywordDict, sameKeywords)
-        self.replacedDict = sameKeywords[-1]
-        self.visit(sameKeywords[-1]['model'])
-        save_model_and_update_old_models(sameKeywords[-1]['model'], allModels)
-        self.isReplaceLastKeyword = False
+        def replace_last_keyword_with_new_keyword(newKeywordDict, sameKeywords, allModels):
+            self.isReplaceLastKeyword = True
+            self.newNode = build_replaced_node(newKeywordDict, sameKeywords)
+            self.replacedDict = sameKeywords[-1]
+            self.visit(sameKeywords[-1]['model'])
+            save_model_and_update_old_models(sameKeywords[-1]['model'], allModels)
+            self.isReplaceLastKeyword = False
 
-    def replace_old_steps_with_keyword_for_same_keywords(self, newKeywordDict, sameKeywords, allModels):
         tagKeywords = []
         updatedNode = None
         for sameKeyword in sameKeywords:
@@ -284,9 +305,8 @@ class KeywordCreator(ast.NodeTransformer):
                 else:
                     sameKeyword['node'] = updatedNode
             if sameKeyword != sameKeywords[-1]:
-                self.remove_node_for_same_keywords(sameKeyword, allModels)
+                remove_node_for_same_keywords(sameKeyword, self.allModels)
                 if is_Keyword_tag(sameKeyword['node']):
                     updatedNode = sameKeyword['node']
             else:
-                self.replace_last_keyword_with_new_keyword(newKeywordDict, sameKeywords, allModels)
-        
+                replace_last_keyword_with_new_keyword(newKeywordDict, sameKeywords, self.allModels)

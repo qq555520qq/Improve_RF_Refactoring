@@ -1,6 +1,8 @@
 import os
-from python_package.newRfrefactoring.common.utility import normalize, get_file_name_from_path, get_file_extension_from_path
 from robot.parsing import get_model, get_resource_model, get_init_model
+from robot.parsing.model import Statement
+from robot.api import Token
+from python_package.newRfrefactoring.common.utility import normalize, get_file_name_from_path, get_file_extension_from_path
 
 
 class TestModelBuilder:
@@ -31,3 +33,14 @@ class TestModelBuilder:
                 models.append(self.build(testDirPath+'/'+file))
 
         return models
+
+    def build_keywordCall(self, prefix, newKeywordName, arguments):
+        keywordsTokens = [
+            Token(Token.SEPARATOR, prefix),
+            Token(Token.KEYWORD, newKeywordName)
+        ]
+        for arg in arguments:
+            keywordsTokens.append(Token(Token.SEPARATOR, '    '))
+            keywordsTokens.append(Token(Token.ARGUMENT, arg))
+        keywordsTokens.append(Token(Token.EOL, '\n'))
+        return Statement.from_tokens(keywordsTokens)

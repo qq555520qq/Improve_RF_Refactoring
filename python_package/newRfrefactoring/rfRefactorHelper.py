@@ -8,6 +8,7 @@ from python_package.newRfrefactoring.keywords.keywordFinder import KeywordFinder
 from python_package.newRfrefactoring.checker.fileChecker import FileChecker
 from python_package.newRfrefactoring.keywords.keywordCreator import KeywordCreator
 from python_package.newRfrefactoring.keywords.keywordPrinter import KeywordPrinter
+from python_package.newRfrefactoring.keywords.keywordMoveHelper import KeywordMoveHelper
 from python_package.newRfrefactoring.helper.lineKeywordsHelper import LineKeywordsHelper
 from python_package.newRfrefactoring.common.utility import *
 from prettytable import PrettyTable
@@ -18,6 +19,7 @@ checker = FileChecker()
 creator = None
 lineKwsHelper = LineKeywordsHelper()
 kwPrinter = KeywordPrinter()
+mover = None
 
 def get_arguments_of_new_keyword_from_user(lineKeywords):
     newKeywordArgs = []
@@ -89,31 +91,78 @@ def update_keywords_arguments(lineKeywords, newKeywordArgs):
                 print('There is not keyword in line that you input.')
             isFirst = False
 
+def replace_steps_with_a_new_keyword(modelsWithSameKeywords, allModels, newKeywordName, newKeywordArgs):
+    replacedStepsModels = []
+    if len(modelsWithSameKeywords) != 0 and is_anwser_yes('The steps are same in '+ str(len(modelsWithSameKeywords)) +' places\nDo you want to replace same steps in other files with new keyword?(Y\\N):'):
+        for modelWithSameKeywords in modelsWithSameKeywords:
+            replacedStepsModels.append(modelWithSameKeywords[0]['model'])
+            clear_screen()
+            kwPrinter.print_model_with_same_keywords(modelWithSameKeywords)
+            if is_anwser_yes('Do you want to replace the steps with new keyword?(Y\\N):'):
+                clear_screen()
+                keywordArgs = []
+                for index, newArg in enumerate(newKeywordArgs):
+                    print_arugments_for_string_list(newKeywordArgs)
+                    arg = input('Please input \"'+ newArg +'\" content.\nIf you finish inputting argument, please input \'Exit\'.\n\nArgument' + str(index + 1)+'('+ newArg + '):')
+                    if normalize(arg) == normalize('Exit'):
+                        break
+                    else:
+                        keywordArgs.append(arg)
+                    clear_screen()
+                newKeywordDict = {'keywordName': newKeywordName, 'arguments': keywordArgs}
+                creator.replace_old_steps_with_keyword_for_same_keywords(newKeywordDict, modelWithSameKeywords)
+    return replacedStepsModels
+
+
+def import_resource_where_new_keyword(newKeywordName, modelsWithReplacement, newKeywordPath):
+    modelsWithoutImport = mover.get_models_without_import_new_resource_from_models_with_replacement(newKeywordName, modelsWithReplacement, newKeywordPath)
+    if len(modelsWithoutImport) != 0:
+        pathWithoutImportTable = PrettyTable()
+        pathOfNewKeywordTable = PrettyTable()
+        pathWithoutImportTable.field_names = ['Path without importing resource of new keyword']
+        pathOfNewKeywordTable.field_names = ['Path of resource where new keyword']
+        for model in modelsWithoutImport:
+            pathWithoutImportTable.add_row([model.source])
+        print('The Following path(s) don\'t import resource of new keyword.')
+        print(pathWithoutImportTable)
+        if is_anwser_yes('Do you want to import resource for them(it)?(Y\\N):'):
+            for model in modelsWithoutImport:
+                clear_screen()
+                pathWithoutImportTable.clear_rows()
+                pathWithoutImportTable.add_row([model.source])
+                pathOfNewKeywordTable.add_row([newKeywordPath])
+                print(pathWithoutImportTable)
+                print(pathOfNewKeywordTable)
+                resourceStr = input('Please input resource value that you want to import for it.\nResource value:')
+                mover.import_new_resource_for_models([model], resourceStr)
+
 def wrap_steps_as_a_new_keyword():
-    # projectPath = get_folder_path_from_user('Please input the folder\'s path which will be scanned.\nScanned folder path:')
+    global creator
+    global mover
+    projectPath = get_folder_path_from_user('Please input the folder\'s path which will be scanned.\nEx:D:/test_data\nScanned folder path:')
     clear_screen()
     # projectPath = 'C:/Users/Gene/Desktop/Thesis_For_Refactor/python_package/test_data'
-    projectPath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data'
+    # projectPath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data'
     # projectPath = 'D:/Project/test_automation'
     teardowmModels = BuildingModelThread(projectPath)
     teardowmModels.start()
     projectbuildThread = BuildingModelThread(projectPath)
     projectbuildThread.start()
 
-    # fromFilePath = get_file_path_from_user('Please input the file\'s path which has the steps that will be wrapped as a keyword.\nFile path:')
+    fromFilePath = get_file_path_from_user('Please input the file\'s path which has the steps that will be wrapped as a keyword.\nEx:D:/test_data/test_data.robot\nFile path:')
     clear_screen()
     # fromFilePath = 'C:/Users/Gene/Desktop/Thesis_For_Refactor/python_package/test_data/test_data.robot'
-    fromFilePath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data/test_data.robot'
+    # fromFilePath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data/test_data.robot'
     # fromFilePath = 'D:/Project/test_automation/RobotTests/Feature Tests/Parts Management/TMD-18039 Edit_View Part Instance Detail Page/Keywords/TMD-18137.txt'
     fileBuildThread = BuildingModelThread(fromFilePath)
     fileBuildThread.start()
 
-    # startLine = int(get_number_from_user('Please input start line to get steps.\nStart line:'))
-    # clear_screen()
-    # endLine = int(get_number_from_user('Please input end line to get steps.\nEnd line:'))
-    # clear_screen()
-    startLine = 44
-    endLine = 48
+    startLine = int(get_number_from_user('Please input start line to get steps.\nStart line:'))
+    clear_screen()
+    endLine = int(get_number_from_user('Please input end line to get steps.\nEnd line:'))
+    clear_screen()
+    # startLine = 44
+    # endLine = 50
     # startLine = 92
     # endLine = 98
 
@@ -129,8 +178,8 @@ def wrap_steps_as_a_new_keyword():
     checker.find_models_with_same_keywords(allModels, lineKeywords)
     modelsWithSameKeywords = checker.get_models_with_same_keywords()
 
-    # newKeywordArgs = get_arguments_of_new_keyword_from_user(lineKeywords)
-    newKeywordArgs = ['${test1}']
+    newKeywordArgs = get_arguments_of_new_keyword_from_user(lineKeywords)
+    # newKeywordArgs = ['${test1}']
     newKeywordArgsTokens = []
     if len(newKeywordArgs) != 0:
         update_keywords_arguments(lineKeywords, newKeywordArgs)
@@ -139,42 +188,18 @@ def wrap_steps_as_a_new_keyword():
     newKeywordsBody = lineKwsHelper.get_new_keyword_body_from_line_keywords_and_arguments_tokens(lineKeywords, newKeywordArgsTokens)
     clear_screen()
     kwPrinter.print_all_lines_keywords(lineKeywords)
-    # newKeywordName = input('Please input name for new keyword.\nKeyword name:')
-    newKeywordName = 'Test123'
+    newKeywordName = input('Please input name for new keyword.\nKeyword name:')
+    # newKeywordName = 'Test123'
     clear_screen()
-    # newKeywordPath = get_file_path_from_user('Please input the file\'s path where new keyword will insert into.\nFile path:')
-    clear_screen()
+    newKeywordPath = get_file_path_from_user('Please input the file\'s path where new keyword will insert into.\nFile path:')
     # newKeywordPath = 'C:/Users/Gene/Desktop/Thesis_For_Refactor/python_package/test_data/ezScrum.txt'
-    newKeywordPath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data/ezScrum.txt'
+    # newKeywordPath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data/ezScrum.txt'
+    clear_screen()
     creator.create_new_keyword_for_file(newKeywordPath, newKeywordName, newKeywordsBody)
-    recovery_models(teardowmModels.join())  #記得刪掉
-    
-    if len(modelsWithSameKeywords) != 0 and is_anwser_yes('The steps are same in '+ str(len(modelsWithSameKeywords)) +' places\nDo you want to replace same steps in other files with new keyword?(Y\\N):'):
-    # if True:
-        for modelWithSameKeywords in modelsWithSameKeywords:
-            clear_screen()
-            kwPrinter.print_model_with_same_keywords(modelWithSameKeywords)
-            if is_anwser_yes('Do you want to replace the steps with new keyword?(Y\\N):'):
-                clear_screen()
-                keywordArgs = []
-                for index, newArg in enumerate(newKeywordArgs):
-                    print_arugments_for_string_list(newKeywordArgs)
-                    arg = input('Please input \"'+ newArg +'\" content.\nIf you finish inputting argument, please input \'Exit\'.\n\nArgument' + str(index + 1)+'('+ newArg + '):')
-                    if normalize(arg) == normalize('Exit'):
-                        break
-                    else:
-                        keywordArgs.append(arg)
-                newKeywordDict = {'keywordName': newKeywordName, 'arguments': keywordArgs}
-                creator.replace_old_steps_with_keyword_for_same_keywords(newKeywordDict, modelWithSameKeywords, allModels)
-                # break
-
-        
-
-
-
-
-
-
+    modelsWithReplacement = replace_steps_with_a_new_keyword(modelsWithSameKeywords, allModels, newKeywordName, newKeywordArgs)
+    clear_screen()
+    mover = KeywordMoveHelper(allModels)
+    import_resource_where_new_keyword(newKeywordName, modelsWithReplacement, newKeywordPath)
 
 if __name__ == '__main__':
 
@@ -184,6 +209,7 @@ if __name__ == '__main__':
     mode = None
     while True:
         mode = input('Mode:')
+        clear_screen()
         if(mode == '1.' or mode == '1'):
             wrap_steps_as_a_new_keyword()
             exit('Thank you for using.')

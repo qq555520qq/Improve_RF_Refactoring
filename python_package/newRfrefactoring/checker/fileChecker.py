@@ -209,7 +209,7 @@ class FileChecker(ast.NodeVisitor):
         
         self.checkModelsUsingSameKeywords = True
         self.keywordNamesList = get_keywords_name_from_lineKeywords(lineKeywords)
-        if is_ForLoop(lineKeywords[0]):
+        if is_ForLoop(lineKeywords[0]['node']):
             self.containFor = lineKeywords[0]['containFor']
         self.copyKeywordNamesList = self.keywordNamesList.copy()
         self.tempKeywords = []
