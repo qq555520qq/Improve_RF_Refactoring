@@ -18,6 +18,7 @@ Add a sprint to project and log some message
     END
     [Teardown]    Run Keywords    Test Keyword
     ...                    AND    For Loop Keyword    5
+    ...                    AND    For Loop Keyword    2
 
 test temp
     [Template]    Choose Project

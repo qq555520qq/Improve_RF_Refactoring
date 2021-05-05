@@ -50,6 +50,7 @@ Go to sprint planning of project and log mutiple text
     END
     [Teardown]    Run Keywords    Test Keyword
     ...                    AND    For Loop Keyword    5
+    ...                    AND    For Loop Keyword    2
 
 *** Keywords ***
 Choose Project

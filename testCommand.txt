@@ -1,12 +1,35 @@
+1. keywordCall
+projectPath = C:\Users\Gene\Desktop\Thesis_For_Refactor\python_package\test_data
+filePath = C:\Users\Gene\Desktop\Thesis_For_Refactor\python_package\test_data\test_data.robot
+startLine = 46
+endLine = 52
+newArg1 = ${welcomeText}
+newKeywordName = Log Welcome Text
+insertKeywordPath = C:\Users\Gene\Desktop\Thesis_For_Refactor\python_package\test_data\common.txt
+Welcome to taipei
+Welcome to ezScrum
+Welcome to kanban
 
+2.In For Loop
+projectPath = C:\Users\Gene\Desktop\Thesis_For_Refactor\python_package\test_data
+filePath = C:\Users\Gene\Desktop\Thesis_For_Refactor\python_package\test_data\test_data.robot
+startLine = 48
+endLine = 49
+newArg1 = ${var1}
+newArg2 = ${var2}
 
-projectPath = D:\Thesis Local\Thesis_For_Refactor\python_package\test_data
+3. All run keywords
+projectPath = C:\Users\Gene\Desktop\Thesis_For_Refactor\python_package\test_data
+filePath = C:\Users\Gene\Desktop\Thesis_For_Refactor\python_package\test_data\test_data.robot
+startLine = 51
+endLine = 53
+newArg1 = ${time1}
+newArg2 = ${time2}
 
-
-filePath = D:\Thesis Local\Thesis_For_Refactor\python_package\test_data\test_data.robot
-
-startLine = 44
-
-endLine = 50
-
-insertKeywordPath = D:\Thesis Local\Thesis_For_Refactor\python_package\test_data\ezScrum.txt
+4. Some run keywords
+projectPath = C:\Users\Gene\Desktop\Thesis_For_Refactor\python_package\test_data
+filePath = C:\Users\Gene\Desktop\Thesis_For_Refactor\python_package\test_data\test_data.robot
+startLine = 52
+endLine = 53
+newArg1 = ${time1}
+newArg2 = ${time2}

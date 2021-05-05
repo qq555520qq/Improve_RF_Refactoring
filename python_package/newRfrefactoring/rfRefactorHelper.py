@@ -151,6 +151,7 @@ def import_resource_where_moved_keyword(movedKeywordName, fromFilePath, targetFi
             for model in modelsWithoutImport:
                 clear_screen()
                 pathWithoutImportTable.clear_rows()
+                pathOfTargetFileTable.clear_rows()
                 pathWithoutImportTable.add_row([model.source])
                 pathOfTargetFileTable.add_row([targetFilePath])
                 print(pathWithoutImportTable)

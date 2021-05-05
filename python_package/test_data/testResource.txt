@@ -30,6 +30,7 @@ Find Variable Usage And Log Message
     END
     [Teardown]    Run Keywords    Test Keyword
     ...                    AND    For Loop Keyword    5
+    ...                    AND    For Loop Keyword    2
 
 For Loop Keyword
     [Arguments]    ${times}
