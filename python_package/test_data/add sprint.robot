@@ -82,17 +82,11 @@ Test Keyword
     [Teardown]    Run Keywords    Log    123
     ...    AND    Log    321
 
-Test Keyword
-    Log    ${testVariable}
-    Log    321
-    [Teardown]    Run Keywords    Log    ${testVariable}123
-    ...    AND    Log    321
-
 Same Keywords
     Log    testLog
     FOR    ${var}    IN    @{testVariable}
-        Log    ${var}
-        Log    ${var}2
+        Test To Same Keyword    ${var}
+        Log Same Keyword    ${var}2
     END
     [Teardown]    Run Keywords    Test Keyword
     ...                    AND    For Loop Keyword    5

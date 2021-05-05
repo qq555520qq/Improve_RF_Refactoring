@@ -3,7 +3,7 @@ from robot.api import Token
 from robot.parsing.model import Keyword, Statement
 from python_package.newRfrefactoring.builder.testModelBuilder import TestModelBuilder
 from python_package.newRfrefactoring.keywords.keywordMoveHelper import KeywordMoveHelper
-from python_package.newRfrefactoring.common.utility import save_model_and_update_old_models, normalize, get_keywords_for_run_keywords, is_Keyword_tag
+from python_package.newRfrefactoring.common.utility import save_model_and_update_old_models, normalize, get_keywords_for_run_keywords, is_Keyword_tag, is_ForLoop, is_KeywordCall
 
 
 class KeywordCreator(ast.NodeTransformer):
@@ -12,6 +12,8 @@ class KeywordCreator(ast.NodeTransformer):
         self.allModels = allModels
         self.mover = KeywordMoveHelper(self.allModels)
         self.removedDict = None
+        self.replacedDict = None
+        self.newNode = None
         self.isRemoveNode = False
 
     def visit_SuiteSetup(self, node):
@@ -20,6 +22,9 @@ class KeywordCreator(ast.NodeTransformer):
         """
         if self.isRemoveNode:
             return self.is_node_equal_for_run_keywords(node, self.removedDict)
+        if self.replacedDict['node'] == node:
+            return self.generic_visit(self.newNode)
+        return node
 
     def visit_SuiteTeardown(self, node):
         """
@@ -27,6 +32,9 @@ class KeywordCreator(ast.NodeTransformer):
         """
         if self.isRemoveNode:
             return self.is_node_equal_for_run_keywords(node, self.removedDict)
+        if self.replacedDict['node'] == node:
+            return self.generic_visit(self.newNode)
+        return node
 
     def visit_TestSetup(self, node):
         """
@@ -34,6 +42,9 @@ class KeywordCreator(ast.NodeTransformer):
         """
         if self.isRemoveNode:
             return self.is_node_equal_for_run_keywords(node, self.removedDict)
+        if self.replacedDict['node'] == node:
+            return self.generic_visit(self.newNode)
+        return node
 
     def visit_TestTeardown(self, node):
         """
@@ -41,6 +52,9 @@ class KeywordCreator(ast.NodeTransformer):
         """
         if self.isRemoveNode:
             return self.is_node_equal_for_run_keywords(node, self.removedDict)
+        if self.replacedDict['node'] == node:
+            return self.generic_visit(self.newNode)
+        return node
 
     def visit_Setup(self, node):
         """
@@ -48,6 +62,9 @@ class KeywordCreator(ast.NodeTransformer):
         """
         if self.isRemoveNode:
             return self.is_node_equal_for_run_keywords(node, self.removedDict)
+        if self.replacedDict['node'] == node:
+            return self.generic_visit(self.newNode)
+        return node
 
     def visit_Teardown(self, node):
         """
@@ -55,6 +72,9 @@ class KeywordCreator(ast.NodeTransformer):
         """
         if self.isRemoveNode:
             return self.is_node_equal_for_run_keywords(node, self.removedDict)
+        if self.replacedDict['node'] == node:
+            return self.generic_visit(self.newNode)
+        return node
 
     def visit_TestTemplate(self, node):
         """
@@ -62,6 +82,9 @@ class KeywordCreator(ast.NodeTransformer):
         """
         if self.isRemoveNode:
             return self.is_node_equal_for_one_keyword(node, self.removedDict['node'])
+        if self.replacedDict['node'] == node:
+            return self.generic_visit(self.newNode)
+        return node
 
     def visit_Template(self, node):
         """
@@ -69,6 +92,9 @@ class KeywordCreator(ast.NodeTransformer):
         """
         if self.isRemoveNode:
             return self.is_node_equal_for_one_keyword(node, self.removedDict['node'])
+        if self.replacedDict['node'] == node:
+            return self.generic_visit(self.newNode)
+        return node
 
     def visit_ForLoop(self, node):
         """
@@ -84,6 +110,10 @@ class KeywordCreator(ast.NodeTransformer):
                         else:
                             return self.generic_visit(node)
             return node
+        elif self.isReplaceLastKeyword:
+            if self.replacedDict['node'] == node:
+                return self.generic_visit(self.newNode)
+            return node
 
     def visit_KeywordCall(self, node):
         """
@@ -91,6 +121,10 @@ class KeywordCreator(ast.NodeTransformer):
         """
         if self.isRemoveNode:
             return self.is_node_equal_for_one_keyword(node, self.removedDict['node'])
+        elif self.isReplaceLastKeyword:
+            if self.replacedDict['node'] == node:
+                return self.generic_visit(self.newNode)
+            return node
 
     def create_new_keyword_for_file(self, _path, keywordName, keywordBody):
 
@@ -105,7 +139,7 @@ class KeywordCreator(ast.NodeTransformer):
 
         self.mover.insert_new_keyword_defined(targetFileModel, keywordNode)
 
-    def build_tokens_of_arguments(self, args):
+    def build_tokens_of_new_keyword_arguments(self, args):
         argsTokens = [
             Token(Token.SEPARATOR, '    '),
             Token(Token.ARGUMENTS, '[Arguments]')
@@ -205,7 +239,42 @@ class KeywordCreator(ast.NodeTransformer):
         save_model_and_update_old_models(sameKeywordDict['model'], allModels)
         self.isRemoveNode = False
 
-    def replace_old_steps_with_keyword_for_same_keywords(self, sameKeywords, allModels):
+    def replace_last_keyword_with_new_keyword(self, newKeywordDict, sameKeywords, allModels):
+        def build_keywordCall(newKeywordName, arguments):
+            keywordsTokens = [
+                Token(Token.SEPARATOR, '    '),
+                Token(Token.KEYWORD, newKeywordName)
+            ]
+            for arg in arguments:
+                keywordsTokens.append(Token(Token.SEPARATOR, '    '))
+                keywordsTokens.append(Token(Token.ARGUMENT, arg))
+            keywordsTokens.append(Token(Token.EOL, '\n'))
+            return Statement.from_tokens(keywordsTokens)
+
+        def build_forLoop(lastSameKeyword, newKeywordName, arguments):
+            newKeywordNode = build_keywordCall(newKeywordName, arguments)
+            for index, loopBodyMember in enumerate(lastSameKeyword['node'].body):
+                if loopBodyMember == lastSameKeyword['keyword']:
+                    lastSameKeyword[index] = newKeywordNode
+                    break
+            return lastSameKeyword['node']
+
+        def build_replaced_node(newKeywordDict, sameKeywords):
+            if is_KeywordCall(sameKeywords[0]['node']) or (is_ForLoop(sameKeywords[0]['node']) and sameKeywords[0]['containFor']):
+                return build_keywordCall(newKeywordDict['keywordName'], newKeywordDict['arguments'])
+            elif is_ForLoop(sameKeywords[0]['node']) and not(sameKeywords[0]['containFor']):
+                return build_forLoop(sameKeywords[-1], newKeywordDict['keywordName'], newKeywordDict['arguments'])
+            # elif is_Keyword_tag(sameKeywords[0]['node']):
+            #     if 
+
+        self.isReplaceLastKeyword = True
+        self.newNode = build_replaced_node(newKeywordDict, sameKeywords)
+        self.replacedDict = sameKeywords[-1]
+        self.visit(sameKeywords[-1]['model'])
+        save_model_and_update_old_models(sameKeywords[-1]['model'], allModels)
+        self.isReplaceLastKeyword = False
+
+    def replace_old_steps_with_keyword_for_same_keywords(self, newKeywordDict, sameKeywords, allModels):
         tagKeywords = []
         updatedNode = None
         for sameKeyword in sameKeywords:
@@ -214,7 +283,10 @@ class KeywordCreator(ast.NodeTransformer):
                     tagKeywords.append(sameKeyword['node'])
                 else:
                     sameKeyword['node'] = updatedNode
-            self.remove_node_for_same_keywords(sameKeyword, allModels)
-            if is_Keyword_tag(sameKeyword['node']):
-                updatedNode = sameKeyword['node']
-            
+            if sameKeyword != sameKeywords[-1]:
+                self.remove_node_for_same_keywords(sameKeyword, allModels)
+                if is_Keyword_tag(sameKeyword['node']):
+                    updatedNode = sameKeyword['node']
+            else:
+                self.replace_last_keyword_with_new_keyword(newKeywordDict, sameKeywords, allModels)
+        

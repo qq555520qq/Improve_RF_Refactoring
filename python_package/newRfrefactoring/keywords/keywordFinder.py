@@ -135,7 +135,9 @@ class KeywordFinder(ast.NodeVisitor):
             self.linesKeywords.append(nodeDict)
 
     def append_keyword_by_lines_for_forloop(self, loopNode):
-        nodeDict = {'model': self.model, 'node': loopNode, 'body': loopNode.body.copy()}
+        nodeDict = {'containFor': False, 'model': self.model, 'node': loopNode, 'body': loopNode.body.copy()}
+        if loopNode.lineno >= self.startLine and loopNode.lineno <= self.endLine:
+            nodeDict['containFor'] = True
         for loopBodyMember in loopNode.body:
             if(loopBodyMember.lineno < self.startLine or loopBodyMember.lineno > self.endLine):
                 nodeDict['body'].remove(loopBodyMember)

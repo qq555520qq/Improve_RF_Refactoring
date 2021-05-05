@@ -10,6 +10,7 @@ class FileChecker(ast.NodeVisitor):
         self.isResourceImported = False
         self.checkKeywordAndResource = False
         self.checkModelsUsingSameKeywords = False
+        self.containFor = False
         self.checkedKeyword = None
         self.checkedResource = None
         self.currentModel = None
@@ -208,11 +209,14 @@ class FileChecker(ast.NodeVisitor):
         
         self.checkModelsUsingSameKeywords = True
         self.keywordNamesList = get_keywords_name_from_lineKeywords(lineKeywords)
+        if is_ForLoop(lineKeywords[0]):
+            self.containFor = lineKeywords[0]['containFor']
         self.copyKeywordNamesList = self.keywordNamesList.copy()
         self.tempKeywords = []
         self.currentModel = model
         self.visit(model)
         self.checkModelsUsingSameKeywords = False
+        self.containFor = False
 
     def find_models_with_same_keywords(self, models, nodeDictList):
         for model in models:
@@ -266,6 +270,7 @@ class FileChecker(ast.NodeVisitor):
         for index, loopBodyMember in enumerate(node.body):
             if normalize(self.keywordNamesList[0]) == normalize(loopBodyMember.keyword):
                 modelDict = {'model': self.currentModel, 'node': node, 'keyword': loopBodyMember}
+                modelDict['containFor'] = self.containFor
                 self.tempKeywords.append(modelDict)
                 del(self.keywordNamesList[0])
                 if(len(self.keywordNamesList) == 0):

@@ -33,3 +33,13 @@ Find Usage Test Keyword3
     Find Usage Test Keyword2
     [Teardown]    Run Keywords    Find Usage Test Keyword1
     ...    AND    Find Usage Test Keyword2
+
+Test To Same Keyword
+    [Arguments]    ${text}
+    Log    ${text}123
+    Log    ${text}
+
+Log Same Keyword
+    [Arguments]    ${text}    ${secondText}
+    Log    ${text}
+    Log    ${secondText}

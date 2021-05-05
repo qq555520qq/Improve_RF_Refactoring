@@ -43,8 +43,8 @@ test variable assign in step
 Test mutiple keywords
     Log    testLog
     FOR    ${var}    IN    @{testVariable}
-        Log    ${var}
-        Log    ${var}2
+        Test To Same Keyword    ${var}
+        Log Same Keyword    ${var}2
     END
     [Teardown]    Run Keywords    Test Keyword
     ...                    AND    For Loop Keyword    5
