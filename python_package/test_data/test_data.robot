@@ -48,7 +48,6 @@ Test mutiple keywords
     END
     [Teardown]    Run Keywords    Test Keyword
     ...                    AND    For Loop Keyword    5
-    # [Teardown]    Log    ${testVariable}123
 
 *** Keywords ***
 Choose Project

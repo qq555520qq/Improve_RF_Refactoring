@@ -134,7 +134,29 @@ def import_resource_where_new_keyword(newKeywordName, modelsWithReplacement, new
                 print(pathWithoutImportTable)
                 print(pathOfNewKeywordTable)
                 resourceStr = input('Please input resource value that you want to import for it.\nResource value:')
-                mover.import_new_resource_for_models([model], resourceStr)
+                mover.import_new_resource_for_models(model, resourceStr)
+
+def import_resource_where_moved_keyword(movedKeywordName, fromFilePath, targetFilePath):
+    modelsWithoutImport = mover.get_models_without_import_new_resource(movedKeywordName, fromFilePath, targetFilePath)
+    if len(modelsWithoutImport) != 0:
+        pathWithoutImportTable = PrettyTable()
+        pathOfTargetFileTable = PrettyTable()
+        pathWithoutImportTable.field_names = ['Path without importing target file']
+        pathOfTargetFileTable.field_names = ['Path of target file']
+        for model in modelsWithoutImport:
+            pathWithoutImportTable.add_row([model.source])
+        print('The Following path(s) don\'t import target file.')
+        print(pathWithoutImportTable)
+        if is_anwser_yes('Do you want to import resource for them(it)?(Y\\N):'):
+            for model in modelsWithoutImport:
+                clear_screen()
+                pathWithoutImportTable.clear_rows()
+                pathWithoutImportTable.add_row([model.source])
+                pathOfTargetFileTable.add_row([targetFilePath])
+                print(pathWithoutImportTable)
+                print(pathOfTargetFileTable)
+                resourceStr = input('Please input resource value that you want to import for it.\nResource value:')
+                mover.import_new_resource_for_models(model, resourceStr)
 
 def wrap_steps_as_a_new_keyword():
     global creator
@@ -207,7 +229,7 @@ def move_defined_keyword_to_another_model():
     clear_screen()
     projectbuildThread = BuildingModelThread(projectPath)
     projectbuildThread.start()
-    keywordName = input('Please input the keyword which you want to move.\nEx:Open The Browser\nMoved keyword\'s name:')
+    movedKeywordName = input('Please input the keyword which you want to move.\nEx:Open The Browser\nMoved keyword\'s name:')
     clear_screen()
     fromFilePath = get_file_path_from_user('Please input the file\'s path where the moved keyword.\nEx:D:/test_data\nFrom file\'s path:')
     fromFilebuildThread = BuildingModelThread(fromFilePath)
@@ -222,8 +244,11 @@ def move_defined_keyword_to_another_model():
     fromFileModel = fromFilebuildThread.join()
     targetFileModel = targetFilebuildThread.join()
     mover = KeywordMoveHelper(allModels)
-    targetFileName = get_file_name_from_path(targetFileModel.source)
-    mover.move_keyword_defined_to_file(keywordName, fromFileModel, targetFileModel, targetFileName)
+    movedKeywordNode = mover.find_moved_keyword_node(fromFileModel, movedKeywordName)
+    mover.remove_old_keyword_defined(fromFileModel, movedKeywordNode)
+    mover.insert_new_keyword_defined(targetFileModel, movedKeywordNode)
+    clear_screen()
+    import_resource_where_moved_keyword(movedKeywordName, fromFileModel.source, targetFileModel.source)
 
 if __name__ == '__main__':
 
@@ -231,9 +256,11 @@ if __name__ == '__main__':
     print('Please select a mode:')
     print('1. Move defined keyword to another file')
     print('2. Wrap steps as a keyword')
+    print('3. Move defined variable to another file')
+    print('4. Wrap value as a common variable')
     print('9. Exit system')
-
     mode = None
+
     while True:
         mode = input('Mode:')
         clear_screen()
@@ -243,6 +270,10 @@ if __name__ == '__main__':
         elif(mode == '2.' or mode == '2'):
             wrap_steps_as_a_new_keyword()
             exit('Thank you for using.')
+        elif(mode == '3.' or mode == '3'):
+            exit('Sorry,please waiting we are Developing.')
+        elif(mode == '4.' or mode == '4'):
+            exit('Sorry,please waiting we are Developing.')
         elif(mode == '9.' or mode == '9'):
             exit('Thank you for using.')
         else:

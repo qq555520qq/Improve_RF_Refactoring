@@ -68,54 +68,43 @@ class KeywordMoveHelper(ast.NodeTransformer):
         self.visit(model)
         save_model_and_update_old_models(model, self.modelsInDir)
         self.insertKeywordDefined = False
-    
-    def get_models_without_import_new_resource(self, movedKeywordName, oldImportedResource, newImportedResource):
-        
-        def split_models_without_import(allModels, modelsWithImport):
+
+    def split_models_without_import(self, allModels, modelsWithImport):
             for model in modelsWithImport:
                 if(model in allModels):
                     allModels.remove(model)
             return allModels
 
-        oldImportedResourceName = get_file_name_from_path(oldImportedResource)
+    def get_models_without_import_new_resource(self, movedKeywordName, oldImportedResourcePath, newImportedResourcePath):
+        oldImportedResourceName = get_file_name_from_path(oldImportedResourcePath)
         self.checker.visit_models_to_check_keyword_and_resource(self.modelsInDir, movedKeywordName, oldImportedResourceName)
         modelsUsingKeyword = self.checker.get_models_with_resource_and_keyword()
         self.checker.clear_models_with_resource_and_keyword()
 
-        newImportedResourceName = get_file_name_from_path(newImportedResource)
+        newImportedResourceName = get_file_name_from_path(newImportedResourcePath)
         self.checker.visit_models_to_check_keyword_and_resource(modelsUsingKeyword, movedKeywordName, newImportedResourceName)
         modelsWithImportNewResource = self.checker.get_models_with_resource_and_keyword()
         self.checker.clear_models_with_resource_and_keyword()
 
-        return split_models_without_import(modelsUsingKeyword, modelsWithImportNewResource)
+        return self.split_models_without_import(modelsUsingKeyword, modelsWithImportNewResource)
 
     def get_models_without_import_new_resource_from_models_with_replacement(self, newKeywordName, modelsWithReplacement, newImportedResourcePath):
-        
-        def split_models_without_import(allModels, modelsWithImport):
-            for model in modelsWithImport:
-                if(model in allModels):
-                    allModels.remove(model)
-            return allModels
-
         newImportedResourceName = get_file_name_from_path(newImportedResourcePath)
         self.checker.visit_models_to_check_keyword_and_resource(modelsWithReplacement, newKeywordName, newImportedResourceName)
         modelsWithImportNewResource = self.checker.get_models_with_resource_and_keyword()
         self.checker.clear_models_with_resource_and_keyword()
 
-        return split_models_without_import(modelsWithReplacement, modelsWithImportNewResource)
+        return self.split_models_without_import(modelsWithReplacement, modelsWithImportNewResource)
 
-    def import_new_resource_for_models(self, modelsWithoutImport, importedResource):
-        
-        self.importedResource = importedResource
+    def import_new_resource_for_models(self, modelWithoutImport, importedResourceValue):
+        self.importedResource = importedResourceValue
         self.importResource = True
-        for model in modelsWithoutImport:
-            self.visit(model)
-            save_model_and_update_old_models(model, self.modelsInDir)
+        self.visit(modelWithoutImport)
+        save_model_and_update_old_models(modelWithoutImport, self.modelsInDir)
         self.importResource = False
     
     def get_models_after_moving(self):
         return self.modelsInDir
-    
     
     def move_keyword_defined_to_file(self, movedKeywordName, fromFileModel, targetFileModel, newImportedResource=None):
 
@@ -125,4 +114,5 @@ class KeywordMoveHelper(ast.NodeTransformer):
         if(newImportedResource):
             self.importedResource = newImportedResource
             modelsWithoutImport = self.get_models_without_import_new_resource(movedKeywordName, fromFileModel.source, targetFileModel.source)
-            self.import_new_resource_for_models(modelsWithoutImport, newImportedResource)
+            for model in modelsWithoutImport:
+                self.import_new_resource_for_models(model, newImportedResource)

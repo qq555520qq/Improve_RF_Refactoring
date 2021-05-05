@@ -31,33 +31,32 @@ class KeywordFinderTest(unittest.TestCase):
 
     def test_find_keyword_by_lines_for_all_loops(self):
         testModel = self.builder.build(test_data+'/test_data.robot')
-        self.finder.find_keywords_by_lines(testModel, 116, 119)
+        self.finder.find_keywords_by_lines(testModel, 126, 129)
         keywords = self.finder.get_lines_keywords()
-
         self.assertEqual(len(keywords[0]['body']), 2)
-        self.assertTrue(keywords[0]['body'][0].lineno >= 116)
-        self.assertTrue(keywords[0]['body'][0].lineno <= 119)
-        self.assertTrue(keywords[0]['body'][1].lineno >= 116)
-        self.assertTrue(keywords[0]['body'][1].lineno <= 119)
+        self.assertTrue(keywords[0]['body'][0].lineno >= 126)
+        self.assertTrue(keywords[0]['body'][0].lineno <= 129)
+        self.assertTrue(keywords[0]['body'][1].lineno >= 126)
+        self.assertTrue(keywords[0]['body'][1].lineno <= 129)
 
     def test_find_keyword_by_lines_for_some_keywords_in_loops(self):
         testModel = self.builder.build(test_data+'/test_data.robot')
-        self.finder.find_keywords_by_lines(testModel, 117, 117)
+        self.finder.find_keywords_by_lines(testModel, 127, 127)
         keywords = self.finder.get_lines_keywords()
 
         self.assertEqual(len(keywords[0]['body']), 1)
-        self.assertTrue(keywords[0]['body'][0].lineno == 117)
+        self.assertTrue(keywords[0]['body'][0].lineno == 127)
 
     def test_find_keyword_by_lines_for_all_run_keywords(self):
         testModel = self.builder.build(test_data+'/test_data.robot')
-        self.finder.find_keywords_by_lines(testModel, 111, 112)
+        self.finder.find_keywords_by_lines(testModel, 114, 115)
         keywords = self.finder.get_lines_keywords()
 
         self.assertEqual(len(keywords[0]['body']), 2)
-        self.assertTrue(keywords[0]['body'][0]['keywordName'].lineno >= 111)
-        self.assertTrue(keywords[0]['body'][0]['keywordName'].lineno <= 112)
-        self.assertTrue(keywords[0]['body'][1]['keywordName'].lineno >= 111)
-        self.assertTrue(keywords[0]['body'][1]['keywordName'].lineno <= 112)
+        self.assertTrue(keywords[0]['body'][0]['keywordName'].lineno >= 114)
+        self.assertTrue(keywords[0]['body'][0]['keywordName'].lineno <= 115)
+        self.assertTrue(keywords[0]['body'][1]['keywordName'].lineno >= 114)
+        self.assertTrue(keywords[0]['body'][1]['keywordName'].lineno <= 115)
 
     def test_find_keyword_by_lines_for_some_keywords_in_run_keywords(self):
         testModel = self.builder.build(test_data+'/test_data.robot')
