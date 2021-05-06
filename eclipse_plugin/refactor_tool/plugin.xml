@@ -15,6 +15,14 @@
             id="robot_framework_refactor_tool.change_signature_command"
             name="change_keyword_signature">
       </command>
+      <command
+            id="robot_framework_refactor_tool.wrap_steps_as_a_new_keyword"
+            name="wrap_steps_as_a_new_keyword">
+      </command>
+      <command
+            id="robot_framework_refactor_tool.move_keyword_defined_to_another_file"
+            name="move_keyword_defined_to_another_file">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -29,6 +37,14 @@
       <handler
             class="robot_framework_refactor_tool.handlers.ChangeSignatureHandler"
             commandId="robot_framework_refactor_tool.change_signature_command">
+      </handler>
+      <handler
+            class="robot_framework_refactor_tool.handlers.WrapStepsAsANewKeywordHandler"
+            commandId="robot_framework_refactor_tool.wrap_steps_as_a_new_keyword">
+      </handler>
+      <handler
+            class="robot_framework_refactor_tool.handlers.MoveKeywordDefinedToAnotherFileHandler"
+            commandId="robot_framework_refactor_tool.move_keyword_defined_to_another_file">
       </handler>
    </extension>
    <extension
@@ -55,6 +71,16 @@
             <command
                   commandId="robot_framework_refactor_tool.change_signature_command"
                   label="Change Keyword Signature"
+                  style="push">
+            </command>
+            <command
+                  commandId="robot_framework_refactor_tool.wrap_steps_as_a_new_keyword"
+                  label="Wrap Steps As A New Keyword"
+                  style="push">
+            </command>
+            <command
+                  commandId="robot_framework_refactor_tool.move_keyword_defined_to_another_file"
+                  label="Move Keyword Defined To Another File"
                   style="push">
             </command>
          </menu>

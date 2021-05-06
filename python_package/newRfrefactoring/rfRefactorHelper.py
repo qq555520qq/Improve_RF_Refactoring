@@ -168,8 +168,6 @@ def wrap_steps_as_a_new_keyword():
     # projectPath = 'C:/Users/Gene/Desktop/Thesis_For_Refactor/python_package/test_data'
     # projectPath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data'
     # projectPath = 'D:/Project/test_automation'
-    teardowmModels = BuildingModelThread(projectPath)
-    teardowmModels.start()
     projectbuildThread = BuildingModelThread(projectPath)
     projectbuildThread.start()
 
@@ -201,7 +199,7 @@ def wrap_steps_as_a_new_keyword():
 
     checker.find_models_with_same_keywords(allModels, lineKeywords)
     modelsWithSameKeywords = checker.get_models_with_same_keywords()
-
+# Adding~
     newKeywordArgs = get_arguments_of_new_keyword_from_user(lineKeywords)
     # newKeywordArgs = ['${test1}']
     newKeywordArgsTokens = []
