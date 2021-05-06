@@ -120,7 +120,7 @@ def import_resource_where_new_keyword(newKeywordName, modelsWithReplacement, new
         pathWithoutImportTable = PrettyTable()
         pathOfNewKeywordTable = PrettyTable()
         pathWithoutImportTable.field_names = ['Path without importing resource of new keyword']
-        pathOfNewKeywordTable.field_names = ['Path of resource where new keyword']
+        pathOfNewKeywordTable.field_names = ['Path of resource where new keyword is']
         for model in modelsWithoutImport:
             pathWithoutImportTable.add_row([model.source])
         print('The Following path(s) don\'t import resource of new keyword.')
@@ -129,6 +129,7 @@ def import_resource_where_new_keyword(newKeywordName, modelsWithReplacement, new
             for model in modelsWithoutImport:
                 clear_screen()
                 pathWithoutImportTable.clear_rows()
+                pathOfNewKeywordTable.clear_rows()
                 pathWithoutImportTable.add_row([model.source])
                 pathOfNewKeywordTable.add_row([newKeywordPath])
                 print(pathWithoutImportTable)
