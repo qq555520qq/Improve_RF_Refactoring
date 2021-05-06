@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Robot_framework_refactor_tool
+Bundle-SymbolicName: robot_framework_refactor_tool;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: robot_framework_refactor_tool.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.ui.ide;bundle-version="3.16.100",
+ org.eclipse.jface.text;bundle-version="3.16.100"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Automatic-Module-Name: robot_framework_refactor_tool
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .,
+ lib/jython-standalone-2.7.2b3.jar
+Import-Package: javax.inject

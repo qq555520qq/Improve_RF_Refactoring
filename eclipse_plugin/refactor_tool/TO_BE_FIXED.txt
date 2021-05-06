@@ -1,0 +1,10 @@
+rfrefactoring
+	1. need to be refactor
+	2.`find_local_variable_from_test_case_obj` of `VariableUsageFinder` class would fail with test case
+	3.'VariableUsageFinder' didn't find reference from 'Variable Table'
+	4.`modify_reference` function of `RefactoringFacade` current only support 'Step' and 'Setting' object 
+plugin
+	1.find another way to put the `Jython` jar
+	2.Modify reference action only support 'Step' and 'Setting' object
+	3.reference preview only support one reference
+	4.nedd to be refactor
