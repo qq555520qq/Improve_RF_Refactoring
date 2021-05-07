@@ -1,6 +1,6 @@
 import ast
 from robot.api import Token
-from python_package.newRfrefactoring.common.utility import normalize, get_keywords_for_run_keywords, is_KeywordCall, is_ForLoop
+from ..common.utility import normalize, get_keywords_for_run_keywords, is_KeywordCall, is_ForLoop
 
 
 class KeywordFinder(ast.NodeVisitor):

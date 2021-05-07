@@ -1,6 +1,6 @@
 import ast
 from robot.api import get_model, Token
-from python_package.newRfrefactoring.common.utility import normalize, is_KeywordCall
+from ..common.utility import normalize, is_KeywordCall
 
 
 class KeywordRenamer(ast.NodeVisitor):

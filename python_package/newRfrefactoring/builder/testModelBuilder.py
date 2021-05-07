@@ -2,7 +2,7 @@ import os
 from robot.parsing import get_model, get_resource_model, get_init_model
 from robot.parsing.model import Statement
 from robot.api import Token
-from python_package.newRfrefactoring.common.utility import normalize, get_file_name_from_path, get_file_extension_from_path
+from ..common.utility import normalize, get_file_name_from_path, get_file_extension_from_path
 
 
 class TestModelBuilder:

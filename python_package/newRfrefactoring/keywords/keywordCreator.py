@@ -1,9 +1,9 @@
 import ast
 from robot.api import Token
 from robot.parsing.model import Keyword, Statement
-from python_package.newRfrefactoring.builder.testModelBuilder import TestModelBuilder
-from python_package.newRfrefactoring.keywords.keywordMoveHelper import KeywordMoveHelper
-from python_package.newRfrefactoring.common.utility import save_model_and_update_old_models, normalize, get_keywords_for_run_keywords, is_Keyword_tag, is_ForLoop, is_KeywordCall
+from ..builder.testModelBuilder import TestModelBuilder
+from ..keywords.keywordMoveHelper import KeywordMoveHelper
+from ..common.utility import save_model_and_update_old_models, normalize, get_keywords_for_run_keywords, is_Keyword_tag, is_ForLoop, is_KeywordCall
 
 
 class KeywordCreator(ast.NodeTransformer):

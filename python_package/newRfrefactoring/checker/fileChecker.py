@@ -1,6 +1,6 @@
 import ast
 from robot.api import Token
-from python_package.newRfrefactoring.common.utility import normalize, get_file_name_from_path, get_keywords_for_run_keywords, is_KeywordCall, is_ForLoop, is_Keyword_tag
+from ..common.utility import normalize, get_file_name_from_path, get_keywords_for_run_keywords, is_KeywordCall, is_ForLoop, is_Keyword_tag
 
 
 class FileChecker(ast.NodeVisitor):

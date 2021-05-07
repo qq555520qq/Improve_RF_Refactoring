@@ -1,4 +1,4 @@
-from python_package.newRfrefactoring.common.utility import is_ForLoop, is_Keyword_tag, is_KeywordCall, normalize
+from ..common.utility import is_ForLoop, is_Keyword_tag, is_KeywordCall, normalize
 from prettytable import PrettyTable
 
 class KeywordPrinter():

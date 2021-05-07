@@ -1,9 +1,9 @@
 import ast
 from robot.parsing.model import Statement
 from robot.api import Token
-from python_package.newRfrefactoring.common.utility import normalize, get_file_name_from_path, save_model_and_update_old_models
-from python_package.newRfrefactoring.checker.fileChecker import FileChecker
-from python_package.newRfrefactoring.keywords.keywordFinder import KeywordFinder
+from ..common.utility import normalize, get_file_name_from_path, save_model_and_update_old_models
+from ..checker.fileChecker import FileChecker
+from ..keywords.keywordFinder import KeywordFinder
 
 
 class KeywordMoveHelper(ast.NodeTransformer):
@@ -96,7 +96,7 @@ class KeywordMoveHelper(ast.NodeTransformer):
 
         return self.split_models_without_import(modelsWithReplacement, modelsWithImportNewResource)
 
-    def import_new_resource_for_models(self, modelWithoutImport, importedResourceValue):
+    def import_new_resource_for_model(self, modelWithoutImport, importedResourceValue):
         self.importedResource = importedResourceValue
         self.importResource = True
         self.visit(modelWithoutImport)
@@ -115,4 +115,4 @@ class KeywordMoveHelper(ast.NodeTransformer):
             self.importedResource = newImportedResource
             modelsWithoutImport = self.get_models_without_import_new_resource(movedKeywordName, fromFileModel.source, targetFileModel.source)
             for model in modelsWithoutImport:
-                self.import_new_resource_for_models(model, newImportedResource)
+                self.import_new_resource_for_model(model, newImportedResource)

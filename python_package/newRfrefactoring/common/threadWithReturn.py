@@ -1,6 +1,6 @@
 import threading
-from python_package.newRfrefactoring.builder.testModelBuilder import TestModelBuilder
-from python_package.newRfrefactoring.common.utility import get_file_extension_from_path
+from ..builder.testModelBuilder import TestModelBuilder
+from ..common.utility import get_file_extension_from_path
 
 
 class BuildingModelThread(threading.Thread):

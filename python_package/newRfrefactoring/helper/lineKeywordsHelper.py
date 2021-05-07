@@ -1,7 +1,7 @@
 from robot.api import Token
 from robot.parsing.model import Statement
-from python_package.newRfrefactoring.common.utility import is_ForLoop, is_Keyword_tag, is_KeywordCall
-from python_package.newRfrefactoring.builder.testModelBuilder import TestModelBuilder
+from ..common.utility import is_ForLoop, is_Keyword_tag, is_KeywordCall
+from ..builder.testModelBuilder import TestModelBuilder
 
 class LineKeywordsHelper():
 

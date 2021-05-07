@@ -2,15 +2,15 @@ import sys
 from os import path
 p = path.normpath(path.dirname(path.abspath(__file__))+"/../..")
 sys.path.append(p)
-from python_package.newRfrefactoring.common.threadWithReturn import BuildingModelThread
-from python_package.newRfrefactoring.builder.testModelBuilder import TestModelBuilder
-from python_package.newRfrefactoring.keywords.keywordFinder import KeywordFinder
-from python_package.newRfrefactoring.checker.fileChecker import FileChecker
-from python_package.newRfrefactoring.keywords.keywordCreator import KeywordCreator
-from python_package.newRfrefactoring.keywords.keywordPrinter import KeywordPrinter
-from python_package.newRfrefactoring.keywords.keywordMoveHelper import KeywordMoveHelper
-from python_package.newRfrefactoring.helper.lineKeywordsHelper import LineKeywordsHelper
-from python_package.newRfrefactoring.common.utility import *
+from ..common.threadWithReturn import BuildingModelThread
+from ..builder.testModelBuilder import TestModelBuilder
+from ..keywords.keywordFinder import KeywordFinder
+from ..checker.fileChecker import FileChecker
+from ..keywords.keywordCreator import KeywordCreator
+from ..keywords.keywordPrinter import KeywordPrinter
+from ..keywords.keywordMoveHelper import KeywordMoveHelper
+from ..helper.lineKeywordsHelper import LineKeywordsHelper
+from ..common.utility import *
 from prettytable import PrettyTable
 
 builder = TestModelBuilder()
@@ -135,7 +135,7 @@ def import_resource_where_new_keyword(newKeywordName, modelsWithReplacement, new
                 print(pathWithoutImportTable)
                 print(pathOfNewKeywordTable)
                 resourceStr = input('Please input resource value that you want to import for it.\nResource value:')
-                mover.import_new_resource_for_models(model, resourceStr)
+                mover.import_new_resource_for_model(model, resourceStr)
 
 def import_resource_where_moved_keyword(movedKeywordName, fromFilePath, targetFilePath):
     modelsWithoutImport = mover.get_models_without_import_new_resource(movedKeywordName, fromFilePath, targetFilePath)
@@ -158,7 +158,7 @@ def import_resource_where_moved_keyword(movedKeywordName, fromFilePath, targetFi
                 print(pathWithoutImportTable)
                 print(pathOfTargetFileTable)
                 resourceStr = input('Please input resource value that you want to import for it.\nResource value:')
-                mover.import_new_resource_for_models(model, resourceStr)
+                mover.import_new_resource_for_model(model, resourceStr)
 
 def wrap_steps_as_a_new_keyword():
     global creator
@@ -199,7 +199,7 @@ def wrap_steps_as_a_new_keyword():
 
     checker.find_models_with_same_keywords(allModels, lineKeywords)
     modelsWithSameKeywords = checker.get_models_with_same_keywords()
-# Adding~
+
     newKeywordArgs = get_arguments_of_new_keyword_from_user(lineKeywords)
     # newKeywordArgs = ['${test1}']
     newKeywordArgsTokens = []
@@ -218,6 +218,7 @@ def wrap_steps_as_a_new_keyword():
     # newKeywordPath = 'D:/Thesis Local/Thesis_For_Refactor/python_package/test_data/ezScrum.txt'
     clear_screen()
     creator.create_new_keyword_for_file(newKeywordPath, newKeywordName, newKeywordsBody)
+    #adding
     modelsWithReplacement = replace_steps_with_a_new_keyword(modelsWithSameKeywords, allModels, newKeywordName, newKeywordArgs)
     clear_screen()
     mover = KeywordMoveHelper(allModels)
