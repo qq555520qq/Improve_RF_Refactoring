@@ -23,17 +23,25 @@ public class NewRefactorHelperTest {
 	public void setUp() {
 		initNewRefactorHelper();
 		this.testDataPath = curDir+"/test_data/";
-		this.allModels = helper.buildProjectModels(testDataPath);
-	}
-	
-	@After
-	public void tearDown(){
-		this.helper.close();
 	}
 
 	@Test
 	public void testBuildProjectModels() {
+		this.allModels = this.helper.buildProjectModels(testDataPath);
 		assertNotEquals(Py.None, this.allModels);
+	}
+
+	@Test
+	public void testBuildFileModel() {
+		PyObject fileModel = this.helper.buildFileModel(this.testDataPath + "test_data.robot");
+		assertNotEquals(Py.None, fileModel);
+	}
+	
+	@Test
+	public void testGetStepsThatWillBeWraped() {
+		PyObject fileModel = this.helper.buildFileModel(this.testDataPath + "test_data.robot");
+		PyList steps = this.helper.getStepsThatWillBeWraped(fileModel, 45, 52);
+		assertNotEquals(3, steps.size());
 	}
 	
 	public void initNewRefactorHelper() {

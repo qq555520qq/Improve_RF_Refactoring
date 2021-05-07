@@ -35,11 +35,11 @@ def get_keywords_for_run_keywords(tokens):
         if token.value != 'AND':
             keywordToken.append(token)
         else:
-            KeywordsToken.append(keywordToken.copy())
+            KeywordsToken.append(list(keywordToken))
             keywordToken = []
 
     if keywordToken != []:
-        KeywordsToken.append(keywordToken.copy())
+        KeywordsToken.append(list(keywordToken))
         keywordToken = []
 
     for keywordTokenList in KeywordsToken:

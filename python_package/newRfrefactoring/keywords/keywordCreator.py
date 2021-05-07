@@ -102,7 +102,7 @@ class KeywordCreator(ast.NodeTransformer):
         """
         if self.isRemoveNode:
             if self.removedDict['node'] == node:
-                for loopBodyMemeber in node.body.copy():
+                for loopBodyMemeber in list(node.body):
                     if loopBodyMemeber == self.removedDict['keyword']:
                         node.body.remove(loopBodyMemeber)
                         if len(node.body) == 0:
@@ -168,7 +168,7 @@ class KeywordCreator(ast.NodeTransformer):
         if node == removedDict['node']:
             if normalize(node.name) == normalize('Run Keywords'):
                 runKeywordsArgs = node.get_tokens(Token.ARGUMENT)
-                copyRunKeywordsArgs = runKeywordsArgs.copy()
+                copyRunKeywordsArgs = list(runKeywordsArgs)
                 for index, runKeywordsArg in enumerate(copyRunKeywordsArgs):
                     removedArgsValues = get_arguments_value_from_arguments_tokens(removedDict['keyword']['arguments'])
                     if runKeywordsArg.value == removedDict['keyword']['keywordName'].value or runKeywordsArg.value in removedArgsValues:

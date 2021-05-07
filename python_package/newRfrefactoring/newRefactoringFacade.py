@@ -37,7 +37,7 @@ class NewRefactoringFacade:
         return self.lineKwsHelper.get_arguments_for_line_keyword(step)
 
     def update_arguments_of_step(self, steps, step, argsOfStep, updatedArgIndex, newArg):
-        updatedData = {'lineKeyword': step, 'updateArg': argsOfStep[updatedArgIndex], 'newArg': newArg}
+        updatedData = {'lineKeyword': step, 'updateArg': argsOfStep[int(updatedArgIndex)], 'newArg': newArg}
         self.lineKwsHelper.update_arguments_of_line_keyword(steps, updatedData)
 
     def build_tokens_of_arguments_in_new_keyword(self, newArgs):

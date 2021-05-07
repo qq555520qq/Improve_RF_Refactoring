@@ -75,7 +75,7 @@ class FileChecker(ast.NodeVisitor):
             self.append_same_keywords_for_run_keywords(node)
             if len(self.keywordNamesList) != 0:
                 self.tempKeywords = []
-                self.keywordNamesList = self.copyKeywordNamesList.copy()
+                self.keywordNamesList = list(self.copyKeywordNamesList)
 
 
     def visit_TestTemplate(self, node):
@@ -211,7 +211,7 @@ class FileChecker(ast.NodeVisitor):
         self.keywordNamesList = get_keywords_name_from_lineKeywords(lineKeywords)
         if is_ForLoop(lineKeywords[0]['node']):
             self.containFor = lineKeywords[0]['containFor']
-        self.copyKeywordNamesList = self.keywordNamesList.copy()
+        self.copyKeywordNamesList = list(self.keywordNamesList)
         self.tempKeywords = []
         self.currentModel = model
         self.visit(model)
@@ -231,12 +231,12 @@ class FileChecker(ast.NodeVisitor):
             self.tempKeywords.append(modelDict)
             del(self.keywordNamesList[0])
             if(len(self.keywordNamesList) == 0):
-                self.sameKeywords.append(self.tempKeywords.copy())
+                self.sameKeywords.append(list(self.tempKeywords))
                 self.tempKeywords = []
-                self.keywordNamesList = self.copyKeywordNamesList.copy()
+                self.keywordNamesList = list(self.copyKeywordNamesList)
         elif(len(self.copyKeywordNamesList) != len(self.keywordNamesList)):
             self.tempKeywords = []
-            self.keywordNamesList = self.copyKeywordNamesList.copy()
+            self.keywordNamesList = list(self.copyKeywordNamesList)
     
     def append_same_keywords_for_run_keywords(self, node):
         if normalize(node.name) == normalize('Run Keywords'):
@@ -247,24 +247,24 @@ class FileChecker(ast.NodeVisitor):
                     self.tempKeywords.append(modelDict)
                     del(self.keywordNamesList[0])
                     if(len(self.keywordNamesList) == 0):
-                        self.sameKeywords.append(self.tempKeywords.copy())
+                        self.sameKeywords.append(list(self.tempKeywords))
                         self.tempKeywords = []
-                        self.keywordNamesList = self.copyKeywordNamesList.copy()
+                        self.keywordNamesList = list(self.copyKeywordNamesList)
                 elif(len(self.copyKeywordNamesList) != len(self.keywordNamesList)):
                     self.tempKeywords = []
-                    self.keywordNamesList = self.copyKeywordNamesList.copy()
+                    self.keywordNamesList = list(self.copyKeywordNamesList)
         else:
             if normalize(self.keywordNamesList[0]) == normalize(node.name):
                 modelDict = {'model': self.currentModel, 'node': node}
                 self.tempKeywords.append(modelDict)
                 del(self.keywordNamesList[0])
                 if(len(self.keywordNamesList) == 0):
-                    self.sameKeywords.append(self.tempKeywords.copy())
+                    self.sameKeywords.append(list(self.tempKeywords))
                     self.tempKeywords = []
-                    self.keywordNamesList = self.copyKeywordNamesList.copy()
+                    self.keywordNamesList = list(self.copyKeywordNamesList)
             elif(len(self.copyKeywordNamesList) != len(self.keywordNamesList)):
                 self.tempKeywords = []
-                self.keywordNamesList = self.copyKeywordNamesList.copy()
+                self.keywordNamesList = list(self.copyKeywordNamesList)
 
     def append_same_keywords_for_forLoop(self, node):
         for index, loopBodyMember in enumerate(node.body):
@@ -274,12 +274,12 @@ class FileChecker(ast.NodeVisitor):
                 self.tempKeywords.append(modelDict)
                 del(self.keywordNamesList[0])
                 if(len(self.keywordNamesList) == 0):
-                    self.sameKeywords.append(self.tempKeywords.copy())
+                    self.sameKeywords.append(list(self.tempKeywords))
                     self.tempKeywords = []
-                    self.keywordNamesList = self.copyKeywordNamesList.copy()
+                    self.keywordNamesList = list(self.copyKeywordNamesList)
             elif(len(self.copyKeywordNamesList) != len(self.keywordNamesList)):
                 self.tempKeywords = []
-                self.keywordNamesList = self.copyKeywordNamesList.copy()
+                self.keywordNamesList = list(self.copyKeywordNamesList)
 
     def get_models_with_resource_and_keyword(self):
         return self.correctModels
