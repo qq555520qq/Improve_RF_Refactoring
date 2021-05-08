@@ -204,6 +204,9 @@ class KeywordFinder(ast.NodeVisitor):
     def clear_keyword_defs(self):
         self.keywordDefList = []
 
+    def clear_lines_keywords(self):
+        self.linesKeywords = []
+
     def get_keyword_calls(self):
         return self.keywordCallList
 
@@ -211,4 +214,6 @@ class KeywordFinder(ast.NodeVisitor):
         return self.keywordDefList
     
     def get_lines_keywords(self):
-        return self.linesKeywords
+        returnList = list(self.linesKeywords)
+        self.clear_lines_keywords()
+        return returnList

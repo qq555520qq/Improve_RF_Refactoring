@@ -6,20 +6,16 @@ import org.eclipse.ui.part.*;
 
 
 import org.eclipse.jface.viewers.*;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.*;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.ui.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 import robot_framework_refactor_tool.handlers.WrapStepsAsANewKeywordHandler;
 
 public class FileSelectionView extends ViewPart {
-	private Node root;
 	private WrapStepsAsANewKeywordHandler wrapHandler;
 	public static final String ID = "robot_framework_refactor_tool.views.SampleView";
 
@@ -29,7 +25,6 @@ public class FileSelectionView extends ViewPart {
 	private Action submitAction;
 	
 	public void update(Node root, WrapStepsAsANewKeywordHandler wrapHandler) {
-		this.root = root;
 		this.wrapHandler = wrapHandler;
 		this.viewer.setInput(root);
 		this.viewer.refresh();
@@ -101,11 +96,16 @@ public class FileSelectionView extends ViewPart {
 		viewer.setContentProvider(new TreeContentProvider());
 		viewer.setLabelProvider(new ViewLabelProvider());
 		viewer.addSelectionChangedListener(event -> {
+			boolean shouldBeEnable = false;
 			List<Node> selections = viewer.getStructuredSelection().toList();
-			boolean shouldBeEnable = selections.size()==1;
+			if(selections.size()==1) {
+				if(selections.get(0).toString().indexOf(".txt") != -1 | selections.get(0).toString().indexOf(".robot") != -1){
+					shouldBeEnable = true;
+				}
+			}
 			submitAction.setEnabled(shouldBeEnable);
 		});
-//		檢查是不是model
+
 		workbench.getHelpSystem().setHelp(viewer.getControl(), "robot_framework_refactor_tool.viewer");
 		getSite().setSelectionProvider(viewer);
 		makeActions();
@@ -126,6 +126,8 @@ public class FileSelectionView extends ViewPart {
 			public void run() {
 				List<Node> selections = viewer.getStructuredSelection().toList();
 				wrapHandler.continueWraping(selections.get(0).toString());
+				viewer.setInput(null);
+				viewer.refresh();
 			}
 		};
 		this.submitAction.setText("Submit");

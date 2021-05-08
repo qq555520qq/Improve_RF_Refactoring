@@ -50,18 +50,6 @@ public class NewRefactorHelper extends PythonInterpreter{
 		return (PyList)this.newRefactoringFacade.invoke("get_same_keywords_with_steps", allModels, steps);
 	}
 
-	public PyObject getStepFromStepsByLine(PyList steps, int line) {
-		return this.newRefactoringFacade.invoke("get_step_from_steps_by_line", steps, Py.newInteger(line));
-	}
-
-	public PyList getArgumentsFromStep(PyObject step) {
-		return (PyList)this.newRefactoringFacade.invoke("get_arguments_from_step", step);
-	}
-
-	public void updateArgumentsOfStep(PyList steps, PyObject step, PyList argsOfStep, String updatedArgIndex, String newArg) {
-		this.newRefactoringFacade.invoke("update_arguments_of_step", new PyObject[] {steps, step, argsOfStep, Py.newStringOrUnicode(processPath(updatedArgIndex)), Py.newStringOrUnicode(processPath(newArg))});
-	}
-
 	public PyList buildTokensOfArgumentsInNewKeyword(PyList newArgs) {
 		return (PyList)this.newRefactoringFacade.invoke("build_tokens_of_arguments_in_new_keyword", newArgs);
 	}
@@ -96,6 +84,18 @@ public class NewRefactorHelper extends PythonInterpreter{
 
 	public void insertDefinedKeyword(PyObject model, PyObject keywordNode) {
 		this.newRefactoringFacade.invoke("insert_defined_keyword", model, keywordNode);
+	}
+//Below temp
+	public PyObject getStepFromStepsByLine(PyList steps, int line) {
+		return this.newRefactoringFacade.invoke("get_step_from_steps_by_line", steps, Py.newInteger(line));
+	}
+
+	public PyList getArgumentsFromStep(PyObject step) {
+		return (PyList)this.newRefactoringFacade.invoke("get_arguments_from_step", step);
+	}
+
+	public void updateArgumentsOfStep(PyList steps, PyObject step, PyList argsOfStep, String updatedArgIndex, String newArg) {
+		this.newRefactoringFacade.invoke("update_arguments_of_step", new PyObject[] {steps, step, argsOfStep, Py.newStringOrUnicode(processPath(updatedArgIndex)), Py.newStringOrUnicode(processPath(newArg))});
 	}
 	
 }

@@ -19,18 +19,15 @@ import helper.PluginHelper;
 import helper.NewRefactorHelper;
 import robot_framework_refactor_tool.views.AddArgumentsForNewKeyword;
 import robot_framework_refactor_tool.views.FileSelectionView;
-import robot_framework_refactor_tool.views.ModifyAction;
 import robot_framework_refactor_tool.views.Node;
 import robot_framework_refactor_tool.views.NodeBuilder;
-import robot_framework_refactor_tool.views.RenameAction;
-import robot_framework_refactor_tool.views.ShowReferencesView;
 
 public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 	
 	private PluginHelper pluginHelper;
 	private NewRefactorHelper newRefactorHelper;
 	private PyList modelsWithSameKeywords;
-	private PyList newKeyowrdBody;
+	private PyList newKeywordBody;
 	private String newKwName;
 	public WrapStepsAsANewKeywordHandler() {
 		newRefactorHelper = PluginHelper.getNewRefactorHelper();
@@ -45,24 +42,23 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 			return null;
 		}
 //		String kwName = pluginHelper.getUserSelectionText();
+		PyList newArguments = new PyList();
 		String projectPath = pluginHelper.getCurrentProjectLocation();
 		String editorLocation = pluginHelper.getCurrentEditorLocation();
 		PyList projectModels = this.newRefactorHelper.buildProjectModels(projectPath);
 		PyObject fileModel = this.newRefactorHelper.buildFileModel(editorLocation);
-		int startLine = this.pluginHelper.getUserSelectionStartLine();
-		int endLine = this.pluginHelper.getUserSelectionEndLine();
+		int startLine = this.pluginHelper.getUserSelectionStartLine() + 1;
+		int endLine = this.pluginHelper.getUserSelectionEndLine() + 1;
 		PyList steps = this.newRefactorHelper.getStepsThatWillBeWraped(fileModel, startLine, endLine);
-		modelsWithSameKeywords = this.newRefactorHelper.getSameKeywordsWithSteps(projectModels, steps);
-		PyList newArguments = new PyList();
+		this.modelsWithSameKeywords = this.newRefactorHelper.getSameKeywordsWithSteps(projectModels, steps);
 		AddArgumentsForNewKeyword addArgDialog = new AddArgumentsForNewKeyword(window.getShell(), newArguments);
 		if(addArgDialog.open()==Window.OK) {
 			PyList argumentsTokens = new PyList();
 			if(newArguments.size() != 0) {
 				argumentsTokens = this.newRefactorHelper.buildTokensOfArgumentsInNewKeyword(newArguments);
 			}
-			newKeyowrdBody = this.newRefactorHelper.getNewKeywordBodyWithStepsAndNewArguments(steps, argumentsTokens);
-
-			InputDialog newNameDialog = new InputDialog(window.getShell(), "New Keyword Name", "Input the new Keyword Name", "", new IInputValidator() {		
+			this.newKeywordBody = this.newRefactorHelper.getNewKeywordBodyWithStepsAndNewArguments(steps, argumentsTokens);
+			InputDialog newNameDialog = new InputDialog(window.getShell(), "New Keyword Name", "Input the new Keyword Name", "", new IInputValidator() {
 				@Override
 				public String isValid(String newText) {
 					if(newText.isEmpty())
@@ -76,14 +72,14 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 			Node root = new NodeBuilder().buildForModels(projectModels);
 			FileSelectionView view= pluginHelper.fileSelectionView();
 			view.update(root, this);
+			pluginHelper.showMessage("Please choose the file to insert new keyword.");
 		}
 
 		return event;
 	}
 
 	public void continueWraping(String targetPath) {
-		System.out.print(targetPath);
-//		this.newRefactorHelper.createNewKeywordForFile(targetPath, this.newKwName, this.newKeyowrdBody);
+		this.newRefactorHelper.createNewKeywordForFile(targetPath, this.newKwName, this.newKeywordBody);
 		
 	}
 }

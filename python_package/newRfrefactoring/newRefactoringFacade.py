@@ -30,16 +30,6 @@ class NewRefactoringFacade:
         self.checker.find_models_with_same_keywords(allModels, steps)
         return self.checker.get_models_with_same_keywords()
 
-    def get_step_from_steps_by_line(self, steps, line):
-        return self.lineKwsHelper.get_line_keyword_from_line_keywords(steps, line)
-
-    def get_arguments_from_step(self, step):
-        return self.lineKwsHelper.get_arguments_for_line_keyword(step)
-
-    def update_arguments_of_step(self, steps, step, argsOfStep, updatedArgIndex, newArg):
-        updatedData = {'lineKeyword': step, 'updateArg': argsOfStep[int(updatedArgIndex)], 'newArg': newArg}
-        self.lineKwsHelper.update_arguments_of_line_keyword(steps, updatedData)
-
     def build_tokens_of_arguments_in_new_keyword(self, newArgs):
         return self.creator.build_tokens_of_new_keyword_arguments(newArgs)
 
@@ -68,3 +58,13 @@ class NewRefactoringFacade:
 
     def insert_defined_keyword(self, model, keywordNode):
         self.creator.mover.insert_new_keyword_defined(model, keywordNode)
+
+    def get_step_from_steps_by_line(self, steps, line):
+        return self.lineKwsHelper.get_line_keyword_from_line_keywords(steps, line)
+
+    def get_arguments_from_step(self, step):
+        return self.lineKwsHelper.get_arguments_for_line_keyword(step)
+
+    def update_arguments_of_step(self, steps, step, argsOfStep, updatedArgIndex, newArg):
+        updatedData = {'lineKeyword': step, 'updateArg': argsOfStep[int(updatedArgIndex)], 'newArg': newArg}
+        self.lineKwsHelper.update_arguments_of_line_keyword(steps, updatedData)

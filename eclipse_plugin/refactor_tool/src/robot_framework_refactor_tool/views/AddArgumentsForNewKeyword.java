@@ -48,17 +48,16 @@ public class AddArgumentsForNewKeyword extends TitleAreaDialog {
 	public void create() {
 		super.create();
 		setTitle("Add arguments for new keyword");
-        setMessage("Tips", IMessageProvider.INFORMATION);
+        setMessage("Please double click to edit data", IMessageProvider.INFORMATION);
 	}
 
 	private void createArguments(Composite container) {
         Label argumentLabel = new Label(container, SWT.NONE);
         argumentLabel.setText("Arguments");
-        GridData argumentData = new GridData();
+        GridData argumentData = new GridData(385, 120);
         argumentData.grabExcessHorizontalSpace = true;
         argumentData.horizontalAlignment = GridData.FILL;
-        argumentTable = new Table(container, SWT.BORDER | SWT.FULL_SELECTION);
-        argumentTable.setItemCount(2);
+        argumentTable = new Table(container, SWT.MULTI | SWT.FULL_SELECTION);
         argumentEditor = new TableEditor(argumentTable);
         argumentEditor.horizontalAlignment = SWT.LEFT;
         argumentEditor.grabHorizontal = true;
@@ -70,8 +69,8 @@ public class AddArgumentsForNewKeyword extends TitleAreaDialog {
     	TableColumn argTypeColumn = new TableColumn(argumentTable,SWT.LEFT);
     	argTypeColumn.setWidth(200);
     	argTypeColumn.setText("name");
-    	argumentTable.setLayoutData(argumentData);
-    	argumentTable.addListener(SWT.MouseDown, e->{
+    	argumentTable.setLayoutData(argumentData);    	
+    	argumentTable.addListener(SWT.MouseDoubleClick, e->{
 				Point pt = new Point(e.x, e.y);
 				selectedArgument = argumentTable.getItem(pt);
 				if(selectedArgument==null)
