@@ -1,0 +1,46 @@
+*** Settings ***
+Documentation     ${resourceFileVariable}_5
+Library           SeleniumLibrary
+Resource          ezScrum.txt
+Library           RefactorLibrary    ${resourceFileVariable}_1    ${resourceFileVariable}_5
+
+*** Variables ***
+${resourceFileVariable}    resource file test data
+${testVariable}    test variable
+
+*** Keywords ***
+Find Usage Test Keyword4
+    Find Usage Test Keyword Impl
+    Find Usage Test Keyword1
+    Find Usage Test Keyword2
+    Find Usage Test Keyword3
+    [Teardown]    Run Keywords    Find Usage Test Keyword1
+    ...    AND    Find Usage Test Keyword2
+
+Find Variable Usage Test Keyword
+    Find Usage Test Keyword1    ${resourceFileVariable}
+    [Teardown]    Find Usage Test Keyword2    ${resourceFileVariable}1
+
+Find Variable Usage And Log Message
+    Find Variable Usage Test Keyword
+    Log    Welcome to ezScrum
+    FOR    ${var}    IN    @{testVariable}
+        Log Mutiple Text    ${var}
+        Log Two Different Text    ${var}    new${var}
+    END
+    [Teardown]    Run Keywords    Test Keyword
+    ...                    AND    For Loop Keyword    5
+    ...                    AND    For Loop Keyword    2
+
+For Loop Keyword
+    [Arguments]    ${times}
+    FOR    ${var}    IN    @{testVariable}
+        Log    ${times}
+        test    ${testVariable}
+    END
+
+Test Keyword
+    Log    ${testVariable}
+    Log    321
+    [Teardown]    Run Keywords    Log    ${testVariable}123
+    ...    AND    Log    321

@@ -1,0 +1,45 @@
+*** Settings ***
+Library           SeleniumLibrary
+
+*** Keywords ***
+Login EzScrum
+    Open Browser    http://140.124.181.135:8080/ezScrum    gc
+    Wait Until Element Is Visible    xpath://input[@name='userId']
+    Input Text    xpath://input[@name='userId']    ga010081
+    Input Text    xpath://input[@name='password']    106598060
+    Click Element    xpath://input[@value='Submit']
+    Wait Until Element Is Visible    xpath://*[@id='Projects_GirdPanel']//span[text()='Project List']    timeout=3s    error=project page not shown within 3 seconds
+
+Login And Go To Project
+    [Arguments]    ${project}
+    Login EzScrum
+    Choose Project    ${project}
+
+Find Usage Test Keyword Impl
+    Log    Find Usage
+
+Find Usage Test Keyword1
+    Find Usage Test Keyword Impl
+    [Teardown]    Find Usage Test Keyword Impl
+
+Find Usage Test Keyword2
+    Find Usage Test Keyword Impl
+    Find Usage Test Keyword1
+    [Teardown]    Find Usage Test Keyword Impl
+
+Find Usage Test Keyword3
+    Find Usage Test Keyword Impl
+    Find Usage Test Keyword1
+    Find Usage Test Keyword2
+    [Teardown]    Run Keywords    Find Usage Test Keyword1
+    ...    AND    Find Usage Test Keyword2
+
+Log Mutiple Text
+    [Arguments]    ${text}
+    Log    ${text}
+    Log    Mutiple${text}
+
+Log Two Different Text
+    [Arguments]    ${text}    ${secondText}
+    Log    ${text}
+    Log    ${secondText}

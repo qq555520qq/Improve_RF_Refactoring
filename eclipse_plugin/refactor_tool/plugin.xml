@@ -125,6 +125,14 @@
             inject="true"
             name="References">
       </view>
+      <view
+            category="robot_framework_refactor_tool"
+            class="robot_framework_refactor_tool.views.FileSelectionView"
+            icon="icons/sample.png"
+            id="robot_framework_refactor_tool.views.FileSelectionView"
+            inject="true"
+            name="FileSelectionView">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">

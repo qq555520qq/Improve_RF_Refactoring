@@ -22,7 +22,7 @@ public class NewRefactorHelperTest {
 	@Before
 	public void setUp() {
 		initNewRefactorHelper();
-		this.testDataPath = curDir+"/test_data/";
+		this.testDataPath = curDir+"/new_test_data/";
 	}
 
 	@Test
@@ -40,10 +40,10 @@ public class NewRefactorHelperTest {
 	@Test
 	public void testGetStepsThatWillBeWraped() {
 		PyObject fileModel = this.helper.buildFileModel(this.testDataPath + "test_data.robot");
-		PyList steps = this.helper.getStepsThatWillBeWraped(fileModel, 45, 52);
-		assertNotEquals(3, steps.size());
+		PyList steps = this.helper.getStepsThatWillBeWraped(fileModel, 46, 53);
+		assertEquals(3, steps.size());
 	}
-	
+
 	public void initNewRefactorHelper() {
 		//pythonSite is the site-packages path, you should replace it with yours.
 		String pythonSite = "C:\\Program Files\\Python36\\Lib\\site-packages";

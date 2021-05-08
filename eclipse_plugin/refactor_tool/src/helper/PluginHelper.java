@@ -14,6 +14,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.python.util.PythonInterpreter;
 
+import robot_framework_refactor_tool.views.FileSelectionView;
 import robot_framework_refactor_tool.views.ShowReferencesView;
 
 public class PluginHelper {
@@ -39,7 +40,20 @@ public class PluginHelper {
 		}
 		return refactorHelper;
 	}
-	
+
+	public static NewRefactorHelper getNewRefactorHelper() {
+		NewRefactorHelper newRefactorHelper = null;
+		String pythonHome = NewRefactorHelper.processPath(PluginHelper.getPythonHome());
+		try {
+			String jythonPath = NewRefactorHelper.processPath(pythonHome+"/rfrefactoring/jython-standalone-2.7.2b3.jar");
+			PluginHelper.initPython(jythonPath, pythonHome);
+			newRefactorHelper = new NewRefactorHelper(new String[] {});
+		}catch(Exception e) {
+			
+		}
+		return newRefactorHelper;
+	}
+
 	public static void initPython(String pythonHome, String sitePath) {
 		Properties props = new Properties();
 		props.put("python.home", pythonHome);
@@ -56,6 +70,26 @@ public class PluginHelper {
 		}
 		else
 			return "";
+	}
+	
+	public int getUserSelectionStartLine() throws ExecutionException{
+		ISelection selection =  window.getActivePage().getSelection();
+		if(selection != null && selection instanceof TextSelection) {
+			TextSelection userSelectText = (TextSelection)selection;
+			return userSelectText.getStartLine();
+		}
+		else
+			return 99999999;
+	}
+	
+	public int getUserSelectionEndLine() throws ExecutionException{
+		ISelection selection =  window.getActivePage().getSelection();
+		if(selection != null && selection instanceof TextSelection) {
+			TextSelection userSelectText = (TextSelection)selection;
+			return userSelectText.getEndLine();
+		}
+		else
+			return 99999999;
 	}
 	
 	public IFileEditorInput getCurrentEditorFile() {
@@ -83,6 +117,16 @@ public class PluginHelper {
 		ShowReferencesView view=null;
 		try {
 			view= (ShowReferencesView)window.getActivePage().showView("robot_framework_refactor_tool.views.ReferencesView");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return view;
+	}
+	
+	public FileSelectionView fileSelectionView() {
+		FileSelectionView view=null;
+		try {
+			view= (FileSelectionView)window.getActivePage().showView("robot_framework_refactor_tool.views.FileSelectionView");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

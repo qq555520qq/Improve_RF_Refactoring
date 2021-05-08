@@ -1,0 +1,9 @@
+*** Settings ***
+Resource          ezScrum.txt
+
+*** Keywords ***
+Login And Go To SideBar Of Project
+    [Arguments]    ${project}   ${sideBar}
+    Login EzScrum
+    Choose Project    ${project}
+    Click SideBar    ${sideBar}

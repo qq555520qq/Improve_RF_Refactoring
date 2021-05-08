@@ -2,15 +2,15 @@ import sys
 from os import path
 p = path.normpath(path.dirname(path.abspath(__file__))+"/../..")
 sys.path.append(p)
-from ..common.threadWithReturn import BuildingModelThread
-from ..builder.testModelBuilder import TestModelBuilder
-from ..keywords.keywordFinder import KeywordFinder
-from ..checker.fileChecker import FileChecker
-from ..keywords.keywordCreator import KeywordCreator
-from ..keywords.keywordPrinter import KeywordPrinter
-from ..keywords.keywordMoveHelper import KeywordMoveHelper
-from ..helper.lineKeywordsHelper import LineKeywordsHelper
-from ..common.utility import *
+from python_package.newRfrefactoring.common.threadWithReturn import BuildingModelThread
+from python_package.newRfrefactoring.builder.testModelBuilder import TestModelBuilder
+from python_package.newRfrefactoring.keywords.keywordFinder import KeywordFinder
+from python_package.newRfrefactoring.checker.fileChecker import FileChecker
+from python_package.newRfrefactoring.keywords.keywordCreator import KeywordCreator
+from python_package.newRfrefactoring.keywords.keywordPrinter import KeywordPrinter
+from python_package.newRfrefactoring.keywords.keywordMoveHelper import KeywordMoveHelper
+from python_package.newRfrefactoring.helper.lineKeywordsHelper import LineKeywordsHelper
+from python_package.newRfrefactoring.common.utility import *
 from prettytable import PrettyTable
 
 builder = TestModelBuilder()

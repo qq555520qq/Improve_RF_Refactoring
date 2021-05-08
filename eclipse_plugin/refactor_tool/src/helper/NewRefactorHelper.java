@@ -50,6 +50,10 @@ public class NewRefactorHelper extends PythonInterpreter{
 		return (PyList)this.newRefactoringFacade.invoke("get_same_keywords_with_steps", allModels, steps);
 	}
 
+	public PyObject getStepFromStepsByLine(PyList steps, int line) {
+		return this.newRefactoringFacade.invoke("get_step_from_steps_by_line", steps, Py.newInteger(line));
+	}
+
 	public PyList getArgumentsFromStep(PyObject step) {
 		return (PyList)this.newRefactoringFacade.invoke("get_arguments_from_step", step);
 	}
@@ -66,7 +70,7 @@ public class NewRefactorHelper extends PythonInterpreter{
 		return (PyList)this.newRefactoringFacade.invoke("get_new_keyword_body_with_steps_and_new_arguments", steps, newArgsTokens);
 	}
 
-	public void create_new_keyword_for_file(String filePath, String newKeywordName, PyList newKeywordBody) {
+	public void createNewKeywordForFile(String filePath, String newKeywordName, PyList newKeywordBody) {
 		this.newRefactoringFacade.invoke("create_new_keyword_for_file", new PyObject[]{Py.newStringOrUnicode(processPath(filePath)), Py.newStringOrUnicode(processPath(newKeywordName)), newKeywordBody});
 	}
 
