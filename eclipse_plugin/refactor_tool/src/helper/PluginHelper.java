@@ -15,6 +15,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.python.util.PythonInterpreter;
 
 import robot_framework_refactor_tool.views.FileSelectionView;
+import robot_framework_refactor_tool.views.SameKeywordsSelectionView;
 import robot_framework_refactor_tool.views.ShowReferencesView;
 
 public class PluginHelper {
@@ -79,7 +80,7 @@ public class PluginHelper {
 			return userSelectText.getStartLine();
 		}
 		else
-			return 99999999;
+			return -1;
 	}
 	
 	public int getUserSelectionEndLine() throws ExecutionException{
@@ -89,7 +90,7 @@ public class PluginHelper {
 			return userSelectText.getEndLine();
 		}
 		else
-			return 99999999;
+			return -1;
 	}
 	
 	public IFileEditorInput getCurrentEditorFile() {
@@ -122,11 +123,21 @@ public class PluginHelper {
 		}
 		return view;
 	}
-	
+
 	public FileSelectionView fileSelectionView() {
 		FileSelectionView view=null;
 		try {
 			view= (FileSelectionView)window.getActivePage().showView("robot_framework_refactor_tool.views.FileSelectionView");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return view;
+	}
+
+	public SameKeywordsSelectionView sameKeywordsSelectionView() {
+		SameKeywordsSelectionView view=null;
+		try {
+			view= (SameKeywordsSelectionView)window.getActivePage().showView("robot_framework_refactor_tool.views.SameKeywordsSelectionView");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

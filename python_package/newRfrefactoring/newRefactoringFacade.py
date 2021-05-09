@@ -3,6 +3,7 @@ from .keywords.keywordFinder import KeywordFinder
 from .checker.fileChecker import FileChecker
 from .helper.lineKeywordsHelper import LineKeywordsHelper
 from .keywords.keywordCreator import KeywordCreator
+from .common.utility import *
 
 
 class NewRefactoringFacade:
@@ -39,10 +40,46 @@ class NewRefactoringFacade:
     def create_new_keyword_for_file(self, filePath, newKeywordName, newKeywordBody):
         self.creator.create_new_keyword_for_file(filePath, newKeywordName, newKeywordBody)
 
-    def replace_steps_with_keyword_and_get_models_with_replacing(keywordName, keywordArgs, steps):
+    def replace_steps_with_keyword_and_get_models_with_replacing(self, keywordName, keywordArgs, steps):
         newKeywordDict = {'keywordName': keywordName, 'arguments': keywordArgs}
         self.creator.replace_old_steps_with_keyword_for_same_keywords(newKeywordDict, steps)
         return steps[0]['model']
+
+    def present_same_steps(self, sameStepsBlock):
+        def get_keywordCall_text(text, node):
+            text += node.keyword
+            for arg in node.args:
+                text += ('    ' + arg)
+            text += '\n'
+            return text
+        
+        def get_loop_info_text(text, node):
+            text += 'For'
+            for variable in node.variables:
+                text += (' ' + variable)
+            text += node.flavor
+            for value in node.values:
+                text += (' ' + value)
+            text += "\n"
+
+        present_result = ''
+        loopFirst = True
+        for sameStep in sameStepsBlock:
+            present_result += '\n'
+            if is_KeywordCall(sameStep['node']):
+                present_result = get_keywordCall_text(present_result, sameStep['node'])
+            elif is_ForLoop(sameStep['node']):
+                if loopFirst:
+                    present_result = get_loop_info_text(present_result, sameStep['node'])
+                    if is_KeywordCall(sameStep['keyword']):
+                        present_result = get_keywordCall_text(present_result, sameStep['keyword'])
+                else:
+                    if is_KeywordCall(sameStep['keyword']):
+                        present_result = get_keywordCall_text(present_result, sameStep['keyword'])
+            # elif is_Keyword_tag(sameStep['node']):
+            # present run keywords
+
+        return present_result
 
     def get_models_without_importing_new_resource_from_models_with_replacement(self, newKeywordName, modelsWithReplacement, newKeywordPath):
         return self.creator.mover.get_models_without_import_new_resource_from_models_with_replacement(newKeywordName, modelsWithReplacement, newKeywordPath)

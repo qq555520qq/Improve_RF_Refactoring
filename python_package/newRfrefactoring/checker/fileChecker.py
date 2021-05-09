@@ -287,5 +287,10 @@ class FileChecker(ast.NodeVisitor):
     def clear_models_with_resource_and_keyword(self):
         self.correctModels = []
 
+    def clear_models_with_same_keywords(self):
+        self.sameKeywords = []
+
     def get_models_with_same_keywords(self):
-        return self.sameKeywords
+        sameKeywordsCopy = list(self.sameKeywords)
+        self.clear_models_with_same_keywords()
+        return sameKeywordsCopy

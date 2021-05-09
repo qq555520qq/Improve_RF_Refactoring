@@ -1,5 +1,7 @@
 package robot_framework_refactor_tool.handlers;
 
+import java.util.List;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -21,6 +23,8 @@ import robot_framework_refactor_tool.views.AddArgumentsForNewKeyword;
 import robot_framework_refactor_tool.views.FileSelectionView;
 import robot_framework_refactor_tool.views.Node;
 import robot_framework_refactor_tool.views.NodeBuilder;
+import robot_framework_refactor_tool.views.SameKeywordsSelectionView;
+import robot_framework_refactor_tool.views.SameStepsBlock;
 
 public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 	
@@ -29,13 +33,15 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 	private PyList modelsWithSameKeywords;
 	private PyList newKeywordBody;
 	private String newKwName;
+	private String newKwPath;
+	private IWorkbenchWindow window;
 	public WrapStepsAsANewKeywordHandler() {
 		newRefactorHelper = PluginHelper.getNewRefactorHelper();
 	}
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
+		window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		this.pluginHelper = new PluginHelper(window);
 		if(newRefactorHelper==null) {
 			pluginHelper.showMessage("No helper");
@@ -51,7 +57,7 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 		int endLine = this.pluginHelper.getUserSelectionEndLine() + 1;
 		PyList steps = this.newRefactorHelper.getStepsThatWillBeWraped(fileModel, startLine, endLine);
 		this.modelsWithSameKeywords = this.newRefactorHelper.getSameKeywordsWithSteps(projectModels, steps);
-		AddArgumentsForNewKeyword addArgDialog = new AddArgumentsForNewKeyword(window.getShell(), newArguments);
+		AddArgumentsForNewKeyword addArgDialog = new AddArgumentsForNewKeyword(window.getShell(), newArguments, "Add arguments for new keyword");
 		if(addArgDialog.open()==Window.OK) {
 			PyList argumentsTokens = new PyList();
 			if(newArguments.size() != 0) {
@@ -70,16 +76,35 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 				return null;
 			newKwName = newNameDialog.getValue();
 			Node root = new NodeBuilder().buildForModels(projectModels);
-			FileSelectionView view= pluginHelper.fileSelectionView();
-			view.update(root, this);
+			FileSelectionView fileView= pluginHelper.fileSelectionView();
+			fileView.update(root, this);
 			pluginHelper.showMessage("Please choose the file to insert new keyword.");
 		}
 
 		return event;
 	}
 
-	public void continueWraping(String targetPath) {
+	public void afterChoosingFileToInsertKeyword(String targetPath) {
+		newKwPath = targetPath;
 		this.newRefactorHelper.createNewKeywordForFile(targetPath, this.newKwName, this.newKeywordBody);
+		Node sameKeywordsRoot = new NodeBuilder().buildForSameKeywords(this.modelsWithSameKeywords);
+		SameKeywordsSelectionView sameKeywordsView = pluginHelper.sameKeywordsSelectionView();
+		sameKeywordsView.update(sameKeywordsRoot, this);
+		pluginHelper.showMessage("Please choose the file(s) with same steps to replace it(them) with new keyword.");
+	}
+
+	public void afterChoosingReplacedSteps(PyList sameKeywordsBlocks) {
+		PyList modelsWithReplacing = new PyList();
+		for (int index = 0;index < sameKeywordsBlocks.size();index++) {
+			PyList newKeywordArgs = new PyList();
+			AddArgumentsForNewKeyword newkeywordArgsDialog = new AddArgumentsForNewKeyword(window.getShell(), newKeywordArgs, "Add arguments for keyword that will be used to replace steps");
+			PyList sameStepsBlock = (PyList)((SameStepsBlock)sameKeywordsBlocks.get(index)).getData();
+			if(newkeywordArgsDialog.open()==Window.OK) {
+				PyObject modelWithReplacing = this.newRefactorHelper.replaceStepsWithKeywordAndGetModelsWithReplacing(newKwName, newKeywordArgs, sameStepsBlock);
+				modelsWithReplacing.add(modelWithReplacing);
+			}
+		}
+		PyList modelsWithoutImporting = this.newRefactorHelper.getModelsWithoutImportingNewResourceFromModelsWithReplacement(newKwName, modelsWithReplacing, newKwPath);
 		
 	}
 }

@@ -37,4 +37,27 @@ public class NodeBuilder {
 		return root;
 
 	}
+
+	public Node buildForSameKeywords(PyList sameKeywords) {
+		Node root = new Node();
+		for (int index = 0; index < sameKeywords.size(); index++) {
+			PyList sameKeywordsBody = (PyList)(sameKeywords.get(index));
+			Node sameStepsBlock = new SameStepsBlock(sameKeywordsBody);
+			for (int sameKeywordIndex = 0; sameKeywordIndex < sameKeywordsBody.size(); sameKeywordIndex++) {
+				PyDictionary keywordNode = (PyDictionary)sameKeywordsBody.get(sameKeywordIndex);
+				Node keyword = null;
+				PyString nodeClass = (PyString)((PyObject)keywordNode.get("node")).__getattr__("__class__").__getattr__("__name__");
+				if((String)nodeClass.__tojava__(String.class) == "KeywordCall") {
+					keyword = new Keyword(keywordNode.get("node"));
+				}
+				else {
+					keyword = new Keyword(keywordNode.get("keyword"));
+				}
+				sameStepsBlock.addChild(keyword);
+			}
+			root.addChild(sameStepsBlock);
+		}
+		return root;
+
+	}
 }

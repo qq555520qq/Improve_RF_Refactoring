@@ -39,15 +39,17 @@ public class AddArgumentsForNewKeyword extends TitleAreaDialog {
 	private final String[] variableLabels = new String[] {"scalar($)", "list(@)","dict(&)"};
 	private final String[] variableTypes = new String[] {"$", "@","&"};
 	private PyList newArguments;
-	public AddArgumentsForNewKeyword(Shell parentShell, PyList arguments) {
+	private String dialogTitle;
+	public AddArgumentsForNewKeyword(Shell parentShell, PyList arguments, String dialogTitle) {
 		super(parentShell);
 		this.newArguments = arguments;
+		this.dialogTitle = dialogTitle;
 	}
 
 	@Override
 	public void create() {
 		super.create();
-		setTitle("Add arguments for new keyword");
+		setTitle(this.dialogTitle);
         setMessage("Please double click to edit data", IMessageProvider.INFORMATION);
 	}
 
@@ -69,7 +71,11 @@ public class AddArgumentsForNewKeyword extends TitleAreaDialog {
     	TableColumn argTypeColumn = new TableColumn(argumentTable,SWT.LEFT);
     	argTypeColumn.setWidth(200);
     	argTypeColumn.setText("name");
-    	argumentTable.setLayoutData(argumentData);    	
+    	argumentTable.setLayoutData(argumentData);
+    	argumentTable.addListener(SWT.MouseDown, e->{
+			Point pt = new Point(e.x, e.y);
+    		selectedArgument = argumentTable.getItem(pt);    		
+    	});
     	argumentTable.addListener(SWT.MouseDoubleClick, e->{
 				Point pt = new Point(e.x, e.y);
 				selectedArgument = argumentTable.getItem(pt);

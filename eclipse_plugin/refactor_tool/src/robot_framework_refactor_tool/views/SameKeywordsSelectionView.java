@@ -3,29 +3,36 @@ package robot_framework_refactor_tool.views;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.*;
+import org.python.core.PyList;
 
+import robot_framework_refactor_tool.handlers.WrapStepsAsANewKeywordHandler;
 
 import org.eclipse.jface.viewers.*;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.*;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.ui.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-import robot_framework_refactor_tool.handlers.WrapStepsAsANewKeywordHandler;
 
-public class FileSelectionView extends ViewPart {
+public class SameKeywordsSelectionView extends ViewPart {
 	private WrapStepsAsANewKeywordHandler wrapHandler;
+	private Node root;
 	public static final String ID = "robot_framework_refactor_tool.views.SampleView";
 
 	@Inject IWorkbench workbench;
 
 	private TreeViewer viewer;
+	private Action selectAllAction;
 	private Action submitAction;
 	
 	public void update(Node root, WrapStepsAsANewKeywordHandler wrapHandler) {
 		this.wrapHandler = wrapHandler;
+		this.root = root;
 		this.viewer.setInput(root);
 		this.viewer.refresh();
 	}
@@ -96,16 +103,22 @@ public class FileSelectionView extends ViewPart {
 		viewer.setContentProvider(new TreeContentProvider());
 		viewer.setLabelProvider(new ViewLabelProvider());
 		viewer.addSelectionChangedListener(event -> {
-			boolean shouldBeEnable = false;
 			List<Node> selections = viewer.getStructuredSelection().toList();
-			if(selections.size()==1) {
-				if(selections.get(0).toString().indexOf(".txt") != -1 | selections.get(0).toString().indexOf(".robot") != -1){
-					shouldBeEnable = true;
+			boolean shouldBeEnable = false;
+			if(selections.size() > 0) {
+				for (Node selection:selections) {	
+					if(selection.toString().indexOf(".txt") == -1 & selection.toString().indexOf(".robot") == -1){
+						shouldBeEnable = false;
+						break;
+					}
+					else {
+						shouldBeEnable = true;
+					}
 				}
 			}
+			
 			submitAction.setEnabled(shouldBeEnable);
 		});
-
 		workbench.getHelpSystem().setHelp(viewer.getControl(), "robot_framework_refactor_tool.viewer");
 		getSite().setSelectionProvider(viewer);
 		makeActions();
@@ -118,14 +131,34 @@ public class FileSelectionView extends ViewPart {
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
+		manager.add(selectAllAction);
 		manager.add(submitAction);
 	}
 
 	private void makeActions() {
+		selectAllAction = new Action() {
+			public void run() {
+				viewer.expandAll();
+				List<Node> allNodes = new ArrayList<Node>();
+				root.accept(new NodeVisitor(){
+					@Override
+					public boolean visit(Node node) {
+						if(node.getClass() == SameStepsBlock.class) {						
+							allNodes.add(node);
+						}
+						return true;
+					}
+					
+				});
+				viewer.setSelection(new StructuredSelection(allNodes), true);
+			}
+		};
+		selectAllAction.setText("Select All");
 		submitAction = new Action() {
 			public void run() {
 				List<Node> selections = viewer.getStructuredSelection().toList();
-				wrapHandler.afterChoosingFileToInsertKeyword(selections.get(0).toString());
+				PyList selectedSameKeywordsBlocks = new PyList(selections);
+				wrapHandler.afterChoosingReplacedSteps(selectedSameKeywordsBlocks);
 				viewer.setInput(null);
 				viewer.refresh();
 			}

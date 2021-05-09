@@ -133,6 +133,14 @@
             inject="true"
             name="FileSelectionView">
       </view>
+      <view
+            category="robot_framework_refactor_tool"
+            class="robot_framework_refactor_tool.views.SameKeywordsSelectionView"
+            icon="icons/sample.png"
+            id="robot_framework_refactor_tool.views.SameKeywordsSelectionView"
+            inject="true"
+            name="SameKeywordsSelectionView">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
