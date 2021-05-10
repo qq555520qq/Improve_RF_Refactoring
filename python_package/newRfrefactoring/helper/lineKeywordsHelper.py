@@ -1,6 +1,6 @@
 from robot.api import Token
 from robot.parsing.model import Statement
-from ..common.utility import is_ForLoop, is_Keyword_tag, is_KeywordCall
+from ..common.utility import is_ForLoop, is_Keyword_tag, is_KeywordCall, normalize
 from ..builder.testModelBuilder import TestModelBuilder
 
 class LineKeywordsHelper():
@@ -99,3 +99,73 @@ class LineKeywordsHelper():
             else:
                 keywordsBody.append(lineKeyword['node'])
         return keywordsBody
+
+    def get_same_keywords_block_text(self, sameStepsBlock):
+            def get_keywordCall_text(node):
+                text = node.keyword
+                for arg in node.args:
+                    text += ('    ' + arg)
+                text += '\n'
+                return text
+            
+            def get_loop_info_text(node):
+                text = 'For'
+                for variable in node.variables:
+                    text += (' ' + variable)
+                text += ( ' ' + node.flavor)
+                for value in node.values:
+                    text += (' ' + value)
+                text += "\n"
+                return text
+
+            def get_tag_keyword_text(node):
+                text = ('    [' + node.__class__.__name__ + ']')
+                text += ('    ' + node.name)
+                if normalize(sameStep['node'].name) != normalize('Run Keywords'):
+                    for arg in node.args:
+                        text += ('    ' + arg)
+                return text
+
+            def get_run_keywords_body_text(body):
+                text = ('    ' + body['keywordName'].value)
+                for arg in body['arguments']:
+                    text += ('    ' + arg.value)
+                text += '\n'
+                return text
+
+
+            present_result = ''
+            loopFirst = True
+            runKeywordsFirst = True
+            for sameStep in sameStepsBlock:
+                if is_KeywordCall(sameStep['node']):
+                    if not(loopFirst):
+                        present_result += 'END'
+                    loopFirst = True
+                    runKeywordsFirst = True
+                    present_result += get_keywordCall_text(sameStep['node'])
+                elif is_ForLoop(sameStep['node']):
+                    runKeywordsFirst = True
+                    if loopFirst:
+                        present_result += get_loop_info_text(sameStep['node'])
+                        if is_KeywordCall(sameStep['keyword']):
+                            present_result += ('    ' + get_keywordCall_text(sameStep['keyword']))
+                        loopFirst = False
+                    else:
+                        if is_KeywordCall(sameStep['keyword']):
+                            present_result += ('    ' + get_keywordCall_text(sameStep['keyword']))
+                elif is_Keyword_tag(sameStep['node']):
+                    if not(loopFirst):
+                        present_result += 'END\n'
+                    loopFirst = True
+                    if normalize(sameStep['node'].name) != normalize('Run Keywords'):
+                            present_result += get_tag_keyword_text(sameStep['node']) + '\n'
+                    else:
+                        if runKeywordsFirst:
+                            runKeywordsFirst = False
+                            present_result += get_tag_keyword_text(sameStep['node'])
+                            present_result += get_run_keywords_body_text(sameStep['keyword'])
+                        else:
+                            present_result += ('    ...    AND' + get_run_keywords_body_text(sameStep['keyword']))
+
+            return present_result

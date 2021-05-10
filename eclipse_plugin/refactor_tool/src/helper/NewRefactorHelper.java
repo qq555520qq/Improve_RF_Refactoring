@@ -69,6 +69,11 @@ public class NewRefactorHelper extends PythonInterpreter{
 	public PyList getModelsWithoutImportingNewResourceFromModelsWithReplacement(String newKeywordName, PyList modelsWithReplacement, String newKeywordPath) {
 		return (PyList) this.newRefactoringFacade.invoke("get_models_without_importing_new_resource_from_models_with_replacement", new PyObject[]{Py.newStringOrUnicode(processPath(newKeywordName)), modelsWithReplacement, Py.newStringOrUnicode(processPath(newKeywordPath))});
 	}
+	
+	public String presentSameSteps(PyList sameStepsBlock) {
+		PyString result = (PyString)this.newRefactoringFacade.invoke("present_same_steps", sameStepsBlock);
+		return result.toString();
+	}
 //Up finish
 	
 	public void importNewResourceForModelWithoutImporting(PyObject model, String resourceValue) {

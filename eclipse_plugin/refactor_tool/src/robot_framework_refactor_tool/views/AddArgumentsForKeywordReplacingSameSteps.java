@@ -1,6 +1,8 @@
 package robot_framework_refactor_tool.views;
 
 import java.util.Arrays;
+
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
@@ -30,31 +32,52 @@ import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyDictionary;
 
+import helper.NewRefactorHelper;
 import helper.RefactorHelper;
 
-public class AddArgumentsForNewKeyword extends TitleAreaDialog {
+public class AddArgumentsForKeywordReplacingSameSteps extends TitleAreaDialog {
 	private Table argumentTable;
 	private TableEditor argumentEditor;
 	private TableItem selectedArgument;
-	private final String[] variableLabels = new String[] {"scalar($)", "list(@)","dict(&)"};
-	private final String[] variableTypes = new String[] {"$", "@","&"};
+//	private final String[] variableLabels = new String[] {"scalar($)", "list(@)","dict(&)"};
+//	private final String[] variableTypes = new String[] {"$", "@","&"};
+	private NewRefactorHelper helper;
+	private StyledText previewArea;
+	private Label previewLabel;
 	private PyList newArguments;
-	public AddArgumentsForNewKeyword(Shell parentShell, PyList arguments) {
+	private PyList sameStepsBlock;
+	public AddArgumentsForKeywordReplacingSameSteps(Shell parentShell, NewRefactorHelper helper, PyList sameStepsBlock, PyList arguments) {
 		super(parentShell);
 		this.newArguments = arguments;
+		this.helper = helper;
+		this.sameStepsBlock = sameStepsBlock;
+	}
+
+	public AddArgumentsForKeywordReplacingSameSteps(Shell parentShell, NewRefactorHelper helper, PyList sameStepsBlock) {
+		super(parentShell);
+		this.helper = helper;
+		this.sameStepsBlock = sameStepsBlock;
 	}
 
 	@Override
 	public void create() {
 		super.create();
-		setTitle("Add arguments for new keyword");
-        setMessage("Please click add button to add data and double click to edit data", IMessageProvider.INFORMATION);
+		if(this.newArguments != null) {		
+			setTitle("Add arguments for the keyword that will replace same steps");
+			setMessage("Please click add button to add data and double click to edit data", IMessageProvider.INFORMATION);
+		}
+		else {
+			setTitle("Present same steps block");	
+	        setMessage("Please check are the steps that you want", IMessageProvider.INFORMATION);
+		}
+        Button cancelButton= getButton(IDialogConstants.CANCEL_ID);
+    	cancelButton.setVisible(false);
 	}
 
 	private void createArguments(Composite container) {
         Label argumentLabel = new Label(container, SWT.NONE);
         argumentLabel.setText("Arguments");
-        GridData argumentData = new GridData(385, 120);
+        GridData argumentData = new GridData(0, 120);
         argumentData.grabExcessHorizontalSpace = true;
         argumentData.horizontalAlignment = GridData.FILL;
         argumentTable = new Table(container, SWT.MULTI | SWT.FULL_SELECTION);
@@ -63,81 +86,39 @@ public class AddArgumentsForNewKeyword extends TitleAreaDialog {
         argumentEditor.grabHorizontal = true;
         argumentTable.setHeaderVisible(true);
         argumentTable.setLinesVisible(true);
-    	TableColumn argNameColumn = new TableColumn(argumentTable,SWT.LEFT);
-    	argNameColumn.setWidth(200);
-    	argNameColumn.setText("type");
-    	TableColumn argTypeColumn = new TableColumn(argumentTable,SWT.LEFT);
-    	argTypeColumn.setWidth(200);
-    	argTypeColumn.setText("name");
+    	TableColumn argColumn = new TableColumn(argumentTable,SWT.LEFT);
+    	argColumn.setWidth(315);
+    	argColumn.setText("arguments");
     	argumentTable.setLayoutData(argumentData);
     	argumentTable.addListener(SWT.MouseDown, e->{
 			Point pt = new Point(e.x, e.y);
-    		selectedArgument = argumentTable.getItem(pt);    		
+    		selectedArgument = argumentTable.getItem(pt);
+    		Control editor = argumentEditor.getEditor();
+			if(editor!=null)
+				editor.dispose();
     	});
     	argumentTable.addListener(SWT.MouseDoubleClick, e->{
-				Point pt = new Point(e.x, e.y);
-				selectedArgument = argumentTable.getItem(pt);
-				if(selectedArgument==null)
-					return;
-				int selectedColumn = 0;
-                for (int col = 0; col < argumentTable.getColumnCount(); col++) {
-                    Rectangle rect = selectedArgument.getBounds(col);
-                    if (rect.contains(pt)) 
-                    	selectedColumn = col;
-                }
-                final int column = selectedColumn;
-				Control editor = argumentEditor.getEditor();
-				if(editor!=null)
-					editor.dispose();
-				Control tableEditor=null;
-				if(column==1) {
-					Text textEditor= new Text(argumentTable,SWT.None);
-					String curText = selectedArgument.getText(column);
-					textEditor.setText(curText);
-					tableEditor = textEditor;
-					textEditor.addModifyListener(event->{
-						String argType = selectedArgument.getText(0);
-						String argName = selectedArgument.getText(1);
-						String originArg = argType+"{"+argName+"}";
-						int index = newArguments.index(Py.newStringOrUnicode(originArg));
-						String input = textEditor.getText();
-						String newArg = argType+"{"+input+"}";
-						selectedArgument.setText(column, input);
-						newArguments.set(index, newArg);
-					});
-				}
-				else {
-					Combo comboEditor = new Combo(argumentTable, SWT.READ_ONLY);
-					comboEditor.setItems(variableLabels);					
-					String type = selectedArgument.getText(column);
-					int typeIndex = Arrays.asList(variableTypes).indexOf(type);					
-					String label = variableLabels[typeIndex];
-					comboEditor.setText(label);
-					tableEditor = comboEditor;
-					comboEditor.addSelectionListener(new SelectionListener() {
-						@Override
-						public void widgetSelected(SelectionEvent e) {
-							int selection = comboEditor.getSelectionIndex();
-							String argType = selectedArgument.getText(0);
-							String argName = selectedArgument.getText(1);
-							String originArg = argType+"{"+argName+"}";
-							int index = newArguments.index(Py.newStringOrUnicode(originArg));
-							selectedArgument.setText(column, argType);
-							String selectionType = variableTypes[selection];
-							selectedArgument.setText(0, selectionType);
-							comboEditor.dispose();
-							newArguments.set(index, selectionType+"{"+argName+"}");
-						}
-						
-						@Override
-						public void widgetDefaultSelected(SelectionEvent e) {
-							// TODO Auto-generated method stub
-							
-						}
-					});
-				}
-				argumentEditor.setEditor(tableEditor, selectedArgument,column);
-				tableEditor.forceFocus();
+			Point pt = new Point(e.x, e.y);
+			selectedArgument = argumentTable.getItem(pt);
+			if(selectedArgument==null) 
+				return;
+			Control editor = argumentEditor.getEditor();
+			if(editor!=null)
+				editor.dispose();
+			Control tableEditor=null;
+			Text textEditor= new Text(argumentTable,SWT.None);
+			String curText = selectedArgument.getText(0);
+			textEditor.setText(curText);
+			tableEditor = textEditor;
+			textEditor.addModifyListener(event->{
+				String originArg = selectedArgument.getText(0);
+				int index = newArguments.index(Py.newStringOrUnicode(originArg));
+				String input = textEditor.getText();
+				selectedArgument.setText(0, input);
+				newArguments.set(index, input);
+			});
+			argumentEditor.setEditor(tableEditor, selectedArgument, 0);
+			tableEditor.forceFocus();
 		});
     }
 
@@ -157,8 +138,8 @@ public class AddArgumentsForNewKeyword extends TitleAreaDialog {
 			@Override
 			public void mouseDown(MouseEvent e) {
 				int argumentLength = newArguments.size();
-				String newArgument = "${argument"+String.valueOf(argumentLength+1)+"}";
-				new TableItem(argumentTable, SWT.LEFT).setText(new String[] {newArgument.substring(0,1), newArgument.substring(2, newArgument.length()-1)});
+				String newArgument = "argument"+String.valueOf(argumentLength+1);
+				new TableItem(argumentTable, SWT.LEFT).setText(new String[] {newArgument});
 				newArguments.append(Py.newStringOrUnicode(newArgument));
 			}
 			
@@ -182,9 +163,7 @@ public class AddArgumentsForNewKeyword extends TitleAreaDialog {
 			@Override
 			public void mouseDown(MouseEvent e) {
 				if(selectedArgument!=null && argumentTable.indexOf(selectedArgument)!=-1) {
-					String argType = selectedArgument.getText(0);
-					String argName = selectedArgument.getText(1);
-					String argumentToRemove = argType+"{"+argName+"}";
+					String argumentToRemove = selectedArgument.getText(0);
 					newArguments.remove(Py.newStringOrUnicode(argumentToRemove));
 					argumentTable.remove(argumentTable.indexOf(selectedArgument));
 				}
@@ -198,6 +177,20 @@ public class AddArgumentsForNewKeyword extends TitleAreaDialog {
 		});
     	
 	}
+    
+    private void createPreviewArea(Composite container) {
+    	previewLabel = new Label(container, SWT.VIRTUAL);
+    	previewLabel.setText("Present same steps");
+    	previewLabel.setVisible(true);
+    	previewArea = new StyledText(container, SWT.BORDER);
+    	GridData previewGrid = new GridData();
+        previewGrid.grabExcessHorizontalSpace = true;
+        previewGrid.horizontalAlignment = GridData.FILL;
+        previewArea.setText(helper.presentSameSteps(sameStepsBlock));
+        previewArea.setLayoutData(previewGrid);
+        previewArea.setEditable(false);
+        previewArea.setVisible(true);
+    }
 	
 	@Override
 	protected Control createDialogArea(Composite parent) {
@@ -206,8 +199,11 @@ public class AddArgumentsForNewKeyword extends TitleAreaDialog {
         container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         GridLayout layout = new GridLayout(3, false);
         container.setLayout(layout);
-		createArguments(container);
-		createArgumentButtons(container);
+        if(this.newArguments != null) {
+        	createArguments(container);
+        	createArgumentButtons(container);
+        }
+		createPreviewArea(container);
 		return area;
 	}
 	

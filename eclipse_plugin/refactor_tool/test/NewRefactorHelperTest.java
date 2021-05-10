@@ -19,29 +19,38 @@ public class NewRefactorHelperTest {
 	private String testDataPath;
 	private NewRefactorHelper helper;
 	private PyList allModels;
+	private PyObject fileModel;
 	@Before
 	public void setUp() {
 		initNewRefactorHelper();
 		this.testDataPath = curDir+"/new_test_data/";
+		this.fileModel = this.helper.buildFileModel(this.testDataPath + "test_data.robot");
+		this.allModels = this.helper.buildProjectModels(testDataPath);
 	}
 
 	@Test
 	public void testBuildProjectModels() {
-		this.allModels = this.helper.buildProjectModels(testDataPath);
 		assertNotEquals(Py.None, this.allModels);
 	}
 
 	@Test
 	public void testBuildFileModel() {
-		PyObject fileModel = this.helper.buildFileModel(this.testDataPath + "test_data.robot");
-		assertNotEquals(Py.None, fileModel);
+		assertNotEquals(Py.None, this.fileModel);
 	}
 	
 	@Test
 	public void testGetStepsThatWillBeWraped() {
-		PyObject fileModel = this.helper.buildFileModel(this.testDataPath + "test_data.robot");
-		PyList steps = this.helper.getStepsThatWillBeWraped(fileModel, 46, 53);
+		PyList steps = this.helper.getStepsThatWillBeWraped(this.fileModel, 46, 53);
 		assertEquals(3, steps.size());
+	}
+	
+	@Test
+	public void testPresentSameSteps() {
+		PyList steps = this.helper.getStepsThatWillBeWraped(this.fileModel, 46, 53);
+		assertEquals(3, steps.size());
+		PyList sameStepsBlocks = this.helper.getSameKeywordsWithSteps(this.allModels, steps);
+		String presentText = this.helper.presentSameSteps((PyList)sameStepsBlocks.get(0));
+		assertEquals(presentText, "Log    Welcome to taipei\nFor ${var} IN @{testVariable}\n    Log Mutiple Text    ${var}\n    Log Two Different Text    ${var}    new${var}\nEND\n    [Teardown]    Run Keywords    Test Keyword\n    ...    AND    For Loop Keyword    5\n    ...    AND    For Loop Keyword    2\n");
 	}
 
 	public void initNewRefactorHelper() {

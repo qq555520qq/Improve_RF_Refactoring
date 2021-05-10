@@ -2,9 +2,11 @@ package robot_framework_refactor_tool.views;
 
 
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.*;
 import org.python.core.PyList;
 
+import helper.NewRefactorHelper;
 import robot_framework_refactor_tool.handlers.WrapStepsAsANewKeywordHandler;
 
 import org.eclipse.jface.viewers.*;
@@ -29,10 +31,14 @@ public class SameKeywordsSelectionView extends ViewPart {
 	private TreeViewer viewer;
 	private Action selectAllAction;
 	private Action submitAction;
+	private IWorkbenchWindow window;
+	private NewRefactorHelper helper;
 	
-	public void update(Node root, WrapStepsAsANewKeywordHandler wrapHandler) {
+	public void update(Node root, WrapStepsAsANewKeywordHandler wrapHandler, IWorkbenchWindow window, NewRefactorHelper helper) {
 		this.wrapHandler = wrapHandler;
 		this.root = root;
+		this.window = window;
+		this.helper = helper;
 		this.viewer.setInput(root);
 		this.viewer.refresh();
 	}
@@ -102,21 +108,25 @@ public class SameKeywordsSelectionView extends ViewPart {
 		viewer = new TreeViewer(parent);
 		viewer.setContentProvider(new TreeContentProvider());
 		viewer.setLabelProvider(new ViewLabelProvider());
+		viewer.addDoubleClickListener(event->{
+			IStructuredSelection selectedSameStepsBlocks = (IStructuredSelection)event.getSelection();
+			PyList sameStepsBlock = (PyList)((Node)selectedSameStepsBlocks.getFirstElement()).getData();
+			AddArgumentsForKeywordReplacingSameSteps presentSameStepsDialog = new AddArgumentsForKeywordReplacingSameSteps(this.window.getShell(), this.helper, sameStepsBlock);
+			presentSameStepsDialog.open();
+			
+		});
 		viewer.addSelectionChangedListener(event -> {
 			List<Node> selections = viewer.getStructuredSelection().toList();
 			boolean shouldBeEnable = false;
-			if(selections.size() > 0) {
-				for (Node selection:selections) {	
-					if(selection.toString().indexOf(".txt") == -1 & selection.toString().indexOf(".robot") == -1){
-						shouldBeEnable = false;
-						break;
-					}
-					else {
-						shouldBeEnable = true;
-					}
+			for (Node selection:selections) {	
+				if(selection.toString().indexOf(".txt") == -1 & selection.toString().indexOf(".robot") == -1){
+					shouldBeEnable = false;
+					break;
 				}
-			}
-			
+				else {
+					shouldBeEnable = true;
+				}
+			}			
 			submitAction.setEnabled(shouldBeEnable);
 		});
 		workbench.getHelpSystem().setHelp(viewer.getControl(), "robot_framework_refactor_tool.viewer");
