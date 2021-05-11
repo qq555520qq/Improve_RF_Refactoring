@@ -96,7 +96,7 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 			Node sameKeywordsRoot = new NodeBuilder().buildForSameKeywords(this.modelsWithSameKeywords);
 			SameKeywordsSelectionView sameKeywordsView = pluginHelper.sameKeywordsSelectionView();
 			sameKeywordsView.update(sameKeywordsRoot, this, this.window, this.newRefactorHelper);
-			pluginHelper.showMessage("Please choose the file(s) with same steps to replace it(them) with new keyword.\n\nClicking node with 'Ctrl' can select multiple and unselect.");
+			pluginHelper.showMessage("Please choose the file(s) with same steps to replace it(them) with new keyword.\n\nClicking node with 'Ctrl' can select multiple and unselect.\n\nDouble clicking can present same steps.");
 		}else {
 			this.afterChoosingReplacedSteps(new PyList());
 		}
