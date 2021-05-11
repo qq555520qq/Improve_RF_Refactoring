@@ -46,12 +46,14 @@ class KeywordMoveHelper(ast.NodeTransformer):
                     return node
         return node
 
-    def find_moved_keyword_node(self, fromFileModel, movedKeywordName):
+    def find_moved_keyword_node(self, fromFileModel, movedKeywordName, keywordLine):
         self.finder.visit_model_for_finding_keyword(fromFileModel, movedKeywordName)
-        if(len(self.finder.get_keyword_defs()) != 0):
-            return self.finder.get_keyword_defs()[0]['keywordNode']
-        else:
-            return None
+        definedKeywords = self.finder.get_keyword_defs()
+        if(len(definedKeywords) != 0):
+            for keyword in definedKeywords:
+                if keyword['keywordNode'].lineno == keywordLine:
+                    return keyword['keywordNode']
+        return None
 
     def remove_old_keyword_defined(self, model, removedKeywordNode=None):
         if(removedKeywordNode):
@@ -106,9 +108,9 @@ class KeywordMoveHelper(ast.NodeTransformer):
     def get_models_after_moving(self):
         return self.modelsInDir
     
-    def move_keyword_defined_to_file(self, movedKeywordName, fromFileModel, targetFileModel, newImportedResource=None):
+    def move_keyword_defined_to_file(self, movedKeywordName, fromFileModel, targetFileModel, keywordLine, newImportedResource=None):
 
-        self.movedKeywordNode = self.find_moved_keyword_node(fromFileModel, movedKeywordName)
+        self.movedKeywordNode = self.find_moved_keyword_node(fromFileModel, movedKeywordName, keywordLine)
         self.remove_old_keyword_defined(fromFileModel)
         self.insert_new_keyword_defined(targetFileModel)
         if(newImportedResource):

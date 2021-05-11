@@ -212,8 +212,15 @@ class KeywordFinder(ast.NodeVisitor):
 
     def get_keyword_defs(self):
         return self.keywordDefList
-    
+
     def get_lines_keywords(self):
         returnList = list(self.linesKeywords)
         self.clear_lines_keywords()
         return returnList
+
+    def get_moved_keyword(self, keywordLine):
+        definedKeyword = self.get_keyword_defs
+        for keyword in definedKeyword:
+            if keyword['keywordNode'].lineno == keywordLine:
+                return keyword
+        return None

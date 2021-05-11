@@ -108,10 +108,7 @@ public class PluginHelper {
 	}
 	
 	public void showMessage(String msg) {
-		MessageDialog.openInformation(
-			window.getShell(),
-			"Robot_framework_refactor_tool",
-			msg);
+		MessageDialog.openInformation(window.getShell(), "Robot_framework_refactor_tool", msg);
 	}
 	
 	public ShowReferencesView showReferencesView() {

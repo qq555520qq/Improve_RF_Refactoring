@@ -13,10 +13,13 @@ import org.eclipse.ui.*;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import robot_framework_refactor_tool.handlers.MoveKeywordDefinedToAnotherFileHandler;
 import robot_framework_refactor_tool.handlers.WrapStepsAsANewKeywordHandler;
 
 public class FileSelectionView extends ViewPart {
-	private WrapStepsAsANewKeywordHandler wrapHandler;
+	private WrapStepsAsANewKeywordHandler wrapHandler = null;
+	private MoveKeywordDefinedToAnotherFileHandler moveHandler = null;
 	public static final String ID = "robot_framework_refactor_tool.views.SampleView";
 
 	@Inject IWorkbench workbench;
@@ -26,6 +29,12 @@ public class FileSelectionView extends ViewPart {
 	
 	public void update(Node root, WrapStepsAsANewKeywordHandler wrapHandler) {
 		this.wrapHandler = wrapHandler;
+		this.viewer.setInput(root);
+		this.viewer.refresh();
+	}
+	
+	public void update(Node root, MoveKeywordDefinedToAnotherFileHandler moveHandler) {
+		this.moveHandler = moveHandler;
 		this.viewer.setInput(root);
 		this.viewer.refresh();
 	}
@@ -125,9 +134,17 @@ public class FileSelectionView extends ViewPart {
 		submitAction = new Action() {
 			public void run() {
 				List<Node> selections = viewer.getStructuredSelection().toList();
-				wrapHandler.afterChoosingFileToInsertKeyword(selections.get(0).toString());
+				String selectionPath = selections.get(0).toString();
 				viewer.setInput(null);
 				viewer.refresh();
+				if (wrapHandler!=null) {
+					wrapHandler.afterChoosingFileToInsertKeyword(selectionPath);
+					wrapHandler = null;
+				}
+				else {
+					moveHandler.afterChoosingFileToInsertMovedKeyword(selectionPath);
+					moveHandler = null;
+				}
 			}
 		};
 		this.submitAction.setText("Submit");

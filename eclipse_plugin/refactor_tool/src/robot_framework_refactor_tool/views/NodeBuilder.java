@@ -1,6 +1,5 @@
 package robot_framework_refactor_tool.views;
 
-import org.hamcrest.core.IsInstanceOf;
 import org.python.core.PyDictionary;
 import org.python.core.PyList;
 import org.python.core.PyObject;

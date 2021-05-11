@@ -5,21 +5,16 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.python.core.Py;
-import org.python.core.PyDictionary;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 
@@ -37,7 +32,7 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 	
 	private PluginHelper pluginHelper;
 	private NewRefactorHelper newRefactorHelper;
-	private PyList modelsWithSameKeywords;
+	private PyList modelsWithSameKeywords = new PyList();
 	private PyList newKeywordBody;
 	private String newKwName;
 	private String newKwPath;
@@ -62,6 +57,10 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 		int startLine = this.pluginHelper.getUserSelectionStartLine() + 1;
 		int endLine = this.pluginHelper.getUserSelectionEndLine() + 1;
 		PyList steps = this.newRefactorHelper.getStepsThatWillBeWraped(fileModel, startLine, endLine);
+		if(steps.size() == 0) {
+			this.pluginHelper.showMessage("Steps you choose are not found.");
+			return null;
+		}
 		this.modelsWithSameKeywords = this.newRefactorHelper.getSameKeywordsWithSteps(projectModels, steps);
 		AddArgumentsForNewKeyword addArgDialog = new AddArgumentsForNewKeyword(window.getShell(), newArguments);
 		if(addArgDialog.open()==Window.OK) {
@@ -93,10 +92,14 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 	public void afterChoosingFileToInsertKeyword(String targetPath) {
 		newKwPath = targetPath;
 		this.newRefactorHelper.createNewKeywordForFile(targetPath, this.newKwName, this.newKeywordBody);
-		Node sameKeywordsRoot = new NodeBuilder().buildForSameKeywords(this.modelsWithSameKeywords);
-		SameKeywordsSelectionView sameKeywordsView = pluginHelper.sameKeywordsSelectionView();
-		sameKeywordsView.update(sameKeywordsRoot, this, this.window, this.newRefactorHelper);
-		pluginHelper.showMessage("Please choose the file(s) with same steps to replace it(them) with new keyword.\n\nClicking node with 'Ctrl' can select multiple and unselect.");
+		if (this.modelsWithSameKeywords.size() > 0) {			
+			Node sameKeywordsRoot = new NodeBuilder().buildForSameKeywords(this.modelsWithSameKeywords);
+			SameKeywordsSelectionView sameKeywordsView = pluginHelper.sameKeywordsSelectionView();
+			sameKeywordsView.update(sameKeywordsRoot, this, this.window, this.newRefactorHelper);
+			pluginHelper.showMessage("Please choose the file(s) with same steps to replace it(them) with new keyword.\n\nClicking node with 'Ctrl' can select multiple and unselect.");
+		}else {
+			this.afterChoosingReplacedSteps(new PyList());
+		}
 	}
 
 	public void afterChoosingReplacedSteps(PyList sameKeywordsBlocks) {
@@ -110,35 +113,40 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 				modelsWithReplacing.add(modelWithReplacing);
 			}
 		}
-		PyList modelsWithoutImporting = this.newRefactorHelper.getModelsWithoutImportingNewResourceFromModelsWithReplacement(newKwName, modelsWithReplacing, newKwPath);
-		for (int index = 0;index < modelsWithoutImporting.size(); index++) {
-			PyObject modelWithoutImporting = (PyObject)modelsWithoutImporting.get(index);
-			String dialogMessage = "Please input new resource value for model without importing resource where new keyword is\n\nPath of new keyword:\n" + this.newKwPath.toString() + "\n\nPath of model without importing:\n" + modelWithoutImporting.__getattr__("source").toString();
-			String FileNameWhereNewKeywordIs = newKwPath.substring(newKwPath.lastIndexOf("/")+1);
-			InputDialog newResourceDialog = new InputDialog(window.getShell(), "New resource value", dialogMessage, FileNameWhereNewKeywordIs, new IInputValidator() {
-				@Override
-				public String isValid(String newText) {
-					if(newText.isEmpty())
-						return "Resource value Should not be empty!!!";
-					return null;
+		if(modelsWithReplacing.size() > 0) {
+			PyList modelsWithoutImporting = this.newRefactorHelper.getModelsWithoutImportingNewResourceFromModelsWithReplacement(newKwName, modelsWithReplacing, this.newKwPath);
+			if(modelsWithoutImporting.size() > 0) {		
+				this.pluginHelper.showMessage("Number of models without importing the new resource is " + modelsWithoutImporting.size() + ".\n\nPlease import resource for it(them).");
+			}
+			for (int index = 0;index < modelsWithoutImporting.size(); index++) {
+				PyObject modelWithoutImporting = (PyObject)modelsWithoutImporting.get(index);
+				String dialogMessage = "Please input new resource value for model without importing resource where new keyword is\n\nPath of new keyword:\n" + this.newKwPath + "\n\nPath of model without importing:\n" + modelWithoutImporting.__getattr__("source");
+				String FileNameWhereNewKeywordIs = newKwPath.substring(newKwPath.lastIndexOf("/")+1);
+				InputDialog newResourceDialog = new InputDialog(window.getShell(), "New resource value", dialogMessage, FileNameWhereNewKeywordIs, new IInputValidator() {
+					@Override
+					public String isValid(String newText) {
+						if(newText.isEmpty())
+							return "Resource value Should not be empty!!!";
+						return null;
+					}
+				}){
+					@Override
+					public void create() {
+						super.create();
+						Button cancelButton= getButton(IDialogConstants.CANCEL_ID);
+						cancelButton.setVisible(false);
+					}
+					@Override
+					protected Control createDialogArea(Composite parent) {
+						Control res = super.createDialogArea(parent);
+						((GridData) this.getText().getLayoutData()).widthHint = 1000;
+						return res;
+					}
+				};
+				if(newResourceDialog.open()==Window.OK) {
+					String newResourceValue = newResourceDialog.getValue();
+					this.newRefactorHelper.importNewResourceForModelWithoutImporting(modelWithoutImporting, newResourceValue);
 				}
-			}){
-				  @Override
-				  public void create() {
-					super.create();
-			        Button cancelButton= getButton(IDialogConstants.CANCEL_ID);
-			    	cancelButton.setVisible(false);
-				  }
-		          @Override
-		          protected Control createDialogArea(Composite parent) {
-		            Control res = super.createDialogArea(parent);
-		            ((GridData) this.getText().getLayoutData()).widthHint = 1000;
-		            return res;
-		          }
-		        };
-			if(newResourceDialog.open()==Window.OK) {
-				String newResourceValue = newResourceDialog.getValue();
-				this.newRefactorHelper.importNewResourceForModelWithoutImporting(modelWithoutImporting, newResourceValue);
 			}
 		}
 		this.pluginHelper.showMessage("Success wrap steps as a new keyword.\n\nPlease go to the file checking new keyword again.");

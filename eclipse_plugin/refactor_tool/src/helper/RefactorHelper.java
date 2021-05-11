@@ -41,7 +41,7 @@ public class RefactorHelper extends PythonInterpreter{
 	public PyObject getKeyword(PyObject root, String kwName, String testDataSource) {
 		return this.refactoringFacade.invoke("get_keyword_obj_from_file",new PyObject[]{root, Py.newStringOrUnicode(kwName), Py.newStringOrUnicode(processPath(testDataSource))});
 	}
-	
+
 	public PyObject getVariable(PyObject root, String variableName, String testDataSource) {
 		return this.refactoringFacade.invoke("get_variable_obj_from_file", new PyObject[]{root, Py.newStringOrUnicode(variableName), Py.newStringOrUnicode(processPath(testDataSource))});
 	}

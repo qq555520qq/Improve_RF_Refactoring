@@ -59,29 +59,28 @@ public class NewRefactorHelper extends PythonInterpreter{
 	}
 
 	public void createNewKeywordForFile(String filePath, String newKeywordName, PyList newKeywordBody) {
-		this.newRefactoringFacade.invoke("create_new_keyword_for_file", new PyObject[]{Py.newStringOrUnicode(processPath(filePath)), Py.newStringOrUnicode(processPath(newKeywordName)), newKeywordBody});
+		this.newRefactoringFacade.invoke("create_new_keyword_for_file", new PyObject[]{Py.newStringOrUnicode(processPath(filePath)), Py.newStringOrUnicode(newKeywordName), newKeywordBody});
 	}
 
 	public PyObject replaceStepsWithKeywordAndGetModelsWithReplacing(String keywordName, PyList keywordArgs, PyList steps) {
-		return this.newRefactoringFacade.invoke("replace_steps_with_keyword_and_get_models_with_replacing", new PyObject[] {Py.newStringOrUnicode(processPath(keywordName)), keywordArgs, steps});
+		return this.newRefactoringFacade.invoke("replace_steps_with_keyword_and_get_models_with_replacing", new PyObject[] {Py.newStringOrUnicode(keywordName), keywordArgs, steps});
 	}
 
 	public PyList getModelsWithoutImportingNewResourceFromModelsWithReplacement(String newKeywordName, PyList modelsWithReplacement, String newKeywordPath) {
-		return (PyList) this.newRefactoringFacade.invoke("get_models_without_importing_new_resource_from_models_with_replacement", new PyObject[]{Py.newStringOrUnicode(processPath(newKeywordName)), modelsWithReplacement, Py.newStringOrUnicode(processPath(newKeywordPath))});
+		return (PyList) this.newRefactoringFacade.invoke("get_models_without_importing_new_resource_from_models_with_replacement", new PyObject[]{Py.newStringOrUnicode(newKeywordName), modelsWithReplacement, Py.newStringOrUnicode(processPath(newKeywordPath))});
 	}
 	
 	public String presentSameSteps(PyList sameStepsBlock) {
 		PyString result = (PyString)this.newRefactoringFacade.invoke("present_same_steps", sameStepsBlock);
 		return result.toString();
 	}
-//Up finish
 	
 	public void importNewResourceForModelWithoutImporting(PyObject model, String resourceValue) {
-		this.newRefactoringFacade.invoke("import_new_resource_for_model_without_importing", model, Py.newStringOrUnicode(processPath(resourceValue)));
+		this.newRefactoringFacade.invoke("import_new_resource_for_model_without_importing", model, Py.newStringOrUnicode(resourceValue));
 	}
 	
-	public PyObject getMovedKeywordNodeFromModel(PyObject model, String keywordName) {
-		return this.newRefactoringFacade.invoke("get_moved_keyword_node_from_model", model, Py.newStringOrUnicode(processPath(keywordName)));
+	public PyObject getMovedKeywordNodeFromModel(PyObject model, String keywordName, int keywordLine) {
+		return this.newRefactoringFacade.invoke("get_moved_keyword_node_from_model", new PyObject[]{model, Py.newStringOrUnicode(keywordName), Py.newInteger(keywordLine)});
 	}
 
 	public void removeDefinedKeyword(PyObject model, PyObject keywordNode) {
@@ -90,6 +89,10 @@ public class NewRefactorHelper extends PythonInterpreter{
 
 	public void insertDefinedKeyword(PyObject model, PyObject keywordNode) {
 		this.newRefactoringFacade.invoke("insert_defined_keyword", model, keywordNode);
+	}
+//Up finish
+	public PyList getModelsWithoutImportTargetResource(String movedKeywordName, String fromFilePath, String targetFilePath) {
+		return (PyList) this.newRefactoringFacade.invoke("get_models_without_import_target_resource", new PyObject[]{Py.newStringOrUnicode(movedKeywordName), Py.newStringOrUnicode(fromFilePath), Py.newStringOrUnicode(targetFilePath)});
 	}
 //Below temp
 	public PyObject getStepFromStepsByLine(PyList steps, int line) {
@@ -101,7 +104,7 @@ public class NewRefactorHelper extends PythonInterpreter{
 	}
 
 	public void updateArgumentsOfStep(PyList steps, PyObject step, PyList argsOfStep, String updatedArgIndex, String newArg) {
-		this.newRefactoringFacade.invoke("update_arguments_of_step", new PyObject[] {steps, step, argsOfStep, Py.newStringOrUnicode(processPath(updatedArgIndex)), Py.newStringOrUnicode(processPath(newArg))});
+		this.newRefactoringFacade.invoke("update_arguments_of_step", new PyObject[] {steps, step, argsOfStep, Py.newStringOrUnicode(updatedArgIndex), Py.newStringOrUnicode(newArg)});
 	}
 	
 }

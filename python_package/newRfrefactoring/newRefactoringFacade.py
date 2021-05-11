@@ -54,14 +54,17 @@ class NewRefactoringFacade:
     def import_new_resource_for_model_without_importing(self, model, resourceValue):
         self.creator.mover.import_new_resource_for_model(model, resourceValue)
 
-    def get_moved_keyword_node_from_model(self, model, keywordName):
-        self.creator.mover.find_moved_keyword_node(model, keywordName)
+    def get_moved_keyword_node_from_model(self, model, keywordName, keywordLine):
+        return self.creator.mover.find_moved_keyword_node(model, keywordName, keywordLine)
 
     def remove_defined_keyword(self, model, keywordNode):
         self.creator.mover.remove_old_keyword_defined(model, keywordNode)
 
     def insert_defined_keyword(self, model, keywordNode):
         self.creator.mover.insert_new_keyword_defined(model, keywordNode)
+
+    def get_models_without_import_target_resource(self, movedKeywordName, fromFilePath, targetFilePath):
+        return self.creator.mover.get_models_without_import_new_resource(movedKeywordName, fromFilePath, targetFilePath)
 
     def get_step_from_steps_by_line(self, steps, line):
         return self.lineKwsHelper.get_line_keyword_from_line_keywords(steps, line)

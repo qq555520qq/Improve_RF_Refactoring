@@ -2,7 +2,6 @@ package robot_framework_refactor_tool.views;
 
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.*;
 import org.python.core.PyList;
 
@@ -10,10 +9,8 @@ import helper.NewRefactorHelper;
 import robot_framework_refactor_tool.handlers.WrapStepsAsANewKeywordHandler;
 
 import org.eclipse.jface.viewers.*;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.*;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.ui.*;
 
 import java.util.ArrayList;

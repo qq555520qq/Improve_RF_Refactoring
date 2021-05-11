@@ -4,7 +4,6 @@ import java.util.Arrays;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -27,10 +26,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.python.core.Py;
 import org.python.core.PyList;
-import org.python.core.PyObject;
-import org.python.core.PyDictionary;
-
-import helper.RefactorHelper;
 
 public class AddArgumentsForNewKeyword extends TitleAreaDialog {
 	private Table argumentTable;

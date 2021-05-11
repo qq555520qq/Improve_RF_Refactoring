@@ -21,7 +21,7 @@ class KeywordMoveHelperTest(unittest.TestCase):
 
         fromFileModel = self.builder.build(test_data + '/ezScrum.txt')
         targetFileModel = self.builder.build(test_data + '/testResource.txt')
-        self.mover.move_keyword_defined_to_file('Login EzScrum', fromFileModel, targetFileModel, 'testResource.txt')
+        self.mover.move_keyword_defined_to_file('Login EzScrum', fromFileModel, targetFileModel, 5, 'testResource.txt')
 
         allModels = self.mover.get_models_after_moving()
         self.checker.visit_models_to_check_keyword_and_resource(allModels, 'Login EzScrum', 'testResource.txt')
