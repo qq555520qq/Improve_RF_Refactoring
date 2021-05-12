@@ -1,6 +1,6 @@
 import unittest
 from python_package.newRfrefactoring.builder.testModelBuilder import TestModelBuilder
-from init import test_data
+from init import new_test_data
 
 
 class TestModelBuilderTest(unittest.TestCase):
@@ -8,7 +8,7 @@ class TestModelBuilderTest(unittest.TestCase):
         self.builder = TestModelBuilder()
 
     def test_build(self):
-        testModel = self.builder.build(test_data+'/add sprint.robot')
+        testModel = self.builder.build(new_test_data+'/add sprint.robot')
         self.assertIsNotNone(testModel)
 
     def test_get_all_models(self):

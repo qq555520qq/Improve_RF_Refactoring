@@ -2,7 +2,7 @@ import unittest
 from python_package.newRfrefactoring.builder.testModelBuilder import TestModelBuilder
 from python_package.newRfrefactoring.keywords.keywordFinder import KeywordFinder
 from python_package.newRfrefactoring.keywords.keywordRenamer import KeywordRenamer
-from init import test_data
+from init import new_test_data
 
 
 class KeywordRenamerTest(unittest.TestCase):
@@ -12,7 +12,7 @@ class KeywordRenamerTest(unittest.TestCase):
         self.renamer = KeywordRenamer()
 
     def test_rename_keyword_for_file(self):
-        testModel = self.builder.build(test_data+'/add sprint.robot')
+        testModel = self.builder.build(new_test_data+'/add sprint.robot')
         self.finder.visit_model_for_finding_keyword(testModel, 'Click SideBar')
 
         keywordCalls = self.finder.get_keyword_calls()

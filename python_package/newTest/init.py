@@ -1,2 +1,2 @@
 from os import path
-test_data = path.dirname(__file__)+'/../test_data'
+new_test_data = path.dirname(__file__)+'/../new_test_data'
