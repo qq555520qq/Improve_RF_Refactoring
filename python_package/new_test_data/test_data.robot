@@ -1,9 +1,19 @@
 *** Settings ***
+Documentation     ${settingVariable} document
+Suite Setup       Open Browser    ${settingVariable}
+Suite Teardown    Close Browser    ${settingVariable}
 Test Setup        Login EzScrum
-Test Teardown     Run Keywords    Delete Sprint    stress_tests
-...               AND    Close Browser
-Library           SeleniumLibrary
+Test Teardown     Run Keywords    Delete Sprint    stress_tests    ${testVariable}_1
+...               AND    Close Browser    ${testVariable}
+Force Tags        ${settingVariable} test data    ${settingVariable}_5
+Library           SeleniumLibrary    ${settingVariable}
+Resource          testResource.txt
 Resource          ezScrum.txt
+Resource          common.txt
+
+*** Variable ***
+${settingVariable}    chrome
+${testVariable}    test variable
 
 *** Test Cases ***
 Add a sprint to project
@@ -13,10 +23,34 @@ Add a sprint to project
     Sprint Should Exist    stress_tests
 
 test temp
+    [Documentation]    ${testVariable}
+    [Tags]    ${testVariable}
+    [Setup]    Choose Project    ${testVariable}
     [Template]    Choose Project
-    123
-    456
-    789
+    [Timeout]    50${testVariable}
+    project_name=${testVariable}_1
+    project_name=${testVariable}_2
+    project_name=${testVariable}_3
+
+test variable assign in step
+    [Tags]    ${testVariable}
+    [Setup]    Choose Project    ${testVariable}
+    [Timeout]    50${testVariable}
+    Choose Project    ${testVariable}_9
+    ${testVariable} =    Set Variable    duplicate variable name
+    Should Be Equal    ${testVariable}    duplicate variable name
+    [Teardown]    Log    teardown ${testVariable}
+
+Go to sprint planning of project and log mutiple text
+    Login And Go To SideBar Of Project  newProject  Sprint Plan
+    Log    Welcome to kanban
+    FOR    ${var}    IN    @{testVariable}
+        Log Mutiple Text    ${var}
+        Log Two Different Text    ${var}    new${var}
+    END
+    [Teardown]    Run Keywords    Test Keyword
+    ...                    AND    For Loop Keyword    5
+    ...                    AND    For Loop Keyword    2
 
 *** Keywords ***
 Choose Project
@@ -27,7 +61,7 @@ Choose Project
     Wait Until Element Is Visible    xpath://*[@id='ProjectNameInfo' and contains(text(),'${project_name}')]    timeout=3s
 
 Click SideBar
-    [Arguments]    ${title}
+    [Arguments]    ${title}=5
     Wait Until Page Contains Element    xpath://span[text()='${title}']
     Wait Until Element Is Visible    xpath://span[text()='${title}']
     Click Element    xpath://span[text()='${title}']
@@ -77,7 +111,33 @@ Input Field
     Input Text    xpath://*[contains(@class,'x-window') and contains(@style,'visibility: visible')]//*[@class='x-form-item ' and .//label[contains(normalize-space(),'${field_name}')]]//*[self::input or self::textarea]    ${text}
 
 Test Keyword
-    Log    123
+    Log    ${testVariable}
     Log    321
-    [Teardown]    Run Keywords    Log    123
+    [Teardown]    Run Keywords    Log    ${testVariable}123
     ...    AND    Log    321
+
+Duplicate Variable Keyword
+    Log    ${testvariable}    ${testVariable}
+    Log    321
+    ${testVariable} =    Set Variable    duplicate variable test data
+    [Teardown]    Run Keywords    Log    ${testVariable}123
+    ...    AND    Log    321
+
+For Loop Keyword
+    [Arguments]    ${times}
+    FOR    ${var}    IN    @{testVariable}
+        Log    ${times}
+        test    ${testVariable}
+    END
+
+Difference Kinds of Variable Keyword
+    Log    &{testVariable}
+    Log    7&{testVariable}['data']
+    Log    ${testVariable['data']}
+    Log    ${testVariable["data"]}5
+    Log    67@{testVariable}[5]8
+    Log    123{testVariable}567
+
+Default argument Keyword
+    [Arguments]    ${test}=${testVariable}
+    Log    msg=${testVariable}

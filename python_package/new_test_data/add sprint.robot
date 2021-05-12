@@ -6,11 +6,19 @@ Library           SeleniumLibrary
 Resource          ezScrum.txt
 
 *** Test Cases ***
-Add a sprint to project
+Add a sprint to project and log some message
     Choose Project    One
     Click SideBar    Sprint Plan
     Add Sprint    sprint_goal=stress_tests    start_date=2019/08/15    interval=1    team_size=5    hours_to_commit=5    focus_factor=100
     Sprint Should Exist    stress_tests
+    Log    Welcome to taipei
+    FOR    ${var}    IN    @{testVariable}
+        Log Mutiple Text    ${var}
+        Log Two Different Text    ${var}    new${var}
+    END
+    [Teardown]    Run Keywords    Test Keyword
+    ...                    AND    For Loop Keyword    5
+    ...                    AND    For Loop Keyword    2
 
 test temp
     [Template]    Choose Project
@@ -81,3 +89,13 @@ Test Keyword
     Log    321
     [Teardown]    Run Keywords    Log    123
     ...    AND    Log    321
+
+For Loop Keyword
+    [Arguments]    ${times}
+    FOR    ${var}    IN    @{testVariable}
+        Log    ${times}
+        test    ${testVariable}
+    END
+
+*** Variables ***
+${testVariable}    test variable

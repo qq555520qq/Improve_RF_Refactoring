@@ -1,10 +1,10 @@
 import unittest
 import re
 from os import path
-from robot.api import TestData
+from robot304.api import TestData
 from init import test_data, get_instance_from_testData
 from python_package.rfrefactoring.referencesFinder import *
-from robot.parsing.model import ResourceFile
+from robot304.parsing.model import ResourceFile
 
 class KeywordReferenceFinderTest(unittest.TestCase):
     def setUp(self):

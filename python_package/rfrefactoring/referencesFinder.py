@@ -1,6 +1,6 @@
 from os import path
-from robot.parsing.model import ForLoop
-from robot.parsing.settings import Setting
+from robot304.parsing.model import ForLoop
+from robot304.parsing.settings import Setting
 import re
 from .reference import Reference
 from .referencesMethods import *

@@ -1,5 +1,5 @@
 from os import path
-from robot.parsing.model import ResourceFile
+from robot304.parsing.model import ResourceFile
 from .testDataVisitor import FindVisitor, TestDataNode, TestDataVisitor
 class TestDataDependencyBuilder:
     """

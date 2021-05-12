@@ -1,5 +1,5 @@
-from robot.parsing.model import Step, Variable
-from robot.parsing.settings import Setting
+from robot304.parsing.model import Step, Variable
+from robot304.parsing.settings import Setting
 
 class KeywordRefactorHelper:
     """

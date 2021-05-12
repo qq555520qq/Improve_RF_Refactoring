@@ -1,6 +1,6 @@
 import re
-from robot.parsing.model import ForLoop, Step, Variable
-from robot.parsing.settings import Arguments, Setting, _Import
+from robot304.parsing.model import ForLoop, Step, Variable
+from robot304.parsing.settings import Arguments, Setting, _Import
 """
 This func is used to search the variable name from a given string.
 variableName: string of variable name.

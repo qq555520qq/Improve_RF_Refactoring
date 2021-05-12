@@ -1,6 +1,6 @@
 import unittest
 from os import path
-from robot.parsing.model import ResourceFile, TestData
+from robot304.parsing.model import ResourceFile, TestData
 from python_package.rfrefactoring.testDataDependencyBuilder import TestDataDependencyBuilder
 from python_package.rfrefactoring.testDataVisitor import TestDataVisitor, FindVisitor
 from init import test_data, ezScrum_test_data

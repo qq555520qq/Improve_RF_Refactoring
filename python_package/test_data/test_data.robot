@@ -9,7 +9,6 @@ Force Tags        ${settingVariable} test data    ${settingVariable}_5
 Library           SeleniumLibrary    ${settingVariable}
 Resource          testResource.txt
 Resource          ezScrum.txt
-Resource          common.txt
 
 *** Variable ***
 ${settingVariable}    chrome
@@ -40,17 +39,6 @@ test variable assign in step
     ${testVariable} =    Set Variable    duplicate variable name
     Should Be Equal    ${testVariable}    duplicate variable name
     [Teardown]    Log    teardown ${testVariable}
-
-Go to sprint planning of project and log mutiple text
-    Login And Go To SideBar Of Project  newProject  Sprint Plan
-    Log    Welcome to kanban
-    FOR    ${var}    IN    @{testVariable}
-        Log Mutiple Text    ${var}
-        Log Two Different Text    ${var}    new${var}
-    END
-    [Teardown]    Run Keywords    Test Keyword
-    ...                    AND    For Loop Keyword    5
-    ...                    AND    For Loop Keyword    2
 
 *** Keywords ***
 Choose Project
@@ -125,10 +113,9 @@ Duplicate Variable Keyword
 
 For Loop Keyword
     [Arguments]    ${times}
-    FOR    ${var}    IN    @{testVariable}
-        Log    ${times}
-        test    ${testVariable}
-    END
+    :FOR    ${var}    IN    @{testVariable}
+    \    Log    ${times}
+    \    test    ${testVariable}
 
 Difference Kinds of Variable Keyword
     Log    &{testVariable}

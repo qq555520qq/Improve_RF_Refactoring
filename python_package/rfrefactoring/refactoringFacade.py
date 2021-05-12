@@ -1,12 +1,12 @@
 import sys
 from os import path
-from robot.api import TestData
-from robot.parsing.model import Step
+from robot304.api import TestData
+from robot304.parsing.model import Step
 from .testDataDependencyBuilder import TestDataDependencyBuilder
 from .testDataVisitor import TestDataVisitor, FindVisitor
 from .referencesFinder import KeywordReferenceFinder, VariableReferenceFinder
 from .refactorHelper import KeywordRefactorHelper, VariableRefactorHelper
-from robot.parsing.model import ResourceFile
+from robot304.parsing.model import ResourceFile
 from .referencesMethods import get_keyword_object_replace_method, get_variable_object_replace_method, get_present_method
 """
     This class is for plugin usage.

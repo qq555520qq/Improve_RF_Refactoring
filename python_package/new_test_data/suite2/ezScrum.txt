@@ -10,11 +10,6 @@ Login EzScrum
     Click Element    xpath://input[@value='Submit']
     Wait Until Element Is Visible    xpath://*[@id='Projects_GirdPanel']//span[text()='Project List']    timeout=3s    error=project page not shown within 3 seconds
 
-Login And Go To Project
-    [Arguments]    ${project}
-    Login EzScrum
-    Choose Project    ${project}
-
 Find Usage Test Keyword Impl
     Log    Find Usage
 
