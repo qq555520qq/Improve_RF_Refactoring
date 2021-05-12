@@ -60,14 +60,13 @@
 
     9.2 Replace the `pythonSite` variable with your site-package path
     ![](/picture/replace_site_package_path_in_test.png)
-
-    9.3 Run `RefactorHelperTest` with junit
-
-        All tests should be passed.
     
-    9.4 Open the `test/NewRefactorHelperTest.java`
+    9.3 Open the `test/NewRefactorHelperTest.java`
     
-    9.5 Replace the `pythonSite` variable with your site-package path
+    9.4 Replace the `pythonSite` variable with your site-package path
     ![](/picture/replace_site_package_path_in_new_test.png)
 
+    9.5 Run `RefactorHelperTest` and `NewRefactorHelperTest` with junit
+
+        All tests should be passed.
 ---
