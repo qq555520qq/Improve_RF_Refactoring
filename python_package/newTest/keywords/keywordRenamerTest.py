@@ -35,7 +35,7 @@ class KeywordRenamerTest(unittest.TestCase):
         self.renamer.rename_keyword_for_nodes('Click SideBar', keywordDefs, keywordCalls)
 
     def test_rename_keyword_for_nodes(self):
-        testModels = self.builder.get_all_models_in_directory(test_data)
+        testModels = self.builder.get_all_models_in_directory(new_test_data)
         self.finder.visit_models_for_finding_keyword(testModels, 'Click SideBar')
 
         keywordCalls = self.finder.get_keyword_calls()

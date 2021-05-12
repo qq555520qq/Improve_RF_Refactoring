@@ -20,7 +20,7 @@ class FileCheckerTest(unittest.TestCase):
         self.assertEqual(len(models), 1)
 
     def test_visit_models_to_check_keyword_and_resource_from_directory(self):
-        testModels = self.builder.get_all_models_in_directory(test_data)
+        testModels = self.builder.get_all_models_in_directory(new_test_data)
 
         self.checker.visit_models_to_check_keyword_and_resource(testModels, 'Login EzScrum', 'ezScrum.txt')
         models = self.checker.get_models_with_resource_and_keyword()
@@ -43,7 +43,7 @@ class FileCheckerTest(unittest.TestCase):
         self.finder.find_keywords_by_lines(testFromModel, 10, 11)
         keywords = self.finder.get_lines_keywords()
         
-        testModels = self.builder.get_all_models_in_directory(test_data)
+        testModels = self.builder.get_all_models_in_directory(new_test_data)
         self.checker.find_models_with_same_keywords(testModels, keywords)
         sameKeywords = self.checker.get_models_with_same_keywords()
         

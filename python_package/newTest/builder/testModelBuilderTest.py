@@ -12,5 +12,5 @@ class TestModelBuilderTest(unittest.TestCase):
         self.assertIsNotNone(testModel)
 
     def test_get_all_models(self):
-        models = self.builder.get_all_models_in_directory(test_data)
+        models = self.builder.get_all_models_in_directory(new_test_data)
         self.assertIsNotNone(models)

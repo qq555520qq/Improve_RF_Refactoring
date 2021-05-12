@@ -20,7 +20,7 @@ class KeywordFinderTest(unittest.TestCase):
         self.assertEqual(len(keywordDefs), 1)
 
     def test_find_keyword_by_keyword_name_from_directory(self):
-        testModels = self.builder.get_all_models_in_directory(test_data)
+        testModels = self.builder.get_all_models_in_directory(new_test_data)
         self.finder.visit_models_for_finding_keyword(testModels, 'Click SideBar')
 
         keywordCalls = self.finder.get_keyword_calls()

@@ -12,15 +12,15 @@ class KeywordMoveHelperTest(unittest.TestCase):
 
     def setUp(self):
         self.builder = TestModelBuilder()
-        self.teardownModels = self.builder.get_all_models_in_directory(test_data)
-        modelsInDir = self.builder.get_all_models_in_directory(test_data)
+        self.teardownModels = self.builder.get_all_models_in_directory(new_test_data)
+        modelsInDir = self.builder.get_all_models_in_directory(new_test_data)
         self.mover = KeywordMoveHelper(modelsInDir)
         self.checker = FileChecker()
 
     def test_move_keyword_defined_to_file(self):
 
-        fromFileModel = self.builder.build(test_data + '/ezScrum.txt')
-        targetFileModel = self.builder.build(test_data + '/testResource.txt')
+        fromFileModel = self.builder.build(new_test_data + '/ezScrum.txt')
+        targetFileModel = self.builder.build(new_test_data + '/testResource.txt')
         self.mover.move_keyword_defined_to_file('Login EzScrum', fromFileModel, targetFileModel, 5, 'testResource.txt')
 
         allModels = self.mover.get_models_after_moving()
