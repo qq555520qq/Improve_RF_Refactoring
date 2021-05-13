@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    ezScrum.txt
+Resource    ../ezScrum.txt
 Resource    mirosoft.txt
 
 *** Keywords ***
