@@ -1,10 +1,15 @@
 package robot_framework_refactor_tool.views;
 
 import java.util.Arrays;
+
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -27,14 +32,17 @@ import org.eclipse.swt.widgets.Text;
 import org.python.core.Py;
 import org.python.core.PyList;
 
-public class AddArgumentsForNewKeyword extends TitleAreaDialog {
+public class CreateANewKeyword extends TitleAreaDialog {
 	private Table argumentTable;
 	private TableEditor argumentEditor;
 	private TableItem selectedArgument;
 	private final String[] variableLabels = new String[] {"scalar($)", "list(@)","dict(&)"};
 	private final String[] variableTypes = new String[] {"$", "@","&"};
+	private StyledText keywordNameArea;
+	private Label keywordNameLabel;
 	private PyList newArguments;
-	public AddArgumentsForNewKeyword(Shell parentShell, PyList arguments) {
+	private String newKwName;
+	public CreateANewKeyword(Shell parentShell, PyList arguments) {
 		super(parentShell);
 		this.newArguments = arguments;
 	}
@@ -42,8 +50,8 @@ public class AddArgumentsForNewKeyword extends TitleAreaDialog {
 	@Override
 	public void create() {
 		super.create();
-		setTitle("Add arguments for new keyword");
-        setMessage("Please click add button to add data and double click to edit data", IMessageProvider.INFORMATION);
+		setTitle("Step1: Create a new keyword");
+        setMessage("Please click \"add\" button to add the argument and double click to edit the argument", IMessageProvider.INFORMATION);
 	}
 
 	private void createArguments(Composite container) {
@@ -193,6 +201,32 @@ public class AddArgumentsForNewKeyword extends TitleAreaDialog {
 		});
     	
 	}
+
+    private void createKeywordNameArea(Composite container) {
+    	keywordNameLabel = new Label(container, SWT.VIRTUAL);
+    	keywordNameLabel.setText("New keyword name");
+    	keywordNameLabel.setVisible(true);
+    	keywordNameArea = new StyledText(container, SWT.BORDER);
+    	GridData keywordNameGrid = new GridData();
+    	keywordNameGrid.grabExcessHorizontalSpace = true;
+    	keywordNameGrid.horizontalAlignment = GridData.FILL;
+        keywordNameArea.setText("New Keyword");
+        keywordNameArea.setLayoutData(keywordNameGrid);
+        keywordNameArea.setEditable(true);
+        keywordNameArea.setVisible(true);
+        keywordNameArea.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				Button okButton = getButton(IDialogConstants.OK_ID);
+				if (keywordNameArea.getText() == "") {
+					okButton.setEnabled(false);
+				}
+				else {
+					okButton.setEnabled(true);
+				}
+			}
+        });
+    }
 	
 	@Override
 	protected Control createDialogArea(Composite parent) {
@@ -203,13 +237,19 @@ public class AddArgumentsForNewKeyword extends TitleAreaDialog {
         container.setLayout(layout);
 		createArguments(container);
 		createArgumentButtons(container);
+		createKeywordNameArea(container);
 		return area;
 	}
 	
 	@Override
 	protected void okPressed() {
+		newKwName = keywordNameArea.getText();
 		super.okPressed();
 		
+	}
+	
+	public String getNewKeywordName() {
+		return newKwName;
 	}
 
 }

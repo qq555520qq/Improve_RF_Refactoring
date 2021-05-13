@@ -36,7 +36,7 @@ public class RenameKeywordHandler extends AbstractHandler {
 			this.refactorHelper.renameKeywordDef(keyword, newName);
 			this.refactorHelper.renameReferences(reference, variableName, newName);
 			view.update(null, null, null);
-			pluginHelper.showMessage("Sucess rename keyowrd '"+variableName+"' to '"+newName+"'.");
+			pluginHelper.showMessage("Robot_framework_refactor_tool", "Sucess rename keyowrd '"+variableName+"' to '"+newName+"'.");
 			try {
 				pluginHelper.getCurrentEditorFile().getFile().refreshLocal(IResource.DEPTH_ONE, null);
 			} catch (CoreException e) {
@@ -51,7 +51,7 @@ public class RenameKeywordHandler extends AbstractHandler {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		this.pluginHelper = new PluginHelper(window);
 		if(refactorHelper==null) {
-			pluginHelper.showMessage(TIP_MESSAGE);
+			pluginHelper.showMessage("Robot_framework_refactor_tool", TIP_MESSAGE);
 			return null;
 		}
 		String oldKwName = pluginHelper.getUserSelectionText();
@@ -60,7 +60,7 @@ public class RenameKeywordHandler extends AbstractHandler {
 		PyObject projectRoot = this.refactorHelper.buildTestData(projectPath);
 		PyObject keyword = this.refactorHelper.getKeyword(projectRoot, oldKwName, editorLocation);
 		if(keyword == Py.None) 
-			pluginHelper.showMessage("Keyword name:"+oldKwName+"\nNot found");		
+			pluginHelper.showMessage("Robot_framework_refactor_tool", "Keyword name:"+oldKwName+"\nNot found");		
 		else {
 			InputDialog newNameDialog = new InputDialog(window.getShell(), "Rename Keyword", "Input the new Keyword Name", "", new IInputValidator() {		
 				@Override

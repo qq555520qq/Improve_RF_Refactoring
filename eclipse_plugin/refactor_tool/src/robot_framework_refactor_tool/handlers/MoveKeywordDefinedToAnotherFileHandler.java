@@ -41,7 +41,7 @@ public class MoveKeywordDefinedToAnotherFileHandler extends AbstractHandler {
 		this.window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		this.pluginHelper = new PluginHelper(window);
 		if(newRefactorHelper==null) {
-			pluginHelper.showMessage(RenameKeywordHandler.TIP_MESSAGE);
+			pluginHelper.showMessage("Robot_framework_refactor_tool", RenameKeywordHandler.TIP_MESSAGE);
 			return null;
 		}
 		String projectPath = this.pluginHelper.getCurrentProjectLocation();
@@ -52,13 +52,13 @@ public class MoveKeywordDefinedToAnotherFileHandler extends AbstractHandler {
 		int keywordLine = this.pluginHelper.getUserSelectionStartLine() + 1;
 		this.movedKeyword = this.newRefactorHelper.getMovedKeywordNodeFromModel(fromModel, movedkwName, keywordLine);
 		if(this.movedKeyword == Py.None) {
-			this.pluginHelper.showMessage("Defined keyword:"+movedkwName+"\nNot found");
+			this.pluginHelper.showMessage("Robot_framework_refactor_tool", "Defined keyword:"+movedkwName+"\nNot found");
 			return null;
 		}
 		Node root = new NodeBuilder().buildForModels(projectModels);
 		FileSelectionView fileView= pluginHelper.fileSelectionView();
 		fileView.update(root, this);
-		pluginHelper.showMessage("Please choose the file to insert moved keyword.");
+		pluginHelper.showMessage("Robot_framework_refactor_tool", "Please choose the file to insert moved keyword.");
 		
 		
 
@@ -71,7 +71,7 @@ public class MoveKeywordDefinedToAnotherFileHandler extends AbstractHandler {
 		this.newRefactorHelper.insertDefinedKeyword(targetModel, this.movedKeyword);
 		PyList modelsWithoutImporting = this.newRefactorHelper.getModelsWithoutImportTargetResource(this.movedkwName, this.editorLocation, targetPath);
 		if(modelsWithoutImporting.size() > 0) {			
-			this.pluginHelper.showMessage("Number of models without importing the new resource is " + modelsWithoutImporting.size() + ".\n\nPlease import resource for it(them).");
+			this.pluginHelper.showMessage("Robot_framework_refactor_tool", "Number of models without importing the new resource is " + modelsWithoutImporting.size() + ".\n\nPlease import resource for it(them).");
 		}
 		for (int index = 0;index < modelsWithoutImporting.size(); index++) {
 			PyObject modelWithoutImporting = (PyObject)modelsWithoutImporting.get(index);
@@ -103,7 +103,7 @@ public class MoveKeywordDefinedToAnotherFileHandler extends AbstractHandler {
 				this.newRefactorHelper.importNewResourceForModelWithoutImporting(modelWithoutImporting, newResourceValue);
 			}
 		}
-		this.pluginHelper.showMessage("Success move the keyword to the target file.\n\nPlease go to the file checking the moved keyword again.");
+		this.pluginHelper.showMessage("Robot_framework_refactor_tool", "Success move the keyword to the target file.\n\nPlease go to the file checking the moved keyword again.");
 		InputDialog getMovedKeywordPathDialog = new InputDialog(window.getShell(), "Path of moved keyword", "You can get the path to check the moved keyword", targetPath, null){
 			  @Override
 			  public void create() {

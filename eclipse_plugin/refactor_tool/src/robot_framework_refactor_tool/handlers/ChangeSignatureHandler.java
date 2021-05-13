@@ -35,7 +35,7 @@ public class ChangeSignatureHandler extends AbstractHandler {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		this.pluginHelper = new PluginHelper(window);
 		if(refactorHelper==null) {
-			pluginHelper.showMessage(RenameKeywordHandler.TIP_MESSAGE);
+			pluginHelper.showMessage("Robot_framework_refactor_tool", RenameKeywordHandler.TIP_MESSAGE);
 			return null;
 		}	
 		String kwName = pluginHelper.getUserSelectionText();
@@ -70,7 +70,7 @@ public class ChangeSignatureHandler extends AbstractHandler {
 				PyObject testDataFile = referenceDict.get(Py.newString("testdata"));
 				refactorHelper.save(testDataFile);
 			}
-			pluginHelper.showMessage("Sucess modify signature");
+			pluginHelper.showMessage("Robot_framework_refactor_tool", "Sucess modify signature");
 			view.update(null, null, null);
 			try {
 				pluginHelper.getCurrentEditorFile().getFile().refreshLocal(IResource.DEPTH_ONE, null);

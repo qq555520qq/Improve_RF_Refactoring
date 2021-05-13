@@ -107,8 +107,8 @@ public class PluginHelper {
 		return getCurrentEditorFile().getFile().getLocation().toString();
 	}
 	
-	public void showMessage(String msg) {
-		MessageDialog.openInformation(window.getShell(), "Robot_framework_refactor_tool", msg);
+	public void showMessage(String title,String msg) {
+		MessageDialog.openInformation(window.getShell(), title, msg);
 	}
 	
 	public ShowReferencesView showReferencesView() {

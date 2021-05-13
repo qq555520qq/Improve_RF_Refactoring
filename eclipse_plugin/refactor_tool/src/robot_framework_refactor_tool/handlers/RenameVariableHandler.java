@@ -30,7 +30,7 @@ public class RenameVariableHandler extends AbstractHandler {
 			this.refactorHelper.renameVariableDef(variable, newVariableName);
 			this.refactorHelper.renameReferences(reference, variableName, newVariableName);
 			view.update(null, null, null);
-			pluginHelper.showMessage("Sucess rename variable '"+variableName+"' to '"+newVariableName+"'.");
+			pluginHelper.showMessage("Robot_framework_refactor_tool", "Sucess rename variable '"+variableName+"' to '"+newVariableName+"'.");
 			try {
 				pluginHelper.getCurrentEditorFile().getFile().refreshLocal(IResource.DEPTH_ONE, null);
 			} catch (CoreException e) {
@@ -49,7 +49,7 @@ public class RenameVariableHandler extends AbstractHandler {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		this.pluginHelper = new PluginHelper(window);
 		if(refactorHelper==null) {
-			pluginHelper.showMessage(RenameKeywordHandler.TIP_MESSAGE);
+			pluginHelper.showMessage("Robot_framework_refactor_tool", RenameKeywordHandler.TIP_MESSAGE);
 			return null;
 		}
 		String variableName = pluginHelper.getUserSelectionText();
@@ -58,7 +58,7 @@ public class RenameVariableHandler extends AbstractHandler {
 		PyObject projectRoot = this.refactorHelper.buildTestData(projectPath);
 		PyObject variable = this.refactorHelper.getVariable(projectRoot, variableName, editorLocation);
 		if(variable == Py.None) 
-			pluginHelper.showMessage("Variable :"+variableName+"\nNot found");
+			pluginHelper.showMessage("Robot_framework_refactor_tool", "Variable :"+variableName+"\nNot found");
 		else {
 			InputDialog newNameDialog = new InputDialog(window.getShell(), "Rename Variable", "Input the new Variable Name", "", new IInputValidator() {
 				@Override
