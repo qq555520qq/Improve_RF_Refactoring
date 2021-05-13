@@ -1,6 +1,7 @@
 *** Settings ***
 Resource    ../ezScrum.txt
 Resource    mirosoft.txt
+Library     SeleniumLibrary
 
 *** Keywords ***
 Login And Go To SideBar Of Project

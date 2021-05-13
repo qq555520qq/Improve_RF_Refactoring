@@ -78,6 +78,7 @@ public class MoveKeywordDefinedToAnotherFileHandler extends AbstractHandler {
 		for (int index = 0;index < modelsWithoutImporting.size(); index++) {
 			PyObject modelWithoutImporting = (PyObject)modelsWithoutImporting.get(index);
 			String pathNotImport = modelWithoutImporting.__getattr__("source").toString();
+			pathNotImport = pathNotImport.substring(0, pathNotImport.lastIndexOf("/"));
 			Path pathAbsolute = Paths.get(targetPath);
 	        Path pathBase = Paths.get(pathNotImport);
 	        Path pathRelative = pathBase.relativize(pathAbsolute);
