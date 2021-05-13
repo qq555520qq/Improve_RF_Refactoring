@@ -1,5 +1,8 @@
 package robot_framework_refactor_tool.handlers;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -55,12 +58,11 @@ public class MoveKeywordDefinedToAnotherFileHandler extends AbstractHandler {
 			this.pluginHelper.showMessage("Robot_framework_refactor_tool", "Defined keyword:"+movedkwName+"\nNot found");
 			return null;
 		}
+		pluginHelper.showMessage("Robot_framework_refactor_tool", "\"Move keyword defined to another file\" will start.\n\nThe following steps are the entire process.\n\nStep1: Choose the file you want to move the keyword into.\n\nStep2: Import new resource automatically for files that not import the new resource.");
 		Node root = new NodeBuilder().buildForModels(projectModels);
 		FileSelectionView fileView= pluginHelper.fileSelectionView();
 		fileView.update(root, this);
-		pluginHelper.showMessage("Robot_framework_refactor_tool", "Please choose the file to insert moved keyword.");
-		
-		
+		pluginHelper.showMessage("Step1: Choose the file you want to move the keyword into", "Please choose the file you want to move the keyword into.");
 
 		return event;
 	}
@@ -70,41 +72,19 @@ public class MoveKeywordDefinedToAnotherFileHandler extends AbstractHandler {
 		this.newRefactorHelper.removeDefinedKeyword(this.fromModel, this.movedKeyword);
 		this.newRefactorHelper.insertDefinedKeyword(targetModel, this.movedKeyword);
 		PyList modelsWithoutImporting = this.newRefactorHelper.getModelsWithoutImportTargetResource(this.movedkwName, this.editorLocation, targetPath);
-		if(modelsWithoutImporting.size() > 0) {			
-			this.pluginHelper.showMessage("Robot_framework_refactor_tool", "Number of models without importing the new resource is " + modelsWithoutImporting.size() + ".\n\nPlease import resource for it(them).");
+		if(modelsWithoutImporting.size() > 0) {
+			this.pluginHelper.showMessage("Step2: Import new resource automatically for files that not import the new resource", "Number of files that not import the new resource is " + modelsWithoutImporting.size() + ".\n\nThe system has imported for it(them).");
 		}
 		for (int index = 0;index < modelsWithoutImporting.size(); index++) {
 			PyObject modelWithoutImporting = (PyObject)modelsWithoutImporting.get(index);
-			String dialogMessage = "Please input new resource value for model without importing resource where moved keyword is\n\nPath of moved keyword:\n" + targetPath + "\n\nPath of model without importing:\n" + modelWithoutImporting.__getattr__("source");
-			String FileNameWhereNewKeywordIs = targetPath.substring(targetPath.lastIndexOf("/")+1);
-			InputDialog newResourceDialog = new InputDialog(window.getShell(), "New resource value", dialogMessage, FileNameWhereNewKeywordIs, new IInputValidator() {
-				@Override
-				public String isValid(String newText) {
-					if(newText.isEmpty())
-						return "Resource value Should not be empty!!!";
-					return null;
-				}
-			}){
-				  @Override
-				  public void create() {
-					super.create();
-			        Button cancelButton= getButton(IDialogConstants.CANCEL_ID);
-			    	cancelButton.setVisible(false);
-				  }
-		          @Override
-		          protected Control createDialogArea(Composite parent) {
-		            Control res = super.createDialogArea(parent);
-		            ((GridData) this.getText().getLayoutData()).widthHint = 1000;
-		            return res;
-		          }
-		        };
-			if(newResourceDialog.open()==Window.OK) {
-				String newResourceValue = newResourceDialog.getValue();
-				this.newRefactorHelper.importNewResourceForModelWithoutImporting(modelWithoutImporting, newResourceValue);
-			}
+			String pathNotImport = modelWithoutImporting.__getattr__("source").toString();
+			Path pathAbsolute = Paths.get(targetPath);
+	        Path pathBase = Paths.get(pathNotImport);
+	        Path pathRelative = pathBase.relativize(pathAbsolute);
+			String newResourceValue = pathRelative.toString();
+			this.newRefactorHelper.importNewResourceForModelWithoutImporting(modelWithoutImporting, newResourceValue);
 		}
-		this.pluginHelper.showMessage("Robot_framework_refactor_tool", "Success move the keyword to the target file.\n\nPlease go to the file checking the moved keyword again.");
-		InputDialog getMovedKeywordPathDialog = new InputDialog(window.getShell(), "Path of moved keyword", "You can get the path to check the moved keyword", targetPath, null){
+		InputDialog getMovedKeywordPathDialog = new InputDialog(window.getShell(), "Finish moving the keyword into target file", "Success move the keyword to the target file.\n\nYou can get the path to check the moved keyword", targetPath, null){
 			  @Override
 			  public void create() {
 				super.create();

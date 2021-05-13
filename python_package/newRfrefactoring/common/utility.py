@@ -53,23 +53,6 @@ def get_keywords_for_run_keywords(tokens):
 
     return keywordsList
 
-    # lineList = []
-    # keywordTokens = []
-    # for token in tokens:
-    #     if not(token.lineno in lineList or token.value == 'AND'):
-    #         if keywordDict['keywordName']:
-    #             keywordTokens.append(keywordDict)
-    #             keywordDict = {'keywordName': token, 'arguments': []}
-    #         else:
-    #             keywordDict['keywordName'] = token
-    #         lineList.append(token.lineno)
-    #     elif(token.value != 'AND'):
-    #         keywordDict['arguments'].append(token)
-
-    # if keywordDict['keywordName']:
-    #     keywordTokens.append(keywordDict)
-    # return keywordTokens
-
 def clear_screen():
     """ 
     Clear the terminal screen. 

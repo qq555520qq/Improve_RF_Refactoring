@@ -1,18 +1,13 @@
 package robot_framework_refactor_tool.handlers;
 
-import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.python.core.PyList;
@@ -34,6 +29,7 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 	
 	private PluginHelper pluginHelper;
 	private NewRefactorHelper newRefactorHelper;
+	private PyList modelsBeforeWraping;
 	private PyList modelsWithSameKeywords = new PyList();
 	private PyList newKeywordBody;
 	private String newKwName;
@@ -48,13 +44,14 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 		window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		this.pluginHelper = new PluginHelper(window);
 		if(this.newRefactorHelper==null) {
-			pluginHelper.showMessage("Robot_framework_refactor_tool", "No helper");
+			pluginHelper.showMessage("Robot_framework_refactor_tool", RenameKeywordHandler.TIP_MESSAGE);
 			return null;
 		}
 		PyList newArguments = new PyList();
 		String projectPath = pluginHelper.getCurrentProjectLocation();
 		String editorLocation = pluginHelper.getCurrentEditorLocation();
 		PyList projectModels = this.newRefactorHelper.buildProjectModels(projectPath);
+		modelsBeforeWraping = new PyList(projectModels.getArray());
 		PyObject fileModel = this.newRefactorHelper.buildFileModel(editorLocation);
 		int startLine = this.pluginHelper.getUserSelectionStartLine() + 1;
 		int endLine = this.pluginHelper.getUserSelectionEndLine() + 1;
@@ -64,7 +61,7 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 			return null;
 		}
 		this.modelsWithSameKeywords = this.newRefactorHelper.getSameKeywordsWithSteps(projectModels, steps);
-		pluginHelper.showMessage("Robot_framework_refactor_tool", "\"Wrap steps as a new keyword\" will start.\n\nThe following steps are the entire process.\n\nStep1: Create a new keyword.\n\nStep2: Replace the same steps with new keyword.\n\nStep3:Import new resource for files not import the new resource automatically.");
+		pluginHelper.showMessage("Robot_framework_refactor_tool", "\"Wrap steps as a new keyword\" will start.\n\nThe following steps are the entire process.\n\nStep1: Create a new keyword.\n\nStep2: Replace the same steps with new keyword.\n\nStep3: Import new resource automatically for files that not import the new resource.");
 		CreateANewKeyword createANewKeywordDialog = new CreateANewKeyword(window.getShell(), newArguments);
 		if(createANewKeywordDialog.open()==Window.OK) {
 			PyList argumentsTokens = new PyList();
@@ -82,7 +79,7 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 		return event;
 	}
 
-	public void afterChoosingFileToInsertKeyword(String targetPath) {
+	public void afterChoosingFileToCreateKeyword(String targetPath) {
 		newKwPath = targetPath;
 		this.newRefactorHelper.createNewKeywordForFile(targetPath, this.newKwName, this.newKeywordBody);
 		if (this.modelsWithSameKeywords.size() > 0) {			
@@ -95,7 +92,7 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 		}
 	}
 
-	public void afterChoosingReplacedSteps(PyList sameKeywordsBlocks) {
+	public Object afterChoosingReplacedSteps(PyList sameKeywordsBlocks) {
 		PyList modelsWithReplacing = new PyList();
 		for (int index = 0;index < sameKeywordsBlocks.size();index++) {
 			PyList newKeywordArgs = new PyList();
@@ -105,50 +102,28 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 				PyObject modelWithReplacing = this.newRefactorHelper.replaceStepsWithKeywordAndGetModelsWithReplacing(newKwName, newKeywordArgs, sameStepsBlock);
 				modelsWithReplacing.add(modelWithReplacing);
 			}
+			else {
+				this.newRefactorHelper.saveModels(modelsBeforeWraping);
+				this.pluginHelper.showMessage("Stop wrapping steps as a new keyword", "Revert every change.");
+				return null;
+			}
 		}
 		if(modelsWithReplacing.size() > 0) {
 			PyList modelsWithoutImporting = this.newRefactorHelper.getModelsWithoutImportingNewResourceFromModelsWithReplacement(newKwName, modelsWithReplacing, this.newKwPath);
-			if(modelsWithoutImporting.size() > 0) {		
-				this.pluginHelper.showMessage("Step3:Import new resource for files not import the new resource automatically", "Number of files not import the new resource is " + modelsWithoutImporting.size() + ".\n\nPlease import resource for it(them).");
+			if(modelsWithoutImporting.size() > 0) {
+				this.pluginHelper.showMessage("Step3: Import new resource automatically for files that not import the new resource", "Number of files that not import the new resource is " + modelsWithoutImporting.size() + ".\n\nThe system has imported for it(them).");
 			}
 			for (int index = 0;index < modelsWithoutImporting.size(); index++) {
 				PyObject modelWithoutImporting = (PyObject)modelsWithoutImporting.get(index);
 				String pathNotImport = modelWithoutImporting.__getattr__("source").toString(); 
-//				String dialogMessage = "Please input new resource value for model without importing resource where new keyword is\n\nPath of new keyword:\n" + this.newKwPath + "\n\nPath of model without importing:\n" + modelWithoutImporting.__getattr__("source");
-				Path pathAbsolute = Paths.get(pathNotImport);
-		        Path pathBase = Paths.get(this.newKwName);
+				Path pathAbsolute = Paths.get(this.newKwPath);
+		        Path pathBase = Paths.get(pathNotImport);
 		        Path pathRelative = pathBase.relativize(pathAbsolute);
-//				String FileNameWhereNewKeywordIs = newKwPath.substring(newKwPath.lastIndexOf("/")+1);
-//				InputDialog newResourceDialog = new InputDialog(window.getShell(), "New resource value", dialogMessage, FileNameWhereNewKeywordIs, new IInputValidator() {
-//					@Override
-//					public String isValid(String newText) {
-//						if(newText.isEmpty())
-//							return "Resource value Should not be empty!!!";
-//						return null;
-//					}
-//				}){
-//					@Override
-//					public void create() {
-//						super.create();
-//						Button cancelButton= getButton(IDialogConstants.CANCEL_ID);
-//						cancelButton.setVisible(false);
-//					}
-//					@Override
-//					protected Control createDialogArea(Composite parent) {
-//						Control res = super.createDialogArea(parent);
-//						((GridData) this.getText().getLayoutData()).widthHint = 1000;
-//						return res;
-//					}
-//				};
-//				if(newResourceDialog.open()==Window.OK) {
-//					String newResourceValue = newResourceDialog.getValue();
-					String newResourceValue = pathRelative.toString();
-					this.newRefactorHelper.importNewResourceForModelWithoutImporting(modelWithoutImporting, newResourceValue);
-//				}
+				String newResourceValue = pathRelative.toString();
+				this.newRefactorHelper.importNewResourceForModelWithoutImporting(modelWithoutImporting, newResourceValue);
 			}
 		}
-		this.pluginHelper.showMessage("Robot_framework_refactor_tool", "Success wrap steps as a new keyword.");
-		InputDialog getNewKeywordPathDialog = new InputDialog(window.getShell(), "Path of new keyword", "You can get the path to check the new keyword", newKwPath, null){
+		InputDialog getNewKeywordPathDialog = new InputDialog(window.getShell(), "Finish wrapping steps as a new keyword", "Success wrap steps as a new keyword.\n\nYou can get the path to check the new keyword", newKwPath, null){
 			  @Override
 			  public void create() {
 				super.create();
@@ -157,5 +132,6 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 			  }
 		};
 		getNewKeywordPathDialog.open();
+		return null;
 	}
 }

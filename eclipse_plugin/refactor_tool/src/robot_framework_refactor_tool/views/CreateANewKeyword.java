@@ -50,7 +50,7 @@ public class CreateANewKeyword extends TitleAreaDialog {
 	@Override
 	public void create() {
 		super.create();
-		setTitle("Step1: Create a new keyword");
+		setTitle("Add new keyword name and arguments");
         setMessage("Please click \"add\" button to add the argument and double click to edit the argument", IMessageProvider.INFORMATION);
 	}
 
@@ -252,4 +252,12 @@ public class CreateANewKeyword extends TitleAreaDialog {
 		return newKwName;
 	}
 
+
+	@Override
+	protected void configureShell(Shell newShell)
+	{
+	  super.configureShell(newShell);
+
+	  newShell.setText("Step1: Create a new keyword");
+	}
 }

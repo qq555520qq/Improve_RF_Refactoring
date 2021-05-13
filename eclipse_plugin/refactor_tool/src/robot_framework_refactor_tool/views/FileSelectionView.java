@@ -138,7 +138,7 @@ public class FileSelectionView extends ViewPart {
 				viewer.setInput(null);
 				viewer.refresh();
 				if (wrapHandler!=null) {
-					wrapHandler.afterChoosingFileToInsertKeyword(selectionPath);
+					wrapHandler.afterChoosingFileToCreateKeyword(selectionPath);
 					wrapHandler = null;
 				}
 				else {

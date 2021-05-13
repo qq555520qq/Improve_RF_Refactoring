@@ -90,11 +90,11 @@ public class NewRefactorHelper extends PythonInterpreter{
 	public void insertDefinedKeyword(PyObject model, PyObject keywordNode) {
 		this.newRefactoringFacade.invoke("insert_defined_keyword", model, keywordNode);
 	}
-//Up finish
+
 	public PyList getModelsWithoutImportTargetResource(String movedKeywordName, String fromFilePath, String targetFilePath) {
 		return (PyList) this.newRefactoringFacade.invoke("get_models_without_import_target_resource", new PyObject[]{Py.newStringOrUnicode(movedKeywordName), Py.newStringOrUnicode(fromFilePath), Py.newStringOrUnicode(targetFilePath)});
 	}
-//Below temp
+
 	public PyObject getStepFromStepsByLine(PyList steps, int line) {
 		return this.newRefactoringFacade.invoke("get_step_from_steps_by_line", steps, Py.newInteger(line));
 	}
@@ -105,6 +105,10 @@ public class NewRefactorHelper extends PythonInterpreter{
 
 	public void updateArgumentsOfStep(PyList steps, PyObject step, PyList argsOfStep, String updatedArgIndex, String newArg) {
 		this.newRefactoringFacade.invoke("update_arguments_of_step", new PyObject[] {steps, step, argsOfStep, Py.newStringOrUnicode(updatedArgIndex), Py.newStringOrUnicode(newArg)});
+	}
+
+	public void saveModels(PyList models) {
+		this.newRefactoringFacade.invoke("save_models", models);
 	}
 	
 }

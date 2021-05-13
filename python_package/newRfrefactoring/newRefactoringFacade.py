@@ -75,3 +75,6 @@ class NewRefactoringFacade:
     def update_arguments_of_step(self, steps, step, argsOfStep, updatedArgIndex, newArg):
         updatedData = {'lineKeyword': step, 'updateArg': argsOfStep[int(updatedArgIndex)], 'newArg': newArg}
         self.lineKwsHelper.update_arguments_of_line_keyword(steps, updatedData)
+    
+    def save_models(self, models):
+        recovery_models(models)

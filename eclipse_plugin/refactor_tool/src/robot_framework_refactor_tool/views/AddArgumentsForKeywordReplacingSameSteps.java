@@ -31,8 +31,6 @@ public class AddArgumentsForKeywordReplacingSameSteps extends TitleAreaDialog {
 	private Table argumentTable;
 	private TableEditor argumentEditor;
 	private TableItem selectedArgument;
-//	private final String[] variableLabels = new String[] {"scalar($)", "list(@)","dict(&)"};
-//	private final String[] variableTypes = new String[] {"$", "@","&"};
 	private NewRefactorHelper helper;
 	private StyledText previewArea;
 	private Label previewLabel;
@@ -54,7 +52,7 @@ public class AddArgumentsForKeywordReplacingSameSteps extends TitleAreaDialog {
 	@Override
 	public void create() {
 		super.create();
-		if(this.newArguments != null) {		
+		if(this.newArguments != null) {
 			setTitle("Add arguments for the keyword that will replace same steps");
 			setMessage("Please click add button to add data and double click to edit data", IMessageProvider.INFORMATION);
 		}
@@ -203,6 +201,14 @@ public class AddArgumentsForKeywordReplacingSameSteps extends TitleAreaDialog {
 	protected void okPressed() {
 		super.okPressed();
 		
+	}
+
+	@Override
+	protected void configureShell(Shell newShell)
+	{
+	  super.configureShell(newShell);
+
+	  newShell.setText("Step2: Replace the same steps with new keyword");
 	}
 
 }
