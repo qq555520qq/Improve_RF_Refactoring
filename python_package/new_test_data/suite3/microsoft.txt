@@ -27,6 +27,7 @@ Go To Windows Page
     Click Element    id:shellmenu_2
     Wait Until Page Contains Element    id:c-shellmenu_54    timeout=5s    error=Windows 10 tab should be visible.
     Wait Until Element Is Visible    id:c-shellmenu_54    timeout=5s    error=Windows 10 tab should be visible.
+    sleep    2s
 
 Open Windows 10 Menu
     Wait Until Page Contains Element    id:c-shellmenu_54    timeout=5s    error=Windows 10 tab should be visible.
@@ -34,3 +35,4 @@ Open Windows 10 Menu
     Click Element    id:c-shellmenu_54
     Wait Until Page Contains Element    //*[@id='c-shellmenu_55' and normalize-space()='How to get Windows 10']    timeout=5s    error="How to get windows" in menu should be visible.
     Wait Until Element Is Visible    //*[@id='c-shellmenu_55' and normalize-space()='How to get Windows 10']    timeout=5s    error="How to get windows" in menu should be visible.
+    sleep    2s

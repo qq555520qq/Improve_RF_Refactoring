@@ -22,6 +22,9 @@ import robot_framework_refactor_tool.views.Node;
 import robot_framework_refactor_tool.views.NodeBuilder;
 import robot_framework_refactor_tool.views.SameKeywordsSelectionView;
 import robot_framework_refactor_tool.views.SameStepsBlock;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -36,6 +39,7 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 	private String newKwPath;
 	private IWorkbenchWindow window;
 	private PyList newArgumentsOfNewKeyword;
+	private String editorLocation;
 	public WrapStepsAsANewKeywordHandler() {
 		this.newRefactorHelper = PluginHelper.getNewRefactorHelper();
 	}
@@ -49,7 +53,7 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 			return null;
 		}
 		String projectPath = pluginHelper.getCurrentProjectLocation();
-		String editorLocation = pluginHelper.getCurrentEditorLocation();
+		editorLocation = pluginHelper.getCurrentEditorLocation();
 		PyList projectModels = this.newRefactorHelper.buildProjectModels(projectPath);
 		modelsBeforeWraping = new PyList(projectModels.getArray());
 		PyObject fileModel = this.newRefactorHelper.buildFileModel(editorLocation);
@@ -125,15 +129,24 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 				this.newRefactorHelper.importNewResourceForModelWithoutImporting(modelWithoutImporting, newResourceValue);
 			}
 		}
-		InputDialog getNewKeywordPathDialog = new InputDialog(window.getShell(), "Finish wrapping steps as a new keyword", "Success wrap steps as a new keyword.\n\nYou can get the path to check the new keyword", newKwPath, null){
-			  @Override
-			  public void create() {
-				super.create();
-		        Button cancelButton= getButton(IDialogConstants.CANCEL_ID);
-		    	cancelButton.setVisible(false);
-			  }
-		};
-		getNewKeywordPathDialog.open();
+		InputDialog getNewKeywordPathDialog = new InputDialog(window.getShell(), "Finish wrapping steps as a new keyword", "Success wrap steps as a new keyword.\n\nYou can get the path to check the new keyword.\n\n Do you want to run the test case that you refactor?", newKwPath, null);
+		if(getNewKeywordPathDialog.open() == Window.OK) {
+			ProcessBuilder processBuilder = new ProcessBuilder("robot", editorLocation);
+			try {
+				Process process = processBuilder.start();
+				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				String line;
+				String result = ""; 
+				while ((line = reader.readLine()) != null) {
+//					if(line.contains("PASS")) {
+//					}
+					result += line;
+				}
+				this.pluginHelper.showMessage("Finish wrapping steps as a new keyword", result);
+			}catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
 		return null;
 	}
 }
