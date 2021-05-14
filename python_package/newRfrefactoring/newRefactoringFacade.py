@@ -78,3 +78,7 @@ class NewRefactoringFacade:
     
     def save_models(self, models):
         recovery_models(models)
+
+    def get_variables_not_defined_in_steps(self, steps):
+        localVariables = self.lineKwsHelper.get_local_variables_in_line_keywords(steps)
+        return self.lineKwsHelper.get_variables_not_defined_in_lineKeywords(steps, localVariables)

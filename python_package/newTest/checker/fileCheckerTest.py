@@ -25,7 +25,7 @@ class FileCheckerTest(unittest.TestCase):
         self.checker.visit_models_to_check_keyword_and_resource(testModels, 'Login EzScrum', 'ezScrum.txt')
         models = self.checker.get_models_with_resource_and_keyword()
         
-        self.assertEqual(len(models), 9)
+        self.assertEqual(len(models), 10)
     
     def test_find_model_with_same_keywords(self):
         testFromModel = self.builder.build(new_test_data+'/add sprint.robot')
@@ -47,4 +47,4 @@ class FileCheckerTest(unittest.TestCase):
         self.checker.find_models_with_same_keywords(testModels, keywords)
         sameKeywords = self.checker.get_models_with_same_keywords()
         
-        self.assertEqual(len(sameKeywords), 8)
+        self.assertEqual(len(sameKeywords), 9)

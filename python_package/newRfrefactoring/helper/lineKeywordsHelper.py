@@ -169,3 +169,62 @@ class LineKeywordsHelper():
                             present_result += ('    ...    AND' + get_run_keywords_body_text(sameStep['keyword']))
 
             return present_result
+    
+    def get_local_variables_in_line_keywords(self, lineKeywords):
+        localVariables = []
+        for lineKeyword in lineKeywords:
+            if is_KeywordCall(lineKeyword['node']):
+                for variable in lineKeyword['node'].assign:
+                    if normalize(variable) != normalize(''):
+                        localVariables.append(variable)
+            elif is_ForLoop(lineKeyword['node']):
+                for variable in lineKeyword['node'].variables:
+                    if not(variable in localVariables):
+                        localVariables.append(variable)
+                for keyword in lineKeyword['body']:
+                    if is_KeywordCall(keyword):
+                        for variable in keyword.assign:
+                            if normalize(variable) != normalize(''):
+                                localVariables.append(variable)
+        for index, localVariable in enumerate(localVariables):
+            localVariables[index] = localVariable.replace(' ','').replace('=','')
+        return set(localVariables)
+
+    def get_variables_not_defined_in_lineKeywords(self, lineKeywords, localVariables):
+        variablesNotDefined = []
+        prefixVariable = ['@{', '${', '&{']
+        for lineKeyword in lineKeywords:
+            if is_KeywordCall(lineKeyword['node']):
+                for arg in lineKeyword['node'].args:
+                    for prefix in prefixVariable:
+                        if arg.find(prefix) == 0 and not(arg in localVariables):
+                            variablesNotDefined.append(arg)
+                            break
+            elif is_ForLoop(lineKeyword['node']):
+                for value in lineKeyword['node'].values:
+                    for prefix in prefixVariable:
+                        if value.find(prefix) == 0 and not(value in localVariables):
+                            variablesNotDefined.append(value)
+                            break
+                for keyword in lineKeyword['body']:
+                    if is_KeywordCall(keyword):
+                        for arg in keyword.args:
+                            for prefix in prefixVariable:
+                                if arg.find(prefix) == 0 and not(arg in localVariables):
+                                    variablesNotDefined.append(arg)
+                                    break
+            elif is_Keyword_tag(lineKeyword['node']):
+                if normalize(lineKeyword['node'].name) != normalize('Run Keywords'):
+                    for arg in lineKeyword['node'].args:
+                        for prefix in prefixVariable:
+                            if arg.find(prefix) == 0 and not(arg in localVariables):
+                                variablesNotDefined.append(arg)
+                                break
+                else:
+                    for keyword in lineKeyword['body']:
+                        for arg in keyword['arguments']:
+                            for prefix in prefixVariable:
+                                if arg.value.find(prefix) == 0 and not(arg.value in localVariables):
+                                    variablesNotDefined.append(arg.value)
+                                    break
+        return set(variablesNotDefined)

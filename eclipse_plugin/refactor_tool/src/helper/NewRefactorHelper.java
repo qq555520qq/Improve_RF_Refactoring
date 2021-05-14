@@ -111,4 +111,7 @@ public class NewRefactorHelper extends PythonInterpreter{
 		this.newRefactoringFacade.invoke("save_models", models);
 	}
 	
+	public PyList getVariablesNotDefinedInSteps(PyList steps) {
+		return (PyList)this.newRefactoringFacade.invoke("get_variables_not_defined_in_steps", steps);
+	}
 }

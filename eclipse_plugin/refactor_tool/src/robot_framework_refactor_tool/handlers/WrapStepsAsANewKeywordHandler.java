@@ -60,6 +60,7 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 			this.pluginHelper.showMessage("Robot_framework_refactor_tool", "Steps you choose are not found.");
 			return null;
 		}
+		newArguments = this.newRefactorHelper.getVariablesNotDefinedInSteps(steps);
 		this.modelsWithSameKeywords = this.newRefactorHelper.getSameKeywordsWithSteps(projectModels, steps);
 		pluginHelper.showMessage("Robot_framework_refactor_tool", "\"Wrap steps as a new keyword\" will start.\n\nThe following steps are the entire process.\n\nStep1: Create a new keyword.\n\nStep2: Replace the same steps with new keyword.\n\nStep3: Import new resource automatically for files that not import the new resource.");
 		CreateANewKeyword createANewKeywordDialog = new CreateANewKeyword(window.getShell(), newArguments);
