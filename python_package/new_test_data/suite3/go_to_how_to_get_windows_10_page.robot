@@ -2,16 +2,23 @@
 Library     SeleniumLibrary
 Resource    mirosoft.txt
 
+Test Setup    Run Keywords    Go To Mircosoft
+...    AND    Open Language Option
+...    AND    Select English Language
+
+*** Variables ***
+@{testVariable} =    Welcome    To    Kaohsiung
+
 *** Test Cases ***
 Go To "How To Get Windows 10" Page And Log Welcome Text
-    Go To Mircosoft
-    Open Language Option
-    Select English Language
     For Loop Keyword    8
     Go To Windows Page
     Open Windows 10 Menu
     Go To "How To Get Windows 10" Page
     How To Get Windows 10 Page Should Be Visble
+    FOR    ${var}    IN    @{testVariable}
+        Log    ${var}
+    END
     [Teardown]    Close Browser
 
 *** Keywords ***

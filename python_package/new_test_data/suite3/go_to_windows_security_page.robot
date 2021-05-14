@@ -2,16 +2,22 @@
 Library     SeleniumLibrary
 Resource    mirosoft.txt
 
+Test Setup    Run Keywords    Go To Mircosoft
+...    AND    Open Language Option
+...    AND    Select English Language
+
+*** Variables ***
+@{testVariable} =    Welcome    To    Taipei
+
 *** Test Cases ***
 Go To "Windows Security" Page And Log Welcome Text
-    Go To Mircosoft
-    Open Language Option
-    Select English Language
-    For Loop Keyword    3
     Go To Windows Page
     Open Windows 10 Menu
     Go To "Windows Security" Page
     Windows Security Page Should Be Visble
+    FOR    ${var}    IN    @{testVariable}
+        Log    ${var}
+    END
     [Teardown]    Close Browser
 
 *** Keywords ***
