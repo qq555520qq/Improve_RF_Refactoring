@@ -7,13 +7,8 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
-import org.eclipse.jface.window.Window;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.python.core.Py;
@@ -82,7 +77,7 @@ public class MoveKeywordDefinedToAnotherFileHandler extends AbstractHandler {
 			Path pathAbsolute = Paths.get(targetPath);
 	        Path pathBase = Paths.get(pathNotImport);
 	        Path pathRelative = pathBase.relativize(pathAbsolute);
-			String newResourceValue = pathRelative.toString();
+			String newResourceValue = pathRelative.toString().replace("\\", "/");
 			this.newRefactorHelper.importNewResourceForModelWithoutImporting(modelWithoutImporting, newResourceValue);
 		}
 		InputDialog getMovedKeywordPathDialog = new InputDialog(window.getShell(), "Finish moving the keyword into target file", "Success move the keyword to the target file.\n\nYou can get the path to check the moved keyword", targetPath, null){

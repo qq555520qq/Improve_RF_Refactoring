@@ -1,6 +1,6 @@
 *** Settings ***
 Resource    ezScrum.txt
-Resource    mirosoft.txt
+Resource    ./suite3/microsoft.txt
 
 *** Keywords ***
 Login And Go To SideBar Of Project

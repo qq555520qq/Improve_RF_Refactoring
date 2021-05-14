@@ -2,6 +2,11 @@
 Library    SeleniumLibrary
 
 *** Keywords ***
+Log Double Text
+    [Arguments]    ${text}
+    Log    ${text}
+    Log    ${text}    
+
 Go To Mircosoft
     Open Browser    https://www.microsoft.com/zh-tw    chrome
     Maximize Browser Window

@@ -188,7 +188,7 @@ class LineKeywordsHelper():
                                 localVariables.append(variable)
         for index, localVariable in enumerate(localVariables):
             localVariables[index] = localVariable.replace(' ','').replace('=','')
-        return set(localVariables)
+        return list(set(localVariables))
 
     def get_variables_not_defined_in_lineKeywords(self, lineKeywords, localVariables):
         variablesNotDefined = []
@@ -227,4 +227,4 @@ class LineKeywordsHelper():
                                 if arg.value.find(prefix) == 0 and not(arg.value in localVariables):
                                     variablesNotDefined.append(arg.value)
                                     break
-        return set(variablesNotDefined)
+        return list(set(variablesNotDefined))

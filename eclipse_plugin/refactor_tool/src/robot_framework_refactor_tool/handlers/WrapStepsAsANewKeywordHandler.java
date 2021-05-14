@@ -121,7 +121,7 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 				Path pathAbsolute = Paths.get(this.newKwPath);
 		        Path pathBase = Paths.get(pathNotImport);
 		        Path pathRelative = pathBase.relativize(pathAbsolute);
-				String newResourceValue = pathRelative.toString();
+				String newResourceValue = pathRelative.toString().replace("\\", "/");
 				this.newRefactorHelper.importNewResourceForModelWithoutImporting(modelWithoutImporting, newResourceValue);
 			}
 		}

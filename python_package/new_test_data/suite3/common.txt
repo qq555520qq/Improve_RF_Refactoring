@@ -1,6 +1,6 @@
 *** Settings ***
 Resource    ../ezScrum.txt
-Resource    mirosoft.txt
+Resource    microsoft.txt
 Library     SeleniumLibrary
 
 *** Keywords ***

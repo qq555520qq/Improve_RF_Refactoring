@@ -1,6 +1,6 @@
 *** Settings ***
 Library     SeleniumLibrary
-Resource    mirosoft.txt
+Resource    microsoft.txt
 
 Test Setup    Run Keywords    Go To Mircosoft
 ...    AND    Open Language Option
@@ -16,14 +16,14 @@ Go To "Windows Security" Page And Log Welcome Text
     Go To "Windows Security" Page
     Windows Security Page Should Be Visble
     FOR    ${var}    IN    @{testVariable}
-        Log    ${var}
+        Log Double Text    ${var}
     END
     [Teardown]    Close Browser
 
 *** Keywords ***
 Go To "Windows Security" Page
-    Wait Until Page Contains Element    //*[@id='c-shellmenu_62' and normalize-space()='Windows security']    timeout=5s    error="How to get windows" in menu should be visible.
-    Wait Until Element Is Visible    //*[@id='c-shellmenu_62' and normalize-space()='Windows security']    timeout=5s    error="How to get windows" in menu should be visible.
+    Wait Until Page Contains Element    //*[@id='c-shellmenu_62' and normalize-space()='Windows security']    timeout=5s    error="Windows security" in menu should be visible.
+    Wait Until Element Is Visible    //*[@id='c-shellmenu_62' and normalize-space()='Windows security']    timeout=5s    error="Windows security" in menu should be visible.
     Click Element    //*[@id='c-shellmenu_62' and normalize-space()='Windows security']
 
 Windows Security Page Should Be Visble

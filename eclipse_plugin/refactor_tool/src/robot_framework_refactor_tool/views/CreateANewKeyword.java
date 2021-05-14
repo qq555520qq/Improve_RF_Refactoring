@@ -73,8 +73,9 @@ public class CreateANewKeyword extends TitleAreaDialog {
     	argTypeColumn.setWidth(200);
     	argTypeColumn.setText("name");
     	argumentTable.setLayoutData(argumentData);
-    	for(Object newArgument : this.newArguments) {
-    		new TableItem(argumentTable, SWT.LEFT).setText(new String[] {((String)newArgument).substring(0,1), ((String)newArgument).substring(2, ((String)newArgument).length()-1)});
+    	for(int index=0; index<this.newArguments.size();index++) {
+    		this.newArguments.set(index, "$"+ ((String)this.newArguments.get(index)).substring(1));
+    		new TableItem(argumentTable, SWT.LEFT).setText(new String[] {"$", ((String)this.newArguments.get(index)).substring(2, ((String)this.newArguments.get(index)).length()-1)});
     	}
     	argumentTable.addListener(SWT.MouseDown, e->{
 			Point pt = new Point(e.x, e.y);

@@ -1,6 +1,6 @@
 *** Settings ***
 Library     SeleniumLibrary
-Resource    mirosoft.txt
+Resource    microsoft.txt
 
 Test Setup    Run Keywords    Go To Mircosoft
 ...    AND    Open Language Option
@@ -11,13 +11,12 @@ Test Setup    Run Keywords    Go To Mircosoft
 
 *** Test Cases ***
 Go To "How To Get Windows 10" Page And Log Welcome Text
-    For Loop Keyword    8
     Go To Windows Page
     Open Windows 10 Menu
     Go To "How To Get Windows 10" Page
     How To Get Windows 10 Page Should Be Visble
     FOR    ${var}    IN    @{testVariable}
-        Log    ${var}
+        Log Double Text    ${var}
     END
     [Teardown]    Close Browser
 
