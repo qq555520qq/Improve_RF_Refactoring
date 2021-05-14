@@ -35,6 +35,7 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 	private String newKwName;
 	private String newKwPath;
 	private IWorkbenchWindow window;
+	private PyList newArgumentsOfNewKeyword;
 	public WrapStepsAsANewKeywordHandler() {
 		this.newRefactorHelper = PluginHelper.getNewRefactorHelper();
 	}
@@ -47,7 +48,6 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 			pluginHelper.showMessage("Robot_framework_refactor_tool", RenameKeywordHandler.TIP_MESSAGE);
 			return null;
 		}
-		PyList newArguments = new PyList();
 		String projectPath = pluginHelper.getCurrentProjectLocation();
 		String editorLocation = pluginHelper.getCurrentEditorLocation();
 		PyList projectModels = this.newRefactorHelper.buildProjectModels(projectPath);
@@ -60,14 +60,14 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 			this.pluginHelper.showMessage("Robot_framework_refactor_tool", "Steps you choose are not found.");
 			return null;
 		}
-		newArguments = this.newRefactorHelper.getVariablesNotDefinedInSteps(steps);
+		this.newArgumentsOfNewKeyword = this.newRefactorHelper.getVariablesNotDefinedInSteps(steps);
 		this.modelsWithSameKeywords = this.newRefactorHelper.getSameKeywordsWithSteps(projectModels, steps);
 		pluginHelper.showMessage("Robot_framework_refactor_tool", "\"Wrap steps as a new keyword\" will start.\n\nThe following steps are the entire process.\n\nStep1: Create a new keyword.\n\nStep2: Replace the same steps with new keyword.\n\nStep3: Import new resource automatically for files that not import the new resource.");
-		CreateANewKeyword createANewKeywordDialog = new CreateANewKeyword(window.getShell(), newArguments);
+		CreateANewKeyword createANewKeywordDialog = new CreateANewKeyword(window.getShell(), this.newArgumentsOfNewKeyword);
 		if(createANewKeywordDialog.open()==Window.OK) {
 			PyList argumentsTokens = new PyList();
-			if(newArguments.size() != 0) {
-				argumentsTokens = this.newRefactorHelper.buildTokensOfArgumentsInNewKeyword(newArguments);
+			if(this.newArgumentsOfNewKeyword.size() != 0) {
+				argumentsTokens = this.newRefactorHelper.buildTokensOfArgumentsInNewKeyword(this.newArgumentsOfNewKeyword);
 			}
 			this.newKeywordBody = this.newRefactorHelper.getNewKeywordBodyWithStepsAndNewArguments(steps, argumentsTokens);
 			newKwName = createANewKeywordDialog.getNewKeywordName();
@@ -98,7 +98,7 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 		for (int index = 0;index < sameKeywordsBlocks.size();index++) {
 			PyList newKeywordArgs = new PyList();
 			PyList sameStepsBlock = (PyList)((SameStepsBlock)sameKeywordsBlocks.get(index)).getData();
-			AddArgumentsForKeywordReplacingSameSteps newkeywordArgsDialog = new AddArgumentsForKeywordReplacingSameSteps(window.getShell(), this.newRefactorHelper, sameStepsBlock, newKeywordArgs);
+			AddArgumentsForKeywordReplacingSameSteps newkeywordArgsDialog = new AddArgumentsForKeywordReplacingSameSteps(window.getShell(), this.newRefactorHelper, sameStepsBlock, newKeywordArgs, this.newArgumentsOfNewKeyword);
 			if(newkeywordArgsDialog.open()==Window.OK) {
 				PyObject modelWithReplacing = this.newRefactorHelper.replaceStepsWithKeywordAndGetModelsWithReplacing(newKwName, newKeywordArgs, sameStepsBlock);
 				modelsWithReplacing.add(modelWithReplacing);

@@ -36,8 +36,10 @@ public class AddArgumentsForKeywordReplacingSameSteps extends TitleAreaDialog {
 	private Label previewLabel;
 	private PyList newArguments;
 	private PyList sameStepsBlock;
-	public AddArgumentsForKeywordReplacingSameSteps(Shell parentShell, NewRefactorHelper helper, PyList sameStepsBlock, PyList arguments) {
+	private PyList argumentsOfReplacedKeyword;
+	public AddArgumentsForKeywordReplacingSameSteps(Shell parentShell, NewRefactorHelper helper, PyList sameStepsBlock, PyList arguments, PyList argumentsOfReplacedKeyword) {
 		super(parentShell);
+		this.argumentsOfReplacedKeyword = argumentsOfReplacedKeyword;
 		this.newArguments = arguments;
 		this.helper = helper;
 		this.sameStepsBlock = sameStepsBlock;
@@ -116,6 +118,9 @@ public class AddArgumentsForKeywordReplacingSameSteps extends TitleAreaDialog {
 		Composite buttons = new Composite(container, SWT.None);
     	buttons.setLayout(new RowLayout(SWT.None));
     	Button addArgument = new Button(buttons, SWT.LEFT);
+    	if(argumentsOfReplacedKeyword.size() == 0) {
+			addArgument.setEnabled(false);
+		}
     	addArgument.setSize(200, 200);
     	addArgument.setText("Add");
     	addArgument.addMouseListener(new MouseListener() {
@@ -131,6 +136,9 @@ public class AddArgumentsForKeywordReplacingSameSteps extends TitleAreaDialog {
 				String newArgument = "argument"+String.valueOf(argumentLength+1);
 				new TableItem(argumentTable, SWT.LEFT).setText(new String[] {newArgument});
 				newArguments.append(Py.newStringOrUnicode(newArgument));
+				if(newArguments.size() == argumentsOfReplacedKeyword.size()) {
+					addArgument.setEnabled(false);
+				}
 			}
 			
 			@Override
@@ -142,6 +150,9 @@ public class AddArgumentsForKeywordReplacingSameSteps extends TitleAreaDialog {
     	Button removeArgument = new Button(buttons, SWT.LEFT);
     	removeArgument.setSize(200, 200);
     	removeArgument.setText("Remove");
+    	if(argumentsOfReplacedKeyword.size() == 0) {
+			addArgument.setEnabled(false);
+		}
     	removeArgument.addMouseListener(new MouseListener() {
 			
 			@Override
@@ -156,6 +167,9 @@ public class AddArgumentsForKeywordReplacingSameSteps extends TitleAreaDialog {
 					String argumentToRemove = selectedArgument.getText(0);
 					newArguments.remove(Py.newStringOrUnicode(argumentToRemove));
 					argumentTable.remove(argumentTable.indexOf(selectedArgument));
+					if(newArguments.size() != argumentsOfReplacedKeyword.size()) {
+						addArgument.setEnabled(true);
+					}
 				}
 			}
 			
