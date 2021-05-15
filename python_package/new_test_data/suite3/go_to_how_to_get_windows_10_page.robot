@@ -25,7 +25,9 @@ Go To "How To Get Windows 10" Page
     Wait Until Page Contains Element    //*[@id='c-shellmenu_55' and normalize-space()='How to get Windows 10']    timeout=5s    error="How to get windows" in menu should be visible.
     Wait Until Element Is Visible    //*[@id='c-shellmenu_55' and normalize-space()='How to get Windows 10']    timeout=5s    error="How to get windows" in menu should be visible.
     Click Element    //*[@id='c-shellmenu_55' and normalize-space()='How to get Windows 10']
+    Sleep    1s
 
 How To Get Windows 10 Page Should Be Visble
     Wait Until Page Contains Element    //*[normalize-space()='Want to get Windows 10?']    timeout=5s    error="How To Get Windows 10" Page Should Be Visible.
     Wait Until Element Is Visible    //*[normalize-space()='Want to get Windows 10?']    timeout=5s    error="How To Get Windows 10" Page Should Be Visible.
+    Sleep    1s
