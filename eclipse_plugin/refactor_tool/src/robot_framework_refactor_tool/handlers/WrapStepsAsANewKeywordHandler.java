@@ -131,19 +131,17 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 		}
 		InputDialog getNewKeywordPathDialog = new InputDialog(window.getShell(), "Finish wrapping steps as a new keyword", "Success wrap steps as a new keyword.\n\nYou can get the path to check the new keyword.\n\n Do you want to run the test case that you refactor?", newKwPath, null);
 		if(getNewKeywordPathDialog.open() == Window.OK) {
-			ProcessBuilder processBuilder = new ProcessBuilder("robot", editorLocation);
+			String[] commands = {"robot", "-d", "reportByrfRefactoring", editorLocation};
+			ProcessBuilder processBuilder = new ProcessBuilder(commands);
 			try {
 				Process process = processBuilder.start();
 				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-				String line;
-				String result = ""; 
+				String line; 
 				while ((line = reader.readLine()) != null) {
-//					if(line.contains("PASS")) {
-//					}
-					result += line;
+					System.out.print(line);
 				}
-				this.pluginHelper.showMessage("Finish wrapping steps as a new keyword", result);
 			}catch (Exception e) {
+				e.printStackTrace();
 				// TODO: handle exception
 			}
 		}
