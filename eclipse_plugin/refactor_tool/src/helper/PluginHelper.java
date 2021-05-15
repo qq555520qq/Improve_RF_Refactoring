@@ -1,5 +1,9 @@
 package helper;
 
+import java.awt.Desktop;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
 import java.util.Properties;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -139,6 +143,40 @@ public class PluginHelper {
 			e.printStackTrace();
 		}
 		return view;
+	}
+	
+	public void openFile(String location) {
+		try {
+			File file = new File(location);
+			if(!Desktop.isDesktopSupported()) {
+				System.out.println("not supported");
+			}
+			else if(file.exists()) {
+				Desktop desktop = Desktop.getDesktop();
+				desktop.open(file);  
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void runTestCaseAndOpenReport(String testCasePath) {
+		String[] commands = {"robot", "-d", "outByrfrefactoring", testCasePath};
+		ProcessBuilder runTheTest = new ProcessBuilder(commands);
+		try {
+			Process process = runTheTest.start();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				if(line.indexOf("log.html") != -1) {
+					String outLocation = line.replace("Log:     ", "");
+					this.openFile(outLocation);
+					break;
+				}
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
