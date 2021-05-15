@@ -4,10 +4,8 @@ package robot_framework_refactor_tool.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.python.core.PyList;
@@ -23,8 +21,6 @@ import robot_framework_refactor_tool.views.NodeBuilder;
 import robot_framework_refactor_tool.views.SameKeywordsSelectionView;
 import robot_framework_refactor_tool.views.SameStepsBlock;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -130,20 +126,8 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 			}
 		}
 		InputDialog getNewKeywordPathDialog = new InputDialog(window.getShell(), "Finish wrapping steps as a new keyword", "Success wrap steps as a new keyword.\n\nYou can get the path to check the new keyword.\n\n Do you want to run the test case that you refactor?", newKwPath, null);
-		if(getNewKeywordPathDialog.open() == Window.OK) {
-			String[] commands = {"robot", "-d", "reportByrfRefactoring", editorLocation};
-			ProcessBuilder processBuilder = new ProcessBuilder(commands);
-			try {
-				Process process = processBuilder.start();
-				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-				String line; 
-				while ((line = reader.readLine()) != null) {
-					System.out.print(line);
-				}
-			}catch (Exception e) {
-				e.printStackTrace();
-				// TODO: handle exception
-			}
+		if(getNewKeywordPathDialog.open() == Window.OK & editorLocation.indexOf(".robot") != -1) {
+			this.pluginHelper.runTestCaseAndOpenReport(editorLocation);
 		}
 		return null;
 	}
