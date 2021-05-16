@@ -77,11 +77,16 @@ class KeywordMoveHelper(ast.NodeTransformer):
                     allModels.remove(model)
             return allModels
 
-    def get_models_without_import_new_resource(self, movedKeywordName, oldImportedResourcePath, newImportedResourcePath):
-        oldImportedResourceName = get_file_name_from_path(oldImportedResourcePath)
-        self.checker.visit_models_to_check_keyword_and_resource(self.modelsInDir, movedKeywordName, oldImportedResourceName)
+    def get_models_using_keyword(self, pathOfKeywordDefined, keywordName):
+        fileNameKeywordDefined = get_file_name_from_path(pathOfKeywordDefined)
+        self.checker.visit_models_to_check_keyword_and_resource(self.modelsInDir, keywordName, fileNameKeywordDefined)
         modelsUsingKeyword = self.checker.get_models_with_resource_and_keyword()
         self.checker.clear_models_with_resource_and_keyword()
+        return modelsUsingKeyword
+
+
+    def get_models_without_import_new_resource(self, movedKeywordName, oldImportedResourcePath, newImportedResourcePath):
+        modelsUsingKeyword = self.get_models_using_keyword(oldImportedResourcePath, movedKeywordName)
 
         newImportedResourceName = get_file_name_from_path(newImportedResourcePath)
         self.checker.visit_models_to_check_keyword_and_resource(modelsUsingKeyword, movedKeywordName, newImportedResourceName)

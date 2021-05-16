@@ -2,7 +2,6 @@ package helper;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 import org.python.core.Py;
 import org.python.core.PyList;
@@ -10,7 +9,6 @@ import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.util.PythonInterpreter;
 
-import robot_framework_refactor_tool.views.Node;
 
 public class NewRefactorHelper extends PythonInterpreter{
 	private PyObject newRefactoringFacade;
@@ -91,8 +89,12 @@ public class NewRefactorHelper extends PythonInterpreter{
 		this.newRefactoringFacade.invoke("insert_defined_keyword", model, keywordNode);
 	}
 
+	public PyList getModelsUsingKeyword(String pathOfKeywordDefined, String keywordName) {
+		return (PyList)this.newRefactoringFacade.invoke("get_models_using_keyword", new PyObject[] {Py.newStringOrUnicode(processPath(pathOfKeywordDefined)), Py.newStringOrUnicode(keywordName)});
+	}
+	
 	public PyList getModelsWithoutImportTargetResource(String movedKeywordName, String fromFilePath, String targetFilePath) {
-		return (PyList) this.newRefactoringFacade.invoke("get_models_without_import_target_resource", new PyObject[]{Py.newStringOrUnicode(movedKeywordName), Py.newStringOrUnicode(fromFilePath), Py.newStringOrUnicode(targetFilePath)});
+		return (PyList) this.newRefactoringFacade.invoke("get_models_without_import_target_resource", new PyObject[] {Py.newStringOrUnicode(movedKeywordName), Py.newStringOrUnicode(fromFilePath), Py.newStringOrUnicode(targetFilePath)});
 	}
 
 	public void saveModels(PyList models) {

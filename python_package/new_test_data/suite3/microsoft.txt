@@ -7,7 +7,7 @@ Log Double Text
     Log    ${text}
     Log    ${text}
 
-Go To Mircosoft
+Go To Microsoft
     Open Browser    https://www.microsoft.com/zh-tw    chrome
     Maximize Browser Window
     Sleep    1s

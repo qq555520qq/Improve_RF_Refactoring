@@ -148,7 +148,7 @@ class FileChecker(ast.NodeVisitor):
             keywordCalled = normalize(node.name)
             if(keywordCalled == normalize('Run Keywords')):
                 for keywordToken in node.get_tokens(Token.ARGUMENT):
-                    if(keywordCalled == self.checkedKeyword):
+                    if(normalize(keywordToken.value) == self.checkedKeyword):
                         self.isKeywordCalled = True
                         break
             else:

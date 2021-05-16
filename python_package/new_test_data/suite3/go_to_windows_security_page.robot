@@ -2,7 +2,7 @@
 Library     SeleniumLibrary
 Resource    microsoft.txt
 
-Test Setup    Run Keywords    Go To Mircosoft
+Test Setup    Run Keywords    Go To Microsoft
 ...    AND    Open Language Option
 ...    AND    Select English Language
 

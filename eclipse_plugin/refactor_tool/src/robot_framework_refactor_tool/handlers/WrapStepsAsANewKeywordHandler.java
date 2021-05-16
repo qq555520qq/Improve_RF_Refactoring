@@ -23,6 +23,8 @@ import robot_framework_refactor_tool.views.SameStepsBlock;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 	
@@ -127,7 +129,9 @@ public class WrapStepsAsANewKeywordHandler extends AbstractHandler {
 		}
 		InputDialog getNewKeywordPathDialog = new InputDialog(window.getShell(), "Finish wrapping steps as a new keyword", "Success wrap steps as a new keyword.\n\nYou can get the path to check the new keyword.\n\n Do you want to run the test case that you refactor?", newKwPath, null);
 		if(getNewKeywordPathDialog.open() == Window.OK & editorLocation.indexOf(".robot") != -1) {
-			this.pluginHelper.runTestCaseAndOpenReport(editorLocation);
+			List<String> paths = new ArrayList<>();
+			paths.add(editorLocation);
+			this.pluginHelper.runTestCasesAndOpenReport(paths);
 		}
 		return null;
 	}

@@ -4,6 +4,8 @@ import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -160,8 +162,14 @@ public class PluginHelper {
 		}
 	}
 
-	public void runTestCaseAndOpenReport(String testCasePath) {
-		String[] commands = {"robot", "-d", "outByrfrefactoring", testCasePath};
+	public void runTestCasesAndOpenReport(List<String> testCasesPath) {
+		List<String> commands = new ArrayList<>();
+		commands.add("robot");
+		commands.add("-d");
+		commands.add("outByrfrefactoring");
+		for(String testCasePath : testCasesPath) {
+			commands.add(testCasePath);
+		}
 		ProcessBuilder runTheTest = new ProcessBuilder(commands);
 		try {
 			Process process = runTheTest.start();

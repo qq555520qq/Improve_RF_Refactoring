@@ -63,9 +63,12 @@ class NewRefactoringFacade:
     def insert_defined_keyword(self, model, keywordNode):
         self.creator.mover.insert_new_keyword_defined(model, keywordNode)
 
+    def get_models_using_keyword(self, pathOfKeywordDefined, keywordName):
+        return self.creator.mover.get_models_using_keyword(pathOfKeywordDefined, keywordName)
+
     def get_models_without_import_target_resource(self, movedKeywordName, fromFilePath, targetFilePath):
         return self.creator.mover.get_models_without_import_new_resource(movedKeywordName, fromFilePath, targetFilePath)
-    
+
     def save_models(self, models):
         recovery_models(models)
 

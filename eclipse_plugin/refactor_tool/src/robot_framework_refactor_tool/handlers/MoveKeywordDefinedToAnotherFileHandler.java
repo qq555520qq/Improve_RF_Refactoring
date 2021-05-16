@@ -2,13 +2,14 @@ package robot_framework_refactor_tool.handlers;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.InputDialog;
-import org.eclipse.swt.widgets.Button;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.python.core.Py;
@@ -66,6 +67,7 @@ public class MoveKeywordDefinedToAnotherFileHandler extends AbstractHandler {
 		PyObject targetModel = this.newRefactorHelper.buildFileModel(targetPath);
 		this.newRefactorHelper.removeDefinedKeyword(this.fromModel, this.movedKeyword);
 		this.newRefactorHelper.insertDefinedKeyword(targetModel, this.movedKeyword);
+		PyList modelsUsingMovedKeyword = this.newRefactorHelper.getModelsUsingKeyword(this.editorLocation, this.movedkwName);
 		PyList modelsWithoutImporting = this.newRefactorHelper.getModelsWithoutImportTargetResource(this.movedkwName, this.editorLocation, targetPath);
 		if(modelsWithoutImporting.size() > 0) {
 			this.pluginHelper.showMessage("Step2: Import new resource automatically for files that not import the new resource", "Number of files that not import the new resource is " + modelsWithoutImporting.size() + ".\n\nThe system has imported for it(them).");
@@ -80,14 +82,15 @@ public class MoveKeywordDefinedToAnotherFileHandler extends AbstractHandler {
 			String newResourceValue = pathRelative.toString().replace("\\", "/");
 			this.newRefactorHelper.importNewResourceForModelWithoutImporting(modelWithoutImporting, newResourceValue);
 		}
-		InputDialog getMovedKeywordPathDialog = new InputDialog(window.getShell(), "Finish moving the keyword into target file", "Success move the keyword to the target file.\n\nYou can get the path to check the moved keyword", targetPath, null){
-			  @Override
-			  public void create() {
-				super.create();
-		        Button cancelButton= getButton(IDialogConstants.CANCEL_ID);
-		    	cancelButton.setVisible(false);
-			  }
-		};
-		getMovedKeywordPathDialog.open();
+		List<String> pathOfFilesCanRun = new ArrayList<>();
+		for(Object model : modelsUsingMovedKeyword) {
+			if(((PyObject)model).__getattr__("source").toString().indexOf(".robot") != -1) {
+				pathOfFilesCanRun.add(((PyObject)model).__getattr__("source").toString());
+			}
+		}
+		InputDialog finishMovingDialog = new InputDialog(window.getShell(), "Finish moving the keyword into target file", "Success move the keyword to the target file.\n\nNumber of relative test cases is " + pathOfFilesCanRun.size() + ".\n\nDo you want to run the test cases?\n\nYou can get the path to check the moved keyword.", targetPath, null);
+		if(finishMovingDialog.open() == Window.OK) {
+			this.pluginHelper.runTestCasesAndOpenReport(pathOfFilesCanRun);			
+		}
 	}
 }
