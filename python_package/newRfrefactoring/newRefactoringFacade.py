@@ -65,16 +65,6 @@ class NewRefactoringFacade:
 
     def get_models_without_import_target_resource(self, movedKeywordName, fromFilePath, targetFilePath):
         return self.creator.mover.get_models_without_import_new_resource(movedKeywordName, fromFilePath, targetFilePath)
-
-    def get_step_from_steps_by_line(self, steps, line):
-        return self.lineKwsHelper.get_line_keyword_from_line_keywords(steps, line)
-
-    def get_arguments_from_step(self, step):
-        return self.lineKwsHelper.get_arguments_for_line_keyword(step)
-
-    def update_arguments_of_step(self, steps, step, argsOfStep, updatedArgIndex, newArg):
-        updatedData = {'lineKeyword': step, 'updateArg': argsOfStep[int(updatedArgIndex)], 'newArg': newArg}
-        self.lineKwsHelper.update_arguments_of_line_keyword(steps, updatedData)
     
     def save_models(self, models):
         recovery_models(models)

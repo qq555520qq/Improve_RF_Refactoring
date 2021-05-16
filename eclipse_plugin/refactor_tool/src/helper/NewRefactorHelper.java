@@ -95,22 +95,10 @@ public class NewRefactorHelper extends PythonInterpreter{
 		return (PyList) this.newRefactoringFacade.invoke("get_models_without_import_target_resource", new PyObject[]{Py.newStringOrUnicode(movedKeywordName), Py.newStringOrUnicode(fromFilePath), Py.newStringOrUnicode(targetFilePath)});
 	}
 
-	public PyObject getStepFromStepsByLine(PyList steps, int line) {
-		return this.newRefactoringFacade.invoke("get_step_from_steps_by_line", steps, Py.newInteger(line));
-	}
-
-	public PyList getArgumentsFromStep(PyObject step) {
-		return (PyList)this.newRefactoringFacade.invoke("get_arguments_from_step", step);
-	}
-
-	public void updateArgumentsOfStep(PyList steps, PyObject step, PyList argsOfStep, String updatedArgIndex, String newArg) {
-		this.newRefactoringFacade.invoke("update_arguments_of_step", new PyObject[] {steps, step, argsOfStep, Py.newStringOrUnicode(updatedArgIndex), Py.newStringOrUnicode(newArg)});
-	}
-
 	public void saveModels(PyList models) {
 		this.newRefactoringFacade.invoke("save_models", models);
 	}
-	
+
 	public PyList getVariablesNotDefinedInSteps(PyList steps) {
 		return (PyList)this.newRefactoringFacade.invoke("get_variables_not_defined_in_steps", steps);
 	}
