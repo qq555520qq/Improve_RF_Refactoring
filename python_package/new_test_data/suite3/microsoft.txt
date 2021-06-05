@@ -10,19 +10,19 @@ Log Double Text
 Go To Microsoft
     Open Browser    https://www.microsoft.com/zh-tw    chrome
     Maximize Browser Window
-    Sleep    1s
+    Sleep    2s
 
 Open Language Option
     Wait Until Page Contains Element    id:locale-picker-link    timeout=5s    error=Language option should be visible.
     Wait Until Element Is Visible    id:locale-picker-link    timeout=5s    error=Language option should be visible.
     Click Element    id:locale-picker-link
-    Sleep    1s
+    Sleep    2s
 
 Select English Language
     Wait Until Page Contains Element    //*[@id='l26']//*[normalize-space()='Gulf - English']    timeout=5s    error=English option should be visible.
     Wait Until Element Is Visible    //*[@id='l26']//*[normalize-space()='Gulf - English']    timeout=5s    error=English option should be visible.
     Click Element    //*[@id='l26']//*[normalize-space()='Gulf - English']
-    Sleep    1s
+    Sleep    2s
 
 Go To Windows Page
     Wait Until Page Contains Element    id:shellmenu_2    timeout=5s    error=Windows tab should be visible.
@@ -35,6 +35,7 @@ Go To Windows Page
 Open Windows 10 Menu
     Wait Until Page Contains Element    id:c-shellmenu_54    timeout=5s    error=Windows 10 tab should be visible.
     Wait Until Element Is Visible    id:c-shellmenu_54    timeout=5s    error=Windows 10 tab should be visible.
+    Mouse Over    id:c-shellmenu_54
     Click Element    id:c-shellmenu_54
     Wait Until Page Contains Element    //*[@id='c-shellmenu_55' and normalize-space()='How to get Windows 10']    timeout=5s    error="How to get windows" in menu should be visible.
     Wait Until Element Is Visible    //*[@id='c-shellmenu_55' and normalize-space()='How to get Windows 10']    timeout=5s    error="How to get windows" in menu should be visible.
