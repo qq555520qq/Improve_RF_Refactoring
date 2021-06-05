@@ -1,6 +1,7 @@
 *** Settings ***
 Library     SeleniumLibrary
-Resource    microsoft.txt
+Resource    ../../microsoft.txt
+Resource    ../../common.txt
 
 Test Setup    Run Keywords    Go To Microsoft
 ...    AND    Open Language Option
@@ -18,6 +19,7 @@ Go To "Remote resources & tips" Page And Log Welcome Text
     FOR    ${var}    IN    @{welcomeTaichung}
         Log Double Text    ${var}
     END
+    Log Triple Text    Welcome to Taichung very much
     [Teardown]    Close Browser
 
 *** Keywords ***

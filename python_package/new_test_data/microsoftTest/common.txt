@@ -1,0 +1,9 @@
+*** Settings ***
+Library    SeleniumLibrary
+
+*** Keywords ***
+Log Triple Text
+    [Arguments]    ${text}
+    Log    ${text}
+    Log    ${text}
+    Log    ${text}

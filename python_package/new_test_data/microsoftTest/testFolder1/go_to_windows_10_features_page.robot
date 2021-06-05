@@ -1,6 +1,6 @@
 *** Settings ***
 Library     SeleniumLibrary
-Resource    microsoft.txt
+Resource    ../microsoft.txt
 
 Test Setup    Run Keywords    Go To Microsoft
 ...    AND    Open Language Option
