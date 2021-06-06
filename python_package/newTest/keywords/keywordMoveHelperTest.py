@@ -27,7 +27,7 @@ class KeywordMoveHelperTest(unittest.TestCase):
         self.checker.visit_models_to_check_keyword_and_resource(allModels, 'Login EzScrum', 'testResource.txt')
         modelsUsingKeyword = self.checker.get_models_with_resource_and_keyword()
 
-        self.assertEqual(len(modelsUsingKeyword), 10)
+        self.assertEqual(len(modelsUsingKeyword), 9)
 
         recovery_models(self.teardownModels)
 

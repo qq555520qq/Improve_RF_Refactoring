@@ -41,7 +41,7 @@ class KeywordRenamerTest(unittest.TestCase):
         keywordCalls = self.finder.get_keyword_calls()
         keywordDefs = self.finder.get_keyword_defs()
 
-        self.assertEqual(len(keywordCalls), 9)
+        self.assertEqual(len(keywordCalls), 8)
         self.assertEqual(len(keywordDefs), 7)
         self.finder.clear_keyword_calls()
         self.finder.clear_keyword_defs()
@@ -53,7 +53,7 @@ class KeywordRenamerTest(unittest.TestCase):
         keywordCalls = self.finder.get_keyword_calls()
         keywordDefs = self.finder.get_keyword_defs()
 
-        self.assertEqual(len(keywordCalls), 9)
+        self.assertEqual(len(keywordCalls), 8)
         self.assertEqual(len(keywordDefs), 7)
 
         self.renamer.rename_keyword_for_nodes('Click SideBar', keywordDefs, keywordCalls)

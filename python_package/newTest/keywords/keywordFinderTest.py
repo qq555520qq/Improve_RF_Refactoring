@@ -28,7 +28,7 @@ class KeywordFinderTest(unittest.TestCase):
         keywordCalls = self.finder.get_keyword_calls()
         keywordDefs = self.finder.get_keyword_defs()
 
-        self.assertEqual(len(keywordCalls), 9)
+        self.assertEqual(len(keywordCalls), 8)
         self.assertEqual(len(keywordDefs), 7)
 
     def test_find_keyword_by_lines_for_all_loops(self):
