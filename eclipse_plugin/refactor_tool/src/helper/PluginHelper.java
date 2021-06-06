@@ -164,11 +164,13 @@ public class PluginHelper {
 
 	public void runTestCasesAndOpenReport(List<String> testCasesPath) {
 		List<String> commands = new ArrayList<>();
+		commands.add("python");
+		commands.add("-m");
 		commands.add("robot");
 		commands.add("-d");
 		commands.add("outByrfrefactoring");
 		for(String testCasePath : testCasesPath) {
-			commands.add(testCasePath);
+			commands.add("\"" + testCasePath + "\"");
 		}
 		ProcessBuilder runTheTest = new ProcessBuilder(commands);
 		try {
