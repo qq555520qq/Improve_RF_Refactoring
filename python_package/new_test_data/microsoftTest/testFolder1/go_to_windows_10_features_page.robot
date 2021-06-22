@@ -14,7 +14,7 @@ Go To "Windows 10 features" Page And Log Welcome Text
     Go To Windows Page
     Open Windows 10 Menu
     Go To "Windows 10 features" Page
-    "Windows 10 features" Page Should Be Visble
+    "Windows 10 features" Page Should Be Visible
     FOR    ${var}    IN    @{welcomeTainan}
         Log Double Text    ${var}
     END
@@ -27,7 +27,7 @@ Go To "Windows 10 features" Page
     Click Element    //*[@id='c-shellmenu_60' and normalize-space()='Windows 10 features']
     Sleep    2s
 
-"Windows 10 features" Page Should Be Visble
+"Windows 10 features" Page Should Be Visible
     Wait Until Page Contains Element    //*[normalize-space()='Do great things with Windows']    timeout=5s    error="Windows 10 features" Page Should Be Visible.
     Wait Until Element Is Visible    //*[normalize-space()='Do great things with Windows']    timeout=5s    error="Windows 10 features" Page Should Be Visible.
     Sleep    2s

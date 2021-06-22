@@ -15,7 +15,7 @@ Go To "Remote resources & tips" Page And Log Welcome Text
     Go To Windows Page
     Open Windows 10 Menu
     Go To "Remote resources & tips" Page
-    "Remote resources & tips" Page Should Be Visble
+    "Remote resources & tips" Page Should Be Visible
     FOR    ${var}    IN    @{welcomeTaichung}
         Log Double Text    ${var}
     END
@@ -29,7 +29,7 @@ Go To "Remote resources & tips" Page
     Click Element    //*[@id='c-shellmenu_58' and normalize-space()='Remote resources & tips']
     Sleep    2s
 
-"Remote resources & tips" Page Should Be Visble
+"Remote resources & tips" Page Should Be Visible
     Wait Until Page Contains Element    //*[normalize-space()='Tips and ideas to stay productive and connected at home']    timeout=5s    error="Remote resources & tips" Page Should Be Visible.
     Wait Until Element Is Visible    //*[normalize-space()='Tips and ideas to stay productive and connected at home']    timeout=5s    error="Remote resources & tips" Page Should Be Visible.
     Sleep    2s

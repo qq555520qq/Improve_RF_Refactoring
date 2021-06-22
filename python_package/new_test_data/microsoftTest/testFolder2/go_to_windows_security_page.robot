@@ -14,7 +14,7 @@ Go To "Windows Security" Page And Log Welcome Text
     Go To Windows Page
     Open Windows 10 Menu
     Go To "Windows Security" Page
-    "Windows Security" Page Should Be Visble
+    "Windows Security" Page Should Be Visible
     FOR    ${var}    IN    @{welcomeTaipei}
         Log Double Text    ${var}
     END
@@ -27,7 +27,7 @@ Go To "Windows Security" Page
     Click Element    //*[@id='c-shellmenu_62' and normalize-space()='Windows security']
     Sleep    2s
 
-"Windows Security" Page Should Be Visble
+"Windows Security" Page Should Be Visible
     Wait Until Page Contains Element    //*[normalize-space()='Protect your data and devices with Windows Security']    timeout=5s    error="Windows Security" Page Should Be Visible.
     Wait Until Element Is Visible    //*[normalize-space()='Protect your data and devices with Windows Security']    timeout=5s    error="Windows Security" Page Should Be Visible.
     Sleep    2s

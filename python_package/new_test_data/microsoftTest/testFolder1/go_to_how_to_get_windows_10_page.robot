@@ -14,7 +14,7 @@ Go To "How To Get Windows 10" Page And Log Welcome Text
     Go To Windows Page
     Open Windows 10 Menu
     Go To "How To Get Windows 10" Page
-    "How To Get Windows 10" Page Should Be Visble
+    "How To Get Windows 10" Page Should Be Visible
     FOR    ${var}    IN    @{welcomeKaohsiung}
         Log Double Text    ${var}
     END
@@ -27,7 +27,7 @@ Go To "How To Get Windows 10" Page
     Click Element    //*[@id='c-shellmenu_55' and normalize-space()='How to get Windows 10']
     Sleep    2s
 
-"How To Get Windows 10" Page Should Be Visble
+"How To Get Windows 10" Page Should Be Visible
     Wait Until Page Contains Element    //*[normalize-space()='Want to get Windows 10?']    timeout=5s    error="How To Get Windows 10" Page Should Be Visible.
     Wait Until Element Is Visible    //*[normalize-space()='Want to get Windows 10?']    timeout=5s    error="How To Get Windows 10" Page Should Be Visible.
     Sleep    2s
